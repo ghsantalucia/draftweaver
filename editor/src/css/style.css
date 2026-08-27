@@ -1,0 +1,805 @@
+/* ==========================================================================
+   1. RESET, TEMAS & ESTRUTURA GLOBAL (CSS Variables)
+   ========================================================================== */
+
+/* Tema Claro (Padrão) */
+:root {
+  /* Cores de Fundo Base */
+  --bg-app: #f4f5f7;
+  --bg-header: #1e1e2f;
+  --bg-sidebar: #1e1e2f;
+  --bg-editor: #ffffff;
+
+  /* Cores de Texto */
+  --text-header: #8b949e;
+  --text-sidebar: #ffffff;
+  --text-editor: #2f3640;
+  --text-muted: #888888;
+  --text-folder: #70a1ff;
+  --text-file: #dcdde1;
+  --text-file-active: #ffffff;
+
+  /* Botões e Ações */
+  --btn-primary-bg: #4a69bd;
+  --btn-success-bg: #2ed573;
+  --btn-disabled-bg: #a4b0be;
+  --file-hover-bg: #2f3640;
+  --file-active-bg: #4a69bd;
+
+  /* Componentes (Switches, Toasts, Cards) */
+  --toggle-bg: #243154;
+  --slider-bg: #485460;
+  --card-overlay-bg: #243154;
+  --no-file-overlay-bg: rgba(255, 255, 255, 0.72);
+  --overlay-backdrop: rgba(30, 30, 47, 0.65);
+
+  /* Scrollbars */
+  --scrollbar-thumb: rgba(74, 109, 167, 0.4);
+  --scrollbar-thumb-hover: rgba(74, 109, 167, 0.7);
+}
+
+/* Modo Escuro Completo */
+body.dark-theme {
+  /* Cores de Fundo Base */
+  --bg-app: #12131a;
+  --bg-header: #181926;
+  --bg-sidebar: #181926;
+  --bg-editor: #1e1e2e;
+  
+  /* Cores de Texto */
+  --text-header: #a6adc8;
+  --text-sidebar: #cdd6f4;
+  --text-editor: #cdd6f4;
+  --text-muted: #6c7086;
+  --text-folder: #89b4fa;
+  --text-file: #bac2de;
+  --text-file-active: #ffffff;
+  
+  /* Botões e Ações */
+  /* --btn-primary-bg: #585b70; */
+  --btn-success-bg: #a6e3a1;
+  --btn-disabled-bg: #45475a;
+  --file-hover-bg: #313244;
+  --file-active-bg: #45475a;
+  
+  /* Componentes (Switches, Toasts, Cards) */
+  --toggle-bg: #24253b;
+  --slider-bg: #585b70;
+  --card-overlay-bg: #181926;
+  --no-file-overlay-bg: rgba(30, 30, 46, 0.92);
+  --overlay-backdrop: rgba(18, 19, 26, 0.8);
+  
+  /* Scrollbars */
+  --scrollbar-thumb: rgba(137, 180, 250, 0.3);
+  --scrollbar-thumb-hover: rgba(137, 180, 250, 0.6);
+}
+
+/* Customização da Scrollbar do Editor no Modo Escuro */
+/* Força a estilização de QUALQUER scrollbar dentro do editor no tema escuro */
+body.dark-theme .toastui-editor-defaultUI *::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+body.dark-theme .toastui-editor-defaultUI *::-webkit-scrollbar-track {
+  background: var(--bg-editor) !important;
+}
+
+body.dark-theme .toastui-editor-defaultUI *::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb) !important;
+  border-radius: 4px !important;
+}
+
+body.dark-theme .toastui-editor-defaultUI *::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover) !important;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body,
+html {
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--bg-app);
+  display: flex;
+  flex-direction: column;
+  /* Cabeçalho no topo, App em baixo */
+}
+
+.app-container {
+  display: flex;
+  flex-direction: row;
+  /* Sidebar na esquerda, Editor na direita */
+  flex-grow: 1;
+  /* Preenche a altura restante sem vazar 25px */
+  min-height: 0;
+  /* OBRIGATÓRIO: Impede que o conteúdo interno force o scroll da tela */
+  overflow: hidden;
+}
+
+/* Bloqueia a seleção de texto em toda a aplicação */
+body,
+html,
+.sidebar,
+.sidebar * {
+  user-select: none;
+  -webkit-user-select: none;
+  /* Necessário para Electron / Chromium */
+}
+
+/* Libera a seleção de texto APENAS na área de escrita do Editor */
+.editor-area #markdown-editor,
+.editor-area .toastui-editor-defaultUI,
+.editor-area .toastui-editor-contents {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* ==========================================================================
+   CABEÇALHO DA JANELA CUSTOMIZADO
+   ========================================================================== */
+
+#window-header {
+  width: 100%;
+  height: 30px;
+  min-height: 30px;
+  /* Evita que o flexbox encolha o cabeçalho */
+  background-color: var(--bg-header);
+  /* Fundo escuro combinando com a sidebar */
+  color: #8b949e;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  font-size: 0.75rem;
+  -webkit-app-region: drag;
+  /* Permite arrastar a janela clicando no cabeçalho */
+  user-select: none;
+}
+
+/* Garante que elementos clicáveis no cabeçalho recebam cliques */
+#window-header select,
+#window-header button,
+#window-header input,
+#window-header a {
+  -webkit-app-region: no-drag;
+}
+
+#icon img {
+  width: 25px;
+  height: 25px;
+  margin-top: 10px;
+  /* margin-left: 10px; */
+}
+
+/* ==========================================================================
+   2. COMPONENTES REUTILIZÁVEIS (Botões, Swaps/Toggles, Toasts)
+   ========================================================================== */
+
+/* Botões */
+.btn-primary,
+.btn-success {
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-primary {
+  background: var(--btn-primary-bg);
+  color: white;
+  width: 100%;
+}
+
+.btn-success {
+  background: #2ed573;
+  color: white;
+}
+
+.btn-success:disabled,
+#btn-save:disabled {
+  background: #76818d;
+  color: rgb(188, 188, 188);
+  cursor: not-allowed;
+}
+
+#btn-save {
+  background-color: var(--btn-primary-bg);
+  color: white;
+  padding: 10px 17px;
+}
+
+/* Toggle Switch (Chave Deslizante) */
+.toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 0.8rem;
+  background-color: var(--toggle-bg);
+  padding: 10px 20px;
+  border-radius: 20px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #485460;
+  transition: 0.3s;
+  border-radius: 20px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+input:checked+.slider {
+  background-color: var(--btn-primary-bg);
+}
+
+input:checked+.slider:before {
+  transform: translateX(20px);
+}
+
+/* Notificação Toast */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  color: var(--bg-editor);
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 1000;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast.hidden {
+  opacity: 0;
+  transform: translateY(20px);
+  pointer-events: none;
+}
+
+.toast.success {
+  background-color: #5d9f60e3;
+  border-left: 4px solid #4caf50;
+}
+
+.toast.error {
+  background-color: #b84545db;
+  border-left: 4px solid #ef5350;
+}
+
+
+/* ==========================================================================
+   3. SIDEBAR (Estrutura lateral)
+   ========================================================================== */
+
+.sidebar {
+  width: 400px;
+  min-width: 400px;
+  max-width: 400px;
+  flex-shrink: 0;
+  background-color: var(--bg-header);
+  color: var(--text-sidebar);
+  padding: 15px;
+  padding-top: 0px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  /* Trava essencial para conter o flexbox */
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  /* Impede a sidebar de empurrar o container para fora da tela */
+}
+
+.sidebar-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#select-book {
+  font-size: 25px;
+  font-weight: bold;
+  font-family: calibri;
+  background-color: transparent;
+  color: var(--text-sidebar);
+  border: none;
+  outline: none;
+  cursor: pointer;
+  text-align: left; /* Mudado de center para left para dar espaço ao botão */
+  flex-grow: 1;    /* Faz o select ocupar o espaço disponível sem empurrar o botão */
+  min-width: 0;    /* Evita estouro de largura no flexbox */
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  /* Impede quebras de linha e ativa reticências com desvanecimento */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  /* Remove a seta padrão do sistema para visual mais limpo */
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+/* Estilização da caixa de opções abertas (Dropdown) */
+#select-book option {
+  background-color: var(--bg-header);
+  /* Fundo escuro igual à sidebar */
+  color: var(--bg-editor)fff;
+  /* Texto branco visível */
+  padding: 10px;
+  font-size: 0.8rem;
+  outline: none;
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  text-align: left;
+}
+
+/* Container que coloca o Select e o Botão na mesma linha */
+.book-title-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+
+/* Ajuste fino no botão do menu (engrenagem) */
+.menu-icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-sidebar);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+  opacity: 0.7;
+  transition: opacity 0.2s ease, transform 0.3s ease;
+}
+
+/* Efeito hover discreto */
+.menu-icon-btn:hover {
+  opacity: 1;
+  transform: rotate(30deg);
+}
+
+/* ==========================================================================
+   4. ÁRVORE DE ARQUIVOS (File Tree)
+   ========================================================================== */
+
+.file-tree {
+  flex-grow: 1;
+  /* Preenche todo o espaço vertical disponível na sidebar */
+  min-height: 0;
+  /* OBRIGATÓRIO: Permite que o scroll funcione dentro do flexbox */
+  overflow-y: auto;
+  /* Cria a barra de rolagem APENAS dentro da árvore de arquivos */
+  overflow-x: hidden;
+  padding-right: 5px;
+  /* Espaço para a barra de rolagem não cobrir o texto */
+}
+
+.file-tree ul {
+  list-style: none;
+  padding-left: 12px;
+}
+
+.file-tree li {
+  margin: 4px 0;
+}
+
+.folder-name {
+  cursor: pointer;
+  font-weight: bold;
+  color: var(--text-folder);
+  display: block;
+  padding: 2px 0;
+}
+
+/* Ícones de Pastas (Abertas / Fechadas) */
+li.folder>.folder-name::before {
+  content: "📂 ";
+}
+
+li.folder.collapsed>.folder-name::before {
+  content: "📁 ";
+}
+
+.file-name {
+  cursor: pointer;
+  color: var(--text-file);
+  display: block;
+  padding: 2px 5px 4px 5px;
+  border-radius: 3px;
+}
+
+.file-name:hover {
+  background-color: #2f364099;
+}
+
+.file-name.active {
+  background-color: #4a69bd38;
+  color: white;
+}
+
+.collapsed>ul {
+  display: none;
+}
+
+/* Modo Avançado */
+#file-tree:not(.show-advanced) .advanced-item {
+  display: none !important;
+}
+
+/* Customização da Scrollbar da File Tree */
+.file-tree::-webkit-scrollbar {
+  width: 8px;
+}
+
+.file-tree::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.file-tree::-webkit-scrollbar-thumb {
+  background-color: rgba(74, 109, 167, 0.4);
+  border-radius: 4px;
+}
+
+.file-tree::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(74, 109, 167, 0.7);
+}
+
+
+/* ==========================================================================
+   5. ÁREA DO EDITOR DE TEXTO
+   ========================================================================== */
+
+/* Correção para o Toast UI escurecer totalmente */
+body.dark-theme .toastui-editor-defaultUI {
+  background-color: var(--bg-editor) !important;
+  border-color: #313244 !important;
+}
+
+body.dark-theme .toastui-editor-main,
+body.dark-theme .toastui-editor-ww-container,
+body.dark-theme .toastui-editor-contents {
+  background-color: var(--bg-editor) !important;
+  color: var(--text-editor) !important;
+}
+
+.editor-area {
+  flex-grow: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  background: var(--bg-app);
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  flex-grow: 1;
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  color: #577cb1;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+.CodeMirror {
+  flex-grow: 1;
+  height: 100px !important;
+  /* Permite ao Flexbox preencher o restante do espaço */
+}
+
+#markdown-editor {
+  flex-grow: 1;
+  height: 100%;
+  overflow: hidden;
+}
+
+.toastui-editor-defaultUI {
+  border: 1px solid #ddd !important;
+  border-radius: 6px;
+  height: 100% !important;
+}
+
+/* Modo Readonly do Editor */
+.toastui-editor-defaultUI.readonly-mode {
+  opacity: 0.7;
+  pointer-events: none; /* Bloqueia toolbar e menus superiores */
+}
+
+/* Libera apenas a rolagem (scroll) interna */
+.toastui-editor-defaultUI.readonly-mode .toastui-editor-main {
+  pointer-events: auto;
+}
+
+/* Impede a seleção de texto e oculta o cursor piscando (caret) */
+.toastui-editor-defaultUI.readonly-mode .toastui-editor-contents,
+.toastui-editor-defaultUI.readonly-mode .ProseMirror,
+.toastui-editor-defaultUI.readonly-mode .CodeMirror {
+  cursor: default !important;
+  caret-color: transparent !important; /* Esconde o cursor que pisca entre as letras */
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  -webkit-user-drag: none !important;
+}
+
+/* Garante que o texto selecionado (se houver) não mude de cor */
+.toastui-editor-defaultUI.readonly-mode ::selection {
+  background: transparent !important;
+}
+
+/* ==========================================================================
+   6. OVERLAY & MODAIS (Loading / IA)
+   ========================================================================== */
+
+/* Preenche 100% da .editor-area (que possui position: relative) */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(30, 30, 47, 0.65);
+  /* Escuro suave com transparência */
+  backdrop-filter: blur(6px);
+  /* Efeito de vidro desfocado no editor */
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  color: var(--bg-editor)fff;
+}
+
+.overlay.hidden {
+  display: none !important;
+}
+
+/* Card centralizado elegante */
+.overlay-content {
+  text-align: center;
+  background: var(--toggle-bg);
+  padding: 35px 40px;
+  border-radius: 12px;
+  /* border: 1px solid rgba(255, 255, 255, 0.08); */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.overlay-content p {
+  font-size: 0.95rem;
+  color: var(--text-file);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* Spinner Moderno */
+.spinner {
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border-top-color: var(--text-folder);
+  border-right-color: var(--text-folder);
+  animation: spin 0.8s cubic-bezier(0.6, 0.2, 0.4, 0.8) infinite;
+  margin: 0;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Overlay de editor sem arquivo selecionado */
+.no-file-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--no-file-overlay-bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 90;
+  color: #888;
+  font-size: 1.1rem;
+  font-weight: 500;
+
+  /* Transição suave de opacidade ao aparecer e sumir */
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+/* Quando estiver oculto */
+.no-file-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  /* Impede cliques no overlay invisível */
+}
+
+/* ==========================================================================
+   BOTÃO GSAP ELEGANTE
+   ========================================================================== */
+
+#btn-save {
+  position: relative;
+  width: 160px;
+  height: 40px;
+  background: linear-gradient(90deg, #1a3058, #264ea5, #1a3058);
+  background-size: 300% 100%; /* Permite o GSAP mover o gradiente suavemente */
+  color: #ffffff;
+  border: 1px solid rgba(112, 161, 255, 0.25);
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  outline: none;
+  overflow: visible; /* Necessário para o brilho expansivo */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-text {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* SVG do Borda */
+.btn-border-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.btn-border-path {
+  fill: none;
+  stroke: #60a5fa;
+  stroke-width: 2;
+  stroke-dasharray: 400; /* Perímetro total do retângulo */
+  stroke-dashoffset: 400; /* Começa invisível */
+  filter: drop-shadow(0px 0px 4px #60a5fa);
+}
+
+/* ==========================================================================
+   MENU GAVETA (SETTINGS DRAWER)
+   ========================================================================== */
+
+/* Fundo escuro atrás do menu */
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+  z-index: 200;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.drawer-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Painel da Gaveta */
+.settings-drawer {
+  position: fixed;
+  top: 0;
+  left: -420px; /* Começa escondido fora da tela */
+  width: 400px;
+  height: 100vh;
+  background-color: var(--bg-header);
+  color: var(--text-sidebar);
+  z-index: 201;
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.4);
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+/* Estado aberto da gaveta */
+.settings-drawer.open {
+  left: 0;
+}
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--toggle-bg);
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-sidebar);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.drawer-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}

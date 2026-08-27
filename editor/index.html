@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DraftWeaver</title>
+
+  <!-- Toast UI Editor (WYSIWYG + Markdown) -->
+  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+  <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+  <!-- GSAP Core -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <!-- CSS Modo Escuro do Toast UI -->
+  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/theme/toastui-editor-dark.min.css" />
+  <link rel="stylesheet" href="src/css/style.css">
+</head>
+
+<body>
+
+  <header id="window-header">
+    <!-- <div id="icon"><img src="assets/img/icon.png"/></div> -->
+
+  </header>
+
+  <div class="app-container">
+
+    <!-- Painel Lateral Esquerdo -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+
+        <!-- Container Alinhado: Título do Livro + Ícone do Menu na mesma linha -->
+        <div class="book-title-container">
+          <select id="select-book" class="select-primary">
+            <option value="" disabled selected>Clique para selecionar um livro</option>
+          </select>
+
+          <button id="btn-open-menu" class="menu-icon-btn" title="Configurações">
+            <svg class="gear-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path
+                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+              </path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Switch Novo abaixo do título -->
+        <div class="toggle-container">
+          <span>Modo Avançado</span>
+          <label class="switch">
+            <input type="checkbox" id="mode-toggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+      </div>
+
+      <div id="file-tree" class="file-tree"></div>
+
+    </aside>
+
+    <!-- Área Principal do Editor (TAMBÉM PRECISA ESTAR AQUI) -->
+    <main class="editor-area">
+
+      <div class="editor-header">
+        <span id="page-title">Nenhum arquivo selecionado</span>
+        <!-- <button id="btn-save" type="button" class="btn-success" disabled>Salvar Alterações</button> -->
+
+        <button id="btn-save" class="btn-save-gsap">
+          <svg class="btn-border-svg">
+            <rect class="btn-border-path" x="1" y="1" width="98.5%" height="93%" rx="7"
+              vector-effect="non-scaling-stroke" />
+          </svg>
+          <span class="btn-text">Salvar Alterações</span>
+        </button>
+
+      </div>
+
+      <div id="markdown-editor"></div>
+
+      <!-- Overlay da IA -->
+      <div id="overlay" class="overlay hidden">
+        <div class="overlay-content">
+          <div class="spinner"></div>
+          <p>A IA está processando e atualizando a história. Aguarde...</p>
+        </div>
+      </div>
+
+      <!-- Overlay de Nenhum Arquivo Selecionado -->
+      <div id="no-file-overlay" class="no-file-overlay">
+        <p>📄 Nenhum arquivo selecionado</p>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Container de Notificação Toast -->
+  <div id="toast" class="toast hidden">
+    <span id="toast-message"></span>
+  </div>
+
+  <!-- Overlay transparente/escuro do Menu -->
+  <div id="drawer-overlay" class="drawer-overlay hidden"></div>
+
+  <!-- Gaveta Lateral (Drawer) -->
+  <div id="settings-drawer" class="settings-drawer">
+    <div class="drawer-header">
+      <h3>Configurações</h3>
+      <button id="btn-close-menu" class="close-btn">&times;</button>
+    </div>
+
+    <div class="drawer-content">
+      <!-- O Modo Escuro foi movido para cá -->
+      <div class="toggle-container">
+        <span>Modo Escuro</span>
+        <label class="switch">
+          <input type="checkbox" id="theme-toggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="src/js/app.js"></script>
+</body>
+
+</html>

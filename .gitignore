@@ -1,0 +1,15 @@
+# Dependências do Node.js
+node_modules/
+
+# Logs do sistema
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Pastas de compilação ou arquivos temporários
+dist/
+*.temp

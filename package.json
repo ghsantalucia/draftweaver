@@ -1,0 +1,17 @@
+{
+  "name": "draftweaver",
+  "version": "1.0.0",
+  "description": "Editor e Assistente Literário com IA",
+  "main": "main.js",
+  "scripts": {
+    "start": "nodemon -e js,html,css --watch editor --watch main.js --exec electron ."
+  }, 
+  "keywords": [],
+  "author": "Gabriel Santalucia",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "electron": "^43.4.1",
+    "nodemon": "^3.1.14"
+  }
+}
