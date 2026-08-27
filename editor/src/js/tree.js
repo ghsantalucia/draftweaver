@@ -6,15 +6,15 @@ import { parseMarkdown } from './utils.js';
 export async function renderTree() {
 
   const container = document.getElementById('file-tree');
-  if (!container || !state.currentBookPath) return; 
-  
+  if (!container || !state.currentBookPath) return;
+
   container.innerHTML = ''; // Limpa a árvore antes de re-renderizar
 
   // Chama a construção passando o caminho no disco e o nome base
   const folderName = state.currentBookPath.split(/[/\\]/).pop();
   const ul = await buildTree(state.currentBookPath, folderName);
   container.appendChild(ul);
- 
+
 }
 
 export async function buildTree(directoryPath, currentPath) {
@@ -22,7 +22,10 @@ export async function buildTree(directoryPath, currentPath) {
 
   // 1. Coleta todas as entradas da pasta
   const folderData = await window.electronAPI.getTree(directoryPath);
-  const entries = folderData && folderData.children ? folderData.children : [];
+  const rawEntries = folderData && folderData.children ? folderData.children : [];
+
+  // FILTRO AQUI: Filtra apenas pastas OU arquivos com extensão .md (case insensitive)
+  const entries = rawEntries.filter(e => e.isDirectory || e.name.toLowerCase().endsWith('.md'));
 
   // 2. Ordena alfabeticamente e numericamente (ex: cap_1, cap_2, cap_10)
   entries.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
@@ -31,8 +34,6 @@ export async function buildTree(directoryPath, currentPath) {
   const folders = entries.filter(e => e.isDirectory);
   const files = entries.filter(e => !e.isDirectory);
   const sortedEntries = [...folders, ...files];
-
-  // Local: tree.js -> Dentro da função buildTree(), substituindo o loop 'for (const entry of sortedEntries)'
 
   for (const entry of sortedEntries) {
     const relativePath = currentPath ? `${currentPath}/${entry.name}` : entry.name;
@@ -58,14 +59,11 @@ export async function buildTree(directoryPath, currentPath) {
     } else {
       let meta = {};
 
-      // Lê apenas arquivos Markdown para extrair metadados
-      if (entry.name.endsWith('.md')) {
-        const rawText = await window.electronAPI.readFile(entry.path);
-        if (rawText) {
-          const parsed = parseMarkdown(rawText);
-          meta = parsed.metadata;
-          state.fileMetadataMap[relativePath] = meta; // Salva no cache global
-        }
+      const rawText = await window.electronAPI.readFile(entry.path);
+      if (rawText) {
+        const parsed = parseMarkdown(rawText);
+        meta = parsed.metadata;
+        state.fileMetadataMap[relativePath] = meta; // Salva no cache global
       }
 
       // Regra 1: Se hidden for true, ignora e não renderiza na árvore
@@ -81,7 +79,7 @@ export async function buildTree(directoryPath, currentPath) {
       const span = document.createElement('span');
       span.className = 'file-name';
       span.setAttribute('data-path', relativePath);
-      
+
       // Regra 3: Se houver 'title' no YAML, usa o título amigável, senão usa o nome do arquivo
       const displayName = meta.title ? meta.title : entry.name;
       span.innerText = `📄 ${displayName}`;
