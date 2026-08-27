@@ -24,7 +24,7 @@ O software foi projetado para oferecer versatilidade total na criação, suporta
 * **Editor WYSIWYG Markdown:** Interface visual rica baseada em Toast UI Editor com alternância fluida entre código e visualização final.
 * **Árvore de Arquivos Inteligente:** Navegação dinâmica com suporte a nomes amigáveis via YAML, herança de regras por pasta e filtro estrito para foco no texto.
 * **Modo Escuro Nativo:** Layout escurinho e ajustado para longas sessões de escrita sem cansaço visual.
-* **Controle de Permissões (`humanAllowed`):** Proteção de arquivos críticos do sistema para leitura sem risco de alterações acidentais na interface.
+* **Controle de Permissões:** Proteção de arquivos críticos do sistema para leitura do usuário e IA sem risco de alterações acidentais na interface.
 
 ### 🧠 Arquitetura de Enredo & Consistência
 * **Criação Progressiva de História:** Planejamento estruturado partindo da premissa e filosofia da obra até os pontos de início e fim.
