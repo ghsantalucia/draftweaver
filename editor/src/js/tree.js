@@ -1,6 +1,6 @@
 import { state } from './config.js';
 import { openFileElectron } from './editor.js';
-import { parseMarkdown } from './utils.js';
+import { parseMarkdown, normalizeMetadata } from './utils.js';
 
 
 export async function renderTree() {
@@ -20,17 +20,15 @@ export async function renderTree() {
 export async function buildTree(directoryPath, currentPath) {
   const ul = document.createElement('ul');
 
-  // 1. Coleta todas as entradas da pasta
   const folderData = await window.electronAPI.getTree(directoryPath);
   const rawEntries = folderData && folderData.children ? folderData.children : [];
 
-  // FILTRO AQUI: Filtra apenas pastas OU arquivos com extensão .md (case insensitive)
+  // Filtra apenas pastas OU arquivos .md
   const entries = rawEntries.filter(e => e.isDirectory || e.name.toLowerCase().endsWith('.md'));
 
-  // 2. Ordena alfabeticamente e numericamente (ex: cap_1, cap_2, cap_10)
+  // Ordenação
   entries.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
 
-  // 3. Separa pastas de arquivos para que pastas fiquem no topo da lista
   const folders = entries.filter(e => e.isDirectory);
   const files = entries.filter(e => !e.isDirectory);
   const sortedEntries = [...folders, ...files];
@@ -57,21 +55,26 @@ export async function buildTree(directoryPath, currentPath) {
       ul.appendChild(li);
 
     } else {
-      let meta = {};
+      let rawMeta = {};
 
       const rawText = await window.electronAPI.readFile(entry.path);
       if (rawText) {
         const parsed = parseMarkdown(rawText);
-        meta = parsed.metadata;
-        state.fileMetadataMap[relativePath] = meta; // Salva no cache global
+        rawMeta = parsed.metadata || {};
       }
 
-      // Regra 1: Se hidden for true, ignora e não renderiza na árvore
-      if (meta.hidden === true) continue;
+      // Normalização dos metadados do arquivo
+      const meta = normalizeMetadata(rawMeta, entry.name);
+
+      state.fileMetadataMap[relativePath] = meta;
+
+      // Regra 1: Oculto se humano não pode LER
+      const isHidden = !meta.humanRead && !meta.humanWrite;      
+      if (isHidden) continue;
 
       const li = document.createElement('li');
 
-      // Regra 2: Se advanced for true, aplica a classe para o toggle controlar
+      // Regra 2: Classe para controle do toggle de itens avançados
       if (meta.advanced === true) {
         li.classList.add('advanced-item');
       }
@@ -80,9 +83,8 @@ export async function buildTree(directoryPath, currentPath) {
       span.className = 'file-name';
       span.setAttribute('data-path', relativePath);
 
-      // Regra 3: Se houver 'title' no YAML, usa o título amigável, senão usa o nome do arquivo
-      const displayName = meta.title ? meta.title : entry.name;
-      span.innerText = `📄 ${displayName}`;
+      // Regra 3: Exibe o título definido no YAML ou o nome do arquivo como fallback
+      span.innerText = `📄 ${meta.title}`;
 
       span.onclick = async (e) => {
         e.stopPropagation();

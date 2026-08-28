@@ -8,6 +8,7 @@ O **Draftweaver** é uma plataforma de escrita literária orientada por dados es
 
 O sistema é construído sobre o ecossistema **Electron** (Node.js + Chromium), operando arquivos **Markdown (`.md`)** e **YAML** locais em disco. A separação em camadas garante que a IA atue estritamente como um cliente da aplicação, manipulando estruturas padronizadas sem ter controle direto ou irrestrito sobre a interface do usuário.
 
+```
 +-------------------------------------------------------------+
 |                     FASE 1: O EDITOR                        |
 |   (Interface de Usuário, ToastUI, Árvore de Arquivos, CSS)  |
@@ -33,7 +34,7 @@ O sistema é construído sobre o ecossistema **Electron** (Node.js + Chromium), 
 |                 FASE 4: INTEGRAÇÃO COM IA                   |
 |  (Orquestração de Prompts, RAG, API Calls, Function Call)   |
 +-------------------------------------------------------------+
-
+```
 
 ---
 

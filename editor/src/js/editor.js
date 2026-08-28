@@ -1,5 +1,5 @@
 import { state } from './config.js';
-import { parseMarkdown, showToast, stringifyFrontmatter } from './utils.js';
+import { parseMarkdown, showToast, stringifyFrontmatter, normalizeMetadata } from './utils.js';
 
 // Inicializa o Editor
 export function initEditor() {
@@ -23,6 +23,61 @@ export function initEditor() {
   }
 }
 
+// editor.js
+
+/**
+ * Controla o estado de bloqueio (somente leitura) do editor e do botão salvar.
+ * @param {boolean} isReadOnly 
+ */
+export function setEditorReadOnly(isReadOnly) {
+  const editorContainer = document.querySelector('.toastui-editor-defaultUI');
+  const btnSave = document.getElementById('btn-save');
+
+  if (btnSave) {
+    btnSave.disabled = isReadOnly;
+  }
+
+  if (!editorContainer) return;
+
+  if (isReadOnly) {
+    editorContainer.classList.add('readonly-mode');
+
+    // Instancia os handlers globais se ainda não existirem
+    if (!state.readOnlyKeyHandler) {
+      state.readOnlyKeyHandler = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      };
+    }
+
+    if (!state.readOnlyMouseHandler) {
+      state.readOnlyMouseHandler = (e) => {
+        if (e.shiftKey || e.type === 'selectstart') {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      };
+    }
+
+    editorContainer.addEventListener('keydown', state.readOnlyKeyHandler, true);
+    editorContainer.addEventListener('mousedown', state.readOnlyMouseHandler, true);
+    editorContainer.addEventListener('selectstart', state.readOnlyMouseHandler, true);
+
+    if (document.activeElement) document.activeElement.blur();
+
+  } else {
+    editorContainer.classList.remove('readonly-mode');
+
+    if (state.readOnlyKeyHandler) {
+      editorContainer.removeEventListener('keydown', state.readOnlyKeyHandler, true);
+    }
+    if (state.readOnlyMouseHandler) {
+      editorContainer.removeEventListener('mousedown', state.readOnlyMouseHandler, true);
+      editorContainer.removeEventListener('selectstart', state.readOnlyMouseHandler, true);
+    }
+  }
+}
+
 // Leitura de arquivo via Electron
 export async function openFileElectron(fullPath, relativePath) {
   state.currentFilePath = fullPath;
@@ -30,8 +85,17 @@ export async function openFileElectron(fullPath, relativePath) {
 
   if (rawText === null) return;
 
-  const { metadata, body } = parseMarkdown(rawText);
+  // Normalização com os fallbacks definidos
+  const { metadata: rawMeta, body } = parseMarkdown(rawText);
+
+  // Extrai o nome do arquivo para usar de fallback caso não haja 'title' no YAML
+  const fileName = relativePath.split(/[/\\]/).pop();
+
+  // Aplica os fallbacks centralizados
+  const metadata = normalizeMetadata(rawMeta, fileName);
+
   state.currentFileMetadata = metadata;
+  // state.currentFileMetadata = normalizedMeta;
 
   if (state.editor) {
     state.editor.setMarkdown(body);
@@ -43,62 +107,12 @@ export async function openFileElectron(fullPath, relativePath) {
   if (noFileOverlay) noFileOverlay.classList.add('hidden');
 
   document.getElementById('page-title').innerText = relativePath;
-  document.getElementById('btn-save').disabled = false;
-
   localStorage.setItem('last_open_file', relativePath);
 
-  // Confere se o arquivo tem a chave 'humanAllowed' no YAML e ajusta a interatividade do editor
-  const isHumanAllowed = metadata.humanAllowed !== false;
-  const editorContainer = document.querySelector('.toastui-editor-defaultUI');
-  const btnSave = document.getElementById('btn-save');
+  // Regra de escrita: Bloqueia se humanWrite for false
+  const isReadOnly = !metadata.humanWrite;
 
-  if (editorContainer) {
-    if (!isHumanAllowed) {
-      editorContainer.classList.add('readonly-mode');
-      if (btnSave) btnSave.disabled = true;
-
-      // 1. Instancia handlers para bloquear teclado e seleção via mouse se ainda não existirem
-      if (!state.readOnlyKeyHandler) {
-        state.readOnlyKeyHandler = (e) => {
-          // Bloqueia qualquer tecla digitada ou combinações como Shift, Ctrl+A, etc.
-          e.preventDefault();
-          e.stopPropagation();
-        };
-      }
-
-      if (!state.readOnlyMouseHandler) {
-        state.readOnlyMouseHandler = (e) => {
-          // Bloqueia se apertar Shift durante o clique ou se tentar iniciar seleção de texto
-          if (e.shiftKey || e.type === 'selectstart') {
-            e.preventDefault();
-            e.stopPropagation();
-          }
-        };
-      }
-
-      // 2. Adiciona os ouvintes de eventos na fase de captura (true)
-      editorContainer.addEventListener('keydown', state.readOnlyKeyHandler, true);
-      editorContainer.addEventListener('mousedown', state.readOnlyMouseHandler, true);
-      editorContainer.addEventListener('selectstart', state.readOnlyMouseHandler, true);
-
-      // Remove qualquer foco ou cursor ativo atual
-      if (document.activeElement) document.activeElement.blur();
-
-    } else {
-      // Remove o modo leitura
-      editorContainer.classList.remove('readonly-mode');
-      if (btnSave) btnSave.disabled = false;
-
-      // Remove os ouvintes
-      if (state.readOnlyKeyHandler) {
-        editorContainer.removeEventListener('keydown', state.readOnlyKeyHandler, true);
-      }
-      if (state.readOnlyMouseHandler) {
-        editorContainer.removeEventListener('mousedown', state.readOnlyMouseHandler, true);
-        editorContainer.removeEventListener('selectstart', state.readOnlyMouseHandler, true);
-      }
-    }
-  }
+  setEditorReadOnly(isReadOnly);
 }
 
 // Salvar via Electron

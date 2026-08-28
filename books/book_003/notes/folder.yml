@@ -1,5 +1,7 @@
-hidden: false
+humanRead: true
+humanWrite: true
+aiRead: true
+aiWrite: false
 advanced: false
-humanAllowed: true
-aiAllowed: false
-title: Anotações do Autor
+title: "Anotações do Autor"
+description: "Pasta de anotações livres do autor humano."

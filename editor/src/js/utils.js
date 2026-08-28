@@ -1,3 +1,22 @@
+import { DEFAULT_FILE_METADATA } from './config.js';
+
+// Recebe o metadado lido do YAML e garante que todas as chaves existam com seus devidos valores padrão (fallbacks).
+export function normalizeMetadata(rawMetadata, fallbackTitle = '') {
+  // O Object.assign ou o operador spread (...) aplica os padrões primeiro
+  // e sobrescreve apenas com as propriedades que realmente vieram no YAML.
+  const metadata = {
+    ...DEFAULT_FILE_METADATA,
+    ...rawMetadata
+  };
+
+  // Trata fallbacks dinâmicos (como o título que depende do nome do arquivo)
+  if (!metadata.title) {
+    metadata.title = fallbackTitle;
+  }
+
+  return metadata;
+}
+
 // Função para exibir notificações Toast
 export function showToast(message, type = 'success') {
   const toast = document.getElementById('toast');

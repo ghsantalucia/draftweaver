@@ -1,8 +1,8 @@
 ---
-hidden: true
-advanced: true
-humanAllowed: false
-aiAllowed: false
+humanRead: false
+humanWrite: false
+aiRead: true
+aiWrite: false
 title: Sistema
 ---
 
