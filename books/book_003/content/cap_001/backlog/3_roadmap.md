@@ -1,9 +1,10 @@
 ---
-hidden: false
+humanRead: true
+humanWrite: true
+aiRead: true
+aiWrite: true
 advanced: true
-humanAllowed: true
-aiAllowed: true
-title: Planejamento
+title: "Planejamento"
 ---
 
 # 02_ROADMAP.MD — ESBOÇO DOS PRÓXIMOS CAPÍTULOS

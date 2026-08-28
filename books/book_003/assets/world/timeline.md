@@ -1,9 +1,10 @@
 ---
-hidden: false
+humanRead: true
+humanWrite: false
+aiRead: true
+aiWrite: true
 advanced: false
-humanAllowed: false
-aiAllowed: true
-title: Linha do Tempo
+title: "Linha do Tempo"
 ---
 
 # TIMELINE.MD

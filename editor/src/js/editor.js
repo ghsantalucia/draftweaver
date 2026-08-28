@@ -1,5 +1,5 @@
 import { state } from './config.js';
-import { parseMarkdown, showToast, stringifyFrontmatter, normalizeMetadata } from './utils.js';
+import { parseMarkdown, showToast, stringifyFrontmatter, normalizeItemMetadata } from './utils.js';
 
 // Inicializa o Editor
 export function initEditor() {
@@ -92,7 +92,7 @@ export async function openFileElectron(fullPath, relativePath) {
   const fileName = relativePath.split(/[/\\]/).pop();
 
   // Aplica os fallbacks centralizados
-  const metadata = normalizeMetadata(rawMeta, fileName);
+  const metadata = normalizeItemMetadata(rawMeta, fileName);
 
   state.currentFileMetadata = metadata;
   // state.currentFileMetadata = normalizedMeta;

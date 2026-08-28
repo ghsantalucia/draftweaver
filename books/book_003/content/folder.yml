@@ -1,5 +1,7 @@
-hidden: false
+humanRead: true
+humanWrite: false
+aiRead: true
+aiWrite: true
 advanced: false
-humanAllowed: true
-aiAllowed: true
-title: Capítulos
+title: "Capítulos"
+description: "Contém os manuscritos dos capítulos do livro."

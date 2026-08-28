@@ -1,9 +1,10 @@
 ---
-hidden: false
+humanRead: true
+humanWrite: false
+aiRead: true
+aiWrite: false
 advanced: true
-humanAllowed: false
-aiAllowed: false
-title: Sumário de Personagens
+title: "Sumário dos Personagens"
 ---
 
-# INDEX.MD
+# PERSONAGENS

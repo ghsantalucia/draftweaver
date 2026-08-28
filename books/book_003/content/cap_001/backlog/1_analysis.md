@@ -1,9 +1,10 @@
 ---
-hidden: false
+humanRead: true
+humanWrite: true
+aiRead: true
+aiWrite: true
 advanced: true
-humanAllowed: true
-aiAllowed: true
-title: Análise do Capítulo
+title: "Análise"
 ---
 
 # 01\_ANALYSIS.MD — ANÁLISE E REFLEXÃO PÓS-CAPÍTULO

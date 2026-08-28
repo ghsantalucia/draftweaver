@@ -1,9 +1,10 @@
 ---
-hidden: false
+humanRead: true
+humanWrite: true
+aiRead: true
+aiWrite: true
 advanced: true
-humanAllowed: true
-aiAllowed: true
-title: Predições
+title: "Predições"
 ---
 
 # 03_FORESHADOWING.MD — BANCO DE IDEIAS E PISTAS ATIVAS

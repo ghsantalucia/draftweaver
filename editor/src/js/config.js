@@ -8,7 +8,7 @@ export const state = {
 };
 
 // Valores padrão para metadados de arquivos, caso não estejam presentes no arquivo .md
-export const DEFAULT_FILE_METADATA = {
+export const DEFAULT_TREE_METADATA = {
   humanRead: false,
   humanWrite: false,
   aiRead: false,

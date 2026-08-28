@@ -1,9 +1,10 @@
 ---
-hidden: false
+humanRead: true
+humanWrite: true
+aiRead: true
+aiWrite: false
 advanced: false
-humanAllowed: true
-aiAllowed: false
-title: Anotações
+title: "Anotações do Autor"
 ---
 
 # Anotações.MD

@@ -1,9 +1,10 @@
 ---
-hidden: false
+humanRead: true
+humanWrite: true
+aiRead: true
+aiWrite: true
 advanced: false
-humanAllowed: true
-aiAllowed: true
-title: Protagonista X
+title: "Protagonista X"
 ---
 
 # PROTAGONISTA_X.MD

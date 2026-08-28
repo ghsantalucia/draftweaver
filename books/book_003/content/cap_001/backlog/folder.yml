@@ -1,5 +1,7 @@
-hidden: false
+humanRead: true
+humanWrite: false
+aiRead: true
+aiWrite: true
 advanced: true
-humanAllowed: true
-aiAllowed: true
-title: Backlog
+title: "Backlog"
+description: "Arquivos de referência e anotações do capítulo"

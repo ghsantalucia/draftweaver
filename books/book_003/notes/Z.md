@@ -2,9 +2,11 @@
 humanRead: true
 humanWrite: true
 aiRead: true
-aiWrite: true
+aiWrite: false
 advanced: false
-title: "Sistema de Magia"
+title: "AA"
 ---
 
-# MAGIA.MD
+# Anotações.MD
+
+Notas do autor
