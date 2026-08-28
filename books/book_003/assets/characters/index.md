@@ -4,7 +4,7 @@ humanWrite: false
 aiRead: true
 aiWrite: false
 advanced: true
-title: "Sumário dos Personagens"
+title: "Índice de Personagens"
 ---
 
 # PERSONAGENS

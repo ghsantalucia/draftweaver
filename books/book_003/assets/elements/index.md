@@ -4,7 +4,7 @@ humanWrite: false
 aiRead: true
 aiWrite: false
 advanced: true
-title: "Sumário do Ambiente"
+title: "Índice de Conceitos"
 ---
 
 # INDEX.MD

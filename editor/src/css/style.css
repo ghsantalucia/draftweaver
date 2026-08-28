@@ -497,6 +497,179 @@ li.folder.collapsed>.folder-name::before {
   background-color: rgba(74, 109, 167, 0.7);
 }
 
+/* ==========================================================================
+   7. NAVEGAÇÃO POR ABAS NA SIDEBAR
+   ========================================================================== */
+
+.sidebar {
+  position: relative; /* Necessário para posicionamento absoluto da gaveta de IA */
+}
+
+.sidebar-tabs {
+  display: flex;
+  gap: 4px;
+  background-color: var(--toggle-bg);
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 8px 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: var(--text-sidebar);
+}
+
+.tab-btn.active {
+  background-color: var(--btn-primary-bg);
+  color: #ffffff;
+}
+
+/* Ajuste fino na área da file-tree para não encostar no footer */
+.file-tree {
+  margin-bottom: 50px; /* Garante espaço para o footer recolhido */
+}
+
+/* ==========================================================================
+   8. FOOTER E DRAWER DO ASSISTENTE DE IA
+   ========================================================================== */
+
+.ai-assistant-drawer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 48px; /* Altura recolhida (apenas o cabeçalho) */
+  background: linear-gradient(180deg, #24253b 0%, #181926 100%);
+  border-top: 1px solid rgba(137, 180, 250, 0.2);
+  display: flex;
+  flex-direction: column;
+  transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 80;
+  overflow: hidden;
+}
+
+/* Estado expandido: sobe até cobrir o corpo da sidebar abaixo do header */
+.ai-assistant-drawer.expanded {
+  height: calc(100% - 110px); /* Deixa apenas o header do livro visível */
+  box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.5);
+}
+
+.ai-assistant-header {
+  height: 48px;
+  min-height: 48px;
+  padding: 0 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+
+.ai-title-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-sparkles-icon {
+  color: #89b4fa;
+  font-size: 1.1rem;
+  animation: pulse-sparkle 2s infinite ease-in-out;
+}
+
+@keyframes pulse-sparkle {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.ai-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-sidebar);
+}
+
+.ai-toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: transform 0.3s ease, color 0.2s ease;
+}
+
+.ai-assistant-drawer.expanded .ai-toggle-btn {
+  transform: rotate(180deg);
+}
+
+/* Corpo do Chat dentro da Gaveta */
+.ai-assistant-body {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  gap: 10px;
+  min-height: 0;
+}
+
+.ai-chat-messages {
+  flex-grow: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ai-message {
+  font-size: 0.8rem;
+  padding: 8px 12px;
+  border-radius: 6px;
+  line-height: 1.4;
+}
+
+.ai-message.system {
+  background-color: rgba(137, 180, 250, 0.1);
+  color: var(--text-sidebar);
+  border: 1px solid rgba(137, 180, 250, 0.15);
+}
+
+.ai-chat-input-container {
+  display: flex;
+  gap: 6px;
+}
+
+.ai-chat-input-container input {
+  flex-grow: 1;
+  background-color: var(--bg-header);
+  border: 1px solid var(--slider-bg);
+  border-radius: 6px;
+  padding: 8px 10px;
+  color: var(--text-sidebar);
+  font-size: 0.8rem;
+  outline: none;
+}
+
+.ai-chat-input-container button {
+  background-color: var(--btn-primary-bg);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
 
 /* ==========================================================================
    5. ÁREA DO EDITOR DE TEXTO

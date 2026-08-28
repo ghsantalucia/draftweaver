@@ -4,7 +4,7 @@ humanWrite: false
 aiRead: true
 aiWrite: false
 advanced: true
-title: "Índice de Capítulos"
+title: "Índice de Locais"
 ---
 
 # INDEX.MD

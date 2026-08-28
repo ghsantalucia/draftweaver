@@ -26,6 +26,7 @@
   <div class="app-container">
 
     <!-- Painel Lateral Esquerdo -->
+    <!-- Painel Lateral Esquerdo -->
     <aside class="sidebar">
       <div class="sidebar-header">
 
@@ -46,7 +47,7 @@
           </button>
         </div>
 
-        <!-- Switch Novo abaixo do título -->
+        <!-- Switch de Arquivos Avançados -->
         <div class="toggle-container">
           <span>Arquivos Avançados</span>
           <label class="switch">
@@ -57,7 +58,38 @@
 
       </div>
 
+      <!-- Navegação por Abas -->
+      <nav class="sidebar-tabs">
+        <button class="tab-btn active" data-tab="notes">📝 Anotações</button>
+        <button class="tab-btn" data-tab="writing">📖 Escrita</button>
+        <button class="tab-btn" data-tab="world">🗺️ Mundo</button>
+      </nav>
+
+      <!-- Conteúdo da Árvore de Arquivos -->
       <div id="file-tree" class="file-tree"></div>
+
+      <!-- Footer do Assistente de IA -->
+      <div id="ai-assistant-drawer" class="ai-assistant-drawer">
+        <div id="ai-assistant-header" class="ai-assistant-header">
+          <div class="ai-title-container">
+            <span class="ai-sparkles-icon">✦</span>
+            <span class="ai-title">Assistente de Escrita</span>
+          </div>
+          <button id="btn-toggle-ai" class="ai-toggle-btn" title="Expandir/Recolher Chat">▲</button>
+        </div>
+        
+        <div class="ai-assistant-body">
+          <div class="ai-chat-messages" id="ai-chat-messages">
+            <div class="ai-message system">
+              Olá! Como posso ajudar na estruturação do seu livro hoje?
+            </div>
+          </div>
+          <div class="ai-chat-input-container">
+            <input type="text" id="ai-chat-input" placeholder="Digite uma instrução para a IA..." />
+            <button id="btn-send-ai">Enviar</button>
+          </div>
+        </div>
+      </div>
 
     </aside>
 

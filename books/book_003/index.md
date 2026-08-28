@@ -1,5 +1,5 @@
 ---
-humanRead: true
+humanRead: false
 humanWrite: false
 aiRead: true
 aiWrite: false
