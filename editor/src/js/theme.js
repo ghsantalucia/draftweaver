@@ -34,7 +34,7 @@ function applyTheme(isDark) {
   }
 
   // 3. Atualiza os botões nativos da janela do Windows via Electron API
-  if (window.electronAPI && window.electronAPI.setNativeTheme) {
-    window.electronAPI.setNativeTheme(isDark);
-  }
+  // if (window.electronAPI && window.electronAPI.setNativeTheme) {
+  //   window.electronAPI.setNativeTheme(isDark);
+  // }
 }

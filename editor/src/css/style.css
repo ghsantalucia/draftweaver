@@ -6,21 +6,22 @@
 :root {
   /* Cores de Fundo Base */
   --bg-app: #f4f5f7;
-  --bg-header: #1e1e2f;
-  --bg-sidebar: #1e1e2f;
-  --bg-editor: #ffffff;
+  --bg-header: #0e0f17;
+  --bg-editor: #f4f5f7;
+  --editor-toolbar: #f7f9fc;
+  --border-app: rgba(255,255,255,0.09);
 
   /* Cores de Texto */
   --text-header: #8b949e;
   --text-sidebar: #ffffff;
   --text-editor: #2f3640;
   --text-muted: #888888;
-  --text-folder: #70a1ff;
+  --text-folder: #8ea4ee;
   --text-file: #dcdde1;
   --text-file-active: #ffffff;
 
   /* Botões e Ações */
-  --btn-primary-bg: #4a69bd;
+  --btn-primary-bg: #394d84;
   --btn-success-bg: #2ed573;
   --btn-disabled-bg: #a4b0be;
   --file-hover-bg: #2f3640;
@@ -42,16 +43,15 @@
 body.dark-theme {
   /* Cores de Fundo Base */
   --bg-app: #12131a;
-  --bg-header: #181926;
-  --bg-sidebar: #181926;
-  --bg-editor: #1e1e2e;
+  --bg-editor: #171820;
+  --editor-toolbar: #171820;
   
   /* Cores de Texto */
   --text-header: #a6adc8;
   --text-sidebar: #cdd6f4;
   --text-editor: #cdd6f4;
   --text-muted: #6c7086;
-  --text-folder: #89b4fa;
+  --text-folder: #8ea4ee;
   --text-file: #bac2de;
   --text-file-active: #ffffff;
   
@@ -82,7 +82,7 @@ body.dark-theme .toastui-editor-defaultUI *::-webkit-scrollbar {
 }
 
 body.dark-theme .toastui-editor-defaultUI *::-webkit-scrollbar-track {
-  background: var(--bg-editor) !important;
+  background: var(--bg-header) !important;
 }
 
 body.dark-theme .toastui-editor-defaultUI *::-webkit-scrollbar-thumb {
@@ -98,17 +98,16 @@ body.dark-theme .toastui-editor-defaultUI *::-webkit-scrollbar-thumb:hover {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 body,
 html {
   height: 100vh;
   overflow: hidden;
-  background-color: var(--bg-app);
+  background-color: var(--bg-header);
   display: flex;
   flex-direction: column;
-  /* Cabeçalho no topo, App em baixo */
 }
 
 .app-container {
@@ -138,6 +137,10 @@ html,
 .editor-area .toastui-editor-contents {
   user-select: text;
   -webkit-user-select: text;
+}
+
+.toastui-editor-main a {
+  cursor: pointer;
 }
 
 /* ==========================================================================
@@ -206,12 +209,6 @@ html,
   background: #76818d;
   color: rgb(188, 188, 188);
   cursor: not-allowed;
-}
-
-#btn-save {
-  background-color: var(--btn-primary-bg);
-  color: white;
-  padding: 10px 17px;
 }
 
 /* Toggle Switch (Chave Deslizante) */
@@ -313,22 +310,21 @@ input:checked+.slider:before {
    ========================================================================== */
 
 .sidebar {
-  width: 400px;
-  min-width: 400px;
-  max-width: 400px;
-  flex-shrink: 0;
-  background-color: var(--bg-header);
-  color: var(--text-sidebar);
+  width: 480px;
+  min-width: 480px;
+  max-width: 480px;
+  height: 100%;
   padding: 15px;
   padding-top: 0px;
+  background-color: var(--bg-header);
+  color: var(--text-sidebar);
+  border-right: 1px solid var(--border-app);
   display: flex;
   flex-direction: column;
   gap: 15px;
-  /* Trava essencial para conter o flexbox */
-  height: 100%;
+  flex-shrink: 0;
   min-height: 0;
   overflow: hidden;
-  /* Impede a sidebar de empurrar o container para fora da tela */
 }
 
 .sidebar-header {
@@ -338,9 +334,9 @@ input:checked+.slider:before {
 }
 
 #select-book {
+  padding: 5px 10px;
   font-size: 25px;
   font-weight: bold;
-  font-family: calibri;
   background-color: transparent;
   color: var(--text-sidebar);
   border: none;
@@ -349,22 +345,22 @@ input:checked+.slider:before {
   text-align: left; /* Mudado de center para left para dar espaço ao botão */
   flex-grow: 1;    /* Faz o select ocupar o espaço disponível sem empurrar o botão */
   min-width: 0;    /* Evita estouro de largura no flexbox */
-
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-
   appearance: none;
   -webkit-appearance: none;
-
   /* Impede quebras de linha e ativa reticências com desvanecimento */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-
   /* Remove a seta padrão do sistema para visual mais limpo */
   appearance: none;
   -webkit-appearance: none;
+}
+
+select#select-book:hover {
+    background-color: #ffffff14;
 }
 
 /* Estilização da caixa de opções abertas (Dropdown) */
@@ -438,7 +434,7 @@ input:checked+.slider:before {
 
 .folder-name {
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 600;
   color: var(--text-folder);
   display: block;
   padding: 2px 0;
@@ -519,8 +515,9 @@ li.folder.collapsed>.folder-name::before {
   border: none;
   color: var(--text-muted);
   padding: 8px 4px;
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   font-weight: 600;
+  letter-spacing: 0.4px;
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease;
@@ -550,8 +547,8 @@ li.folder.collapsed>.folder-name::before {
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 48px; /* Altura recolhida (apenas o cabeçalho) */
-  background: linear-gradient(180deg, #24253b 0%, #181926 100%);
+  height: 45.5px;
+  background-color: #09090b; /* Fundo preto sólido */
   border-top: 1px solid rgba(137, 180, 250, 0.2);
   display: flex;
   flex-direction: column;
@@ -562,25 +559,29 @@ li.folder.collapsed>.folder-name::before {
 
 /* Estado expandido: sobe até cobrir o corpo da sidebar abaixo do header */
 .ai-assistant-drawer.expanded {
-  height: calc(100% - 110px); /* Deixa apenas o header do livro visível */
+  height: calc(100% - 50px); /* Deixa apenas o header do livro visível */
   box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.5);
 }
 
 .ai-assistant-header {
-  height: 48px;
-  min-height: 48px;
+  height: 45.5px;
+  min-height: 45.5px;
   padding: 0 15px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
   user-select: none;
+  background-color: #09090b;
+  border-bottom: 1px solid var(--border-app);
+  z-index: 2;
 }
 
 .ai-title-container {
   display: flex;
   align-items: center;
   gap: 8px;
+  letter-spacing: 0.5px;
 }
 
 .ai-sparkles-icon {
@@ -604,7 +605,8 @@ li.folder.collapsed>.folder-name::before {
   background: transparent;
   border: none;
   color: var(--text-muted);
-  font-size: 0.75rem;
+  font-size: 0.60rem;
+  opacity: 0.8;
   cursor: pointer;
   transition: transform 0.3s ease, color 0.2s ease;
 }
@@ -615,12 +617,25 @@ li.folder.collapsed>.folder-name::before {
 
 /* Corpo do Chat dentro da Gaveta */
 .ai-assistant-body {
+  position: relative;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   padding: 12px;
   gap: 10px;
   min-height: 0;
+  /* background-color: #000000; */
+  background: linear-gradient(0deg, #0e0f17 0%, #030305 100%)
+}
+
+#ai-bg-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .ai-chat-messages {
@@ -631,6 +646,12 @@ li.folder.collapsed>.folder-name::before {
   gap: 8px;
 }
 
+.ai-chat-messages,
+.ai-chat-input-container {
+  position: relative;
+  z-index: 1;
+}
+
 .ai-message {
   font-size: 0.8rem;
   padding: 8px 12px;
@@ -639,9 +660,10 @@ li.folder.collapsed>.folder-name::before {
 }
 
 .ai-message.system {
-  background-color: rgba(137, 180, 250, 0.1);
+  background-color: rgba(255, 255, 255, 0.03);
   color: var(--text-sidebar);
-  border: 1px solid rgba(137, 180, 250, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(4px);
 }
 
 .ai-chat-input-container {
@@ -651,24 +673,168 @@ li.folder.collapsed>.folder-name::before {
 
 .ai-chat-input-container input {
   flex-grow: 1;
-  background-color: var(--bg-header);
+  background-color: rgba(24, 25, 38, 0.7);
   border: 1px solid var(--slider-bg);
   border-radius: 6px;
   padding: 8px 10px;
   color: var(--text-sidebar);
   font-size: 0.8rem;
   outline: none;
+  backdrop-filter: blur(4px);
 }
 
-.ai-chat-input-container button {
-  background-color: var(--btn-primary-bg);
-  color: white;
+/* --------------------------------------------------------------------------
+   ESTILOS DOS BALÕES DE CHAT (GLASSMORPHISM)
+   -------------------------------------------------------------------------- */
+
+.ai-chat-messages {
+  position: relative;
+  z-index: 1;
+  flex-grow: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-right: 4px;
+}
+
+/* Base comum para as mensagens */
+.ai-message {
+  max-width: 88%;
+  padding: 12px 16px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  border-radius: 14px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  word-break: break-word;
+}
+
+/* Mensagens da IA (Esquerda - vidro fosco translúcido) */
+.ai-message.system,
+.ai-message.assistant {
+  align-self: flex-start;
+  /* Fundo preto/azulado bem sutil para manter legibilidade sem cobrir totalmente as estrelas */
+  background: rgba(14, 15, 23, 0.45); 
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #cdd6f4;
+  border-bottom-left-radius: 4px;
+  
+  /* Desfoca o canvas de estrelas que passa por trás do balão */
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* Mensagens do Usuário (Direita - tom de destaque com mais opacidade) */
+.ai-message.user {
+  align-self: flex-end;
+  background: rgba(137, 180, 250, 0.18);
+  border: 1px solid rgba(137, 180, 250, 0.35);
+  color: #ffffff;
+  border-bottom-right-radius: 4px;
+}
+
+/* --------------------------------------------------------------------------
+   TEXTAREA AUTO-EXPANSÍVEL E BOTÃO EMBUTIDO (ESTILO GEMINI)
+   -------------------------------------------------------------------------- */
+
+.ai-chat-input-container {
+  position: relative;
+  z-index: 1;
+  padding-top: 6px;
+}
+
+/* Container do Balão do Input */
+.ai-input-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column; /* Empilha a textarea e a linha do botão */
+  background: rgba(18, 19, 28, 0.75);
+  border: 1px solid rgba(137, 180, 250, 0.25);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  padding: 10px 10px 8px 12px;
+  width: 100%;
+}
+
+.ai-input-wrapper:focus-within {
+  border-color: rgba(137, 180, 250, 0.5);
+  box-shadow: 0 0 12px rgba(137, 180, 250, 0.15);
+}
+
+.ai-input-wrapper textarea {
+  width: 100%;
+  background: transparent;
   border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 0.78rem;
-  font-weight: 600;
+  outline: none;
+  color: #cdd6f4;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  resize: none;
+  /* Altura inicial: 2 linhas (~2.8em) | Altura máxima: 10 linhas (~14em) */
+  min-height: 2.8em;
+  max-height: 14em;
+  padding: 0 4px 6px 0;
+  font-family: inherit;
+}
+
+.ai-input-wrapper textarea::placeholder {
+  color: #6c7086;
+}
+
+/* Container de Ações Inferior */
+.ai-input-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 100%;
+  padding-top: 4px;
+}
+
+/* Botão Redondo Perfeito */
+.btn-send-round {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: 30%;
+  border: none;
+  background-color: #3677b3;
+  color: #0d0e15; /* Cor da seta para contraste */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  padding: 0;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+/* Regra para garantir a visibilidade e o tamanho do ícone SVG */
+.btn-send-round svg {
+  width: 20px;
+  height: 20px;
+  stroke: #0d0e15;
+  display: block;
+}
+
+.btn-send-round:hover {
+  opacity: 0.8;
+}
+
+.btn-send-round:active {
+  transform: scale(0.95);
+}
+
+/* Scrollbar discreta para a textarea */
+.ai-input-wrapper textarea::-webkit-scrollbar {
+  width: 4px;
+}
+.ai-input-wrapper textarea::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
 }
 
 /* ==========================================================================
@@ -678,7 +844,6 @@ li.folder.collapsed>.folder-name::before {
 /* Correção para o Toast UI escurecer totalmente */
 body.dark-theme .toastui-editor-defaultUI {
   background-color: var(--bg-editor) !important;
-  border-color: #313244 !important;
 }
 
 body.dark-theme .toastui-editor-main,
@@ -693,8 +858,7 @@ body.dark-theme .toastui-editor-contents {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  padding: 15px;
-  background: var(--bg-app);
+  background: var(--editor-toolbar);
   height: 100%;
   overflow: hidden;
   position: relative;
@@ -705,10 +869,13 @@ body.dark-theme .toastui-editor-contents {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
-  color: #577cb1;
+  color: var(--text-muted);
   font-size: 12px;
   letter-spacing: 1px;
+  padding: 5px 10px;
+  border: solid var(--border-app) 1px;
+  border-left: none;
+  border-right: none;
 }
 
 .CodeMirror {
@@ -724,7 +891,6 @@ body.dark-theme .toastui-editor-contents {
 }
 
 .toastui-editor-defaultUI {
-  border: 1px solid #ddd !important;
   border-radius: 6px;
   height: 100% !important;
 }
@@ -756,6 +922,29 @@ body.dark-theme .toastui-editor-contents {
 /* Garante que o texto selecionado (se houver) não mude de cor */
 .toastui-editor-defaultUI.readonly-mode ::selection {
   background: transparent !important;
+}
+
+.toastui-editor-defaultUI, .toastui-editor-dark {
+   border-radius: 0px;
+}
+
+.editor-header {
+   height: 51px;
+   max-height: 51px;
+   min-height: 51px;
+   box-sizing: border-box;
+}
+
+.toastui-editor-defaultUI-toolbar {
+  border-bottom: 1px solid #b2b2b2 !important;
+}
+body.dark-theme .toastui-editor-defaultUI-toolbar {
+  background-color: var(--editor-toolbar) !important;
+  border-bottom: 1px solid #313244 !important;
+}
+
+.toastui-editor-defaultUI, #markdown-editor  {
+  border: none !important;
 }
 
 /* ==========================================================================
@@ -865,27 +1054,30 @@ body.dark-theme .toastui-editor-contents {
 
 #btn-save {
   position: relative;
-  width: 160px;
-  height: 40px;
+  width: 146px;
+  height: 35px;
   background: linear-gradient(90deg, #1a3058, #264ea5, #1a3058);
   background-size: 300% 100%; /* Permite o GSAP mover o gradiente suavemente */
   color: #ffffff;
   border: 1px solid rgba(112, 161, 255, 0.25);
   border-radius: 8px;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.80rem;
   cursor: pointer;
   outline: none;
   overflow: visible; /* Necessário para o brilho expansivo */
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  color: white;
+  padding: 5px 10px;
 }
 
 .btn-text {
   position: relative;
   z-index: 2;
   pointer-events: none;
+  letter-spacing: 0.7px;
 }
 
 /* SVG do Borda */
@@ -916,11 +1108,11 @@ body.dark-theme .toastui-editor-contents {
 /* Fundo escuro atrás do menu */
 .drawer-overlay {
   position: fixed;
-  top: 0;
+  top: 30px;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(19, 19, 19, 0.5);
   backdrop-filter: blur(3px);
   z-index: 200;
   opacity: 1;
@@ -936,8 +1128,8 @@ body.dark-theme .toastui-editor-contents {
 .settings-drawer {
   position: fixed;
   top: 0;
-  left: -420px; /* Começa escondido fora da tela */
-  width: 400px;
+  left: -480px; /* Começa escondido fora da tela */
+  width: 480px;
   height: 100vh;
   background-color: var(--bg-header);
   color: var(--text-sidebar);
@@ -947,6 +1139,7 @@ body.dark-theme .toastui-editor-contents {
   display: flex;
   flex-direction: column;
   padding: 20px;
+  border-right: solid #1c1e2d 1px;
 }
 
 /* Estado aberto da gaveta */
@@ -959,7 +1152,7 @@ body.dark-theme .toastui-editor-contents {
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid var(--toggle-bg);
-  padding-bottom: 15px;
+  padding: 15px 0px;
   margin-bottom: 20px;
 }
 

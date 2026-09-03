@@ -177,11 +177,23 @@ async function createFileNode(entry, relativePath, parentMeta = null) {
 
 // Função para encontrar, abrir pastas pai e clicar no arquivo
 export function autoOpenFileByPath(targetPath) {
-
   if (!targetPath) return;
 
-  // Normaliza o caminho removendo pontos e barras iniciais
-  const cleanTargetPath = targetPath.replace(/^\.\.\/books\//, '').replace(/^\//, '');
+  // 1. Decodifica caracteres e normaliza barras
+  let decodedPath = targetPath;
+  try {
+    decodedPath = decodeURIComponent(targetPath);
+  } catch (e) {
+    console.error('Erro ao decodificar targetPath:', e);
+  }
+
+  // Limpa barras do início/fim e remove prefixos conhecidos como 'content/', '../books/', etc.
+  const cleanTargetPath = decodedPath
+    .replace(/\\/g, '/')
+    .replace(/^\/+/, '')
+    .replace(/^content\//, '')
+    .replace(/^\.\.\/books\//, '');
+
   const fileSpans = document.querySelectorAll('.file-name');
 
   console.log(`[RESTORE] Elementos .file-name encontrados no DOM: ${fileSpans.length}`);
@@ -194,23 +206,29 @@ export function autoOpenFileByPath(targetPath) {
   let found = false;
 
   for (const span of fileSpans) {
-    const attrPath = span.getAttribute('data-path') || '';
-    const cleanAttrPath = attrPath.replace(/^\//, '');
+    const attrPath = (span.getAttribute('data-path') || '').replace(/\\/g, '/').replace(/^\/+/, '');
 
-    // Compara se os dois caminhos terminam com a mesma estrutura
-    if (cleanAttrPath === cleanTargetPath || cleanAttrPath.endsWith(cleanTargetPath) || cleanTargetPath.endsWith(cleanAttrPath)) {
+    // 2. Comparações flexíveis:
+    // - Igualdade exata sem prefixos
+    // - Se a árvore termina com o caminho do link
+    // - Se o link termina com o caminho da árvore
+    const isMatch =
+      attrPath === cleanTargetPath ||
+      attrPath.endsWith(cleanTargetPath) ||
+      cleanTargetPath.endsWith(attrPath);
 
+    if (isMatch) {
       found = true;
       console.log('[RESTORE] Match encontrado para o arquivo:', attrPath);
 
-      // Expande todas as pastas pai onde o arquivo está guardado
+      // Expande todas as pastas pai
       let parentLi = span.closest('li.folder');
       while (parentLi) {
         parentLi.classList.remove('collapsed');
         parentLi = parentLi.parentElement.closest('li.folder');
       }
 
-      // Se for um arquivo do modo avançado e o modo estiver desligado, ativa o modo avançado
+      // Se for um arquivo avançado e o modo estiver desligado, ativa-o
       const parentFileLi = span.closest('li');
       if (parentFileLi && parentFileLi.classList.contains('advanced-item')) {
         const modeToggle = document.getElementById('mode-toggle');
@@ -219,15 +237,15 @@ export function autoOpenFileByPath(targetPath) {
         if (container) container.classList.add('show-advanced');
       }
 
-      // Dispara o clique no arquivo
+      // Dispara o clique nativo
       span.click();
-      console.log("Arquivo restaurado com sucesso:", attrPath);
+      console.log("Arquivo restaurado/aberto com sucesso:", attrPath);
       break;
     }
   }
 
   if (!found) {
-    console.warn('[RESTORE] O arquivo salvo existe no storage, mas não foi localizado na árvore atual:', cleanTargetPath);
+    console.warn('[RESTORE] O arquivo existe no link/storage, mas não foi localizado na árvore atual:', cleanTargetPath);
   }
 }
 

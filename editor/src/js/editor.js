@@ -1,10 +1,10 @@
 import { state } from './config.js';
 import { parseMarkdown, showToast, stringifyFrontmatter, normalizeItemMetadata } from './utils.js';
+import { autoOpenFileByPath } from './tree.js'; // Ajuste o caminho de importação conforme sua estrutura
 
 // Inicializa o Editor
 export function initEditor() {
 
-  // Ao criar a instância do Editor:
   const currentTheme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'default';
 
   state.editor = new toastui.Editor({
@@ -21,14 +21,52 @@ export function initEditor() {
   if (btnSave) {
     btnSave.addEventListener('click', saveCurrentFile);
   }
+
+  // Ativa a interceptação de links internos
+  setupInternalLinkHandler();
 }
 
-// editor.js
+// Escuta cliques dentro do container do editor para capturar links de arquivos .md
+function setupInternalLinkHandler() {
+  const container = document.querySelector('#markdown-editor');
+  if (!container) return;
 
-/**
- * Controla o estado de bloqueio (somente leitura) do editor e do botão salvar.
- * @param {boolean} isReadOnly 
- */
+  container.addEventListener('click', (e) => {
+    // Procura se o elemento clicado é uma tag <a> ou está dentro de uma
+    const link = e.target.closest('a');
+    if (!link) return;
+
+    let href = link.getAttribute('href');
+
+    if (href) {
+      // 1. Decodifica caracteres de URL (%C3%A7 -> ç)
+      try {
+        href = decodeURIComponent(href);
+      } catch (err) {
+        console.error('Erro ao decodificar URL do link:', err);
+      }
+
+      // 2. Remove parâmetros de busca (?foo=bar) ou âncoras (#secao) se existirem
+      const cleanHref = href.split('?')[0].split('#')[0];
+
+      // 3. Verifica se é um link interno de Markdown ou um caminho relativo/absoluto interno
+      const isExternal = cleanHref.startsWith('http://') || cleanHref.startsWith('https://') || cleanHref.startsWith('mailto:');
+      const isMarkdownFile = cleanHref.toLowerCase().endsWith('.md');
+
+      if (!isExternal && isMarkdownFile) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        console.log('[LINK INTERNO] Clique detectado para:', cleanHref);
+
+        // Dispara a busca flexível na árvore de arquivos
+        autoOpenFileByPath(cleanHref);
+      }
+    }
+  });
+}
+
+// Controla o estado de bloqueio (somente leitura) do editor e do botão salvar.
 export function setEditorReadOnly(isReadOnly) {
   const editorContainer = document.querySelector('.toastui-editor-defaultUI');
   const btnSave = document.getElementById('btn-save');

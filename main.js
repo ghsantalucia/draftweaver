@@ -14,7 +14,7 @@ function createWindow() {
         title: "DraftWeaver",
         titleBarStyle: 'hidden',
         titleBarOverlay: {
-            color: '#1e1e2f',        /* Cor de fundo da barra para combinar com sua Sidebar */
+            color: '#0e0f17',        /* Cor de fundo da barra para combinar com sua Sidebar */
             symbolColor: '#ffffff',   /* Cor dos ícones (X, -, square) */
             height: 30
         },
