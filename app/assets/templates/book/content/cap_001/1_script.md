@@ -3,9 +3,8 @@ humanRead: true
 humanWrite: true
 aiRead: true
 aiWrite: true
-advanced: false
-title: Manuscrito
-description: null
+advanced: true
+title: "Plano Executivo"
 ---
 
-# CAPÍTULO
+# PLANO EXECUTIVO - CAPÍTULO

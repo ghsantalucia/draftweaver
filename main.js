@@ -1,3 +1,7 @@
+/**
+ * @file Ponto de entrada do Electron, gerencia a janela principal e manipuladores IPC do sistema de arquivos.
+ */
+
 const { app, BrowserWindow, Menu, ipcMain, dialog, globalShortcut } = require('electron');
 const path = require('path');
 const fs = require('fs');
@@ -10,7 +14,7 @@ function createWindow() {
         width: 1200,
         height: 800,
         // Define o ícone da janela
-        icon: path.join(__dirname, 'editor', 'assets', 'img', 'icon.ico'),
+        icon: path.join(__dirname, 'app', 'assets', 'img', 'icon.ico'),
         title: "DraftWeaver",
         titleBarStyle: 'hidden',
         titleBarOverlay: {
@@ -45,8 +49,8 @@ function createWindow() {
         }
     });
 
-    // Aponta para a pasta /editor
-    mainWindow.loadFile(path.join(__dirname, 'editor', 'index.html'));
+    // Aponta para a pasta /app
+    mainWindow.loadFile(path.join(__dirname, 'app', 'index.html'));
 
     mainWindow.webContents.on('before-input-event', (event, input) => {
         if (!app.isPackaged && input.type === 'keyDown') {

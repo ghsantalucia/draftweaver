@@ -1,11 +1,10 @@
 ---
 humanRead: true
-humanWrite: true
+humanWrite: false
 aiRead: true
 aiWrite: true
 advanced: false
-title: Manuscrito
-description: null
+title: "Linha do Tempo"
 ---
 
-# CAPÍTULO
+# TIMELINE.MD

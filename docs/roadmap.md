@@ -6,7 +6,7 @@ Fase 1 — O Editor:
 
     [x] Árvore de arquivos dinâmica (apenas pastas e .md).
 
-    [ ] Suporte ao folder.yml com herança de propriedades.
+    [X] Suporte ao folder.yml com herança de propriedades.
 
     [x] Leitura e escrita de metadados Frontmatter YAML.
 
@@ -14,7 +14,7 @@ Fase 1 — O Editor:
 
 Fase 2 — O Framework:
 
-    [X] Criação da pasta de modelos em editor/assets/templates/.
+    [X] Criação da pasta de modelos em app/assets/templates/.
 
     [ ] Modal/Fluxo de interface para "Criar Novo Projeto" (copiando os arquivos do template).
 

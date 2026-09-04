@@ -1,5 +1,5 @@
 /**
- * Módulo de Gerenciamento de Temas (Claro / Escuro)
+ * @file Gerencia a alternância e a persistência dos temas claro/escuro na aplicação e no editor de texto.
  */
 
 export function initTheme() {

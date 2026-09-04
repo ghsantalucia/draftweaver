@@ -1,10 +1,16 @@
-import { state } from './config.js';
-import { parseMarkdown, showToast, stringifyFrontmatter, normalizeItemMetadata } from './utils.js';
-import { autoOpenFileByPath } from './tree.js'; // Ajuste o caminho de importação conforme sua estrutura
+/**
+ * @file Controla a inicialização do ToastUI Editor, leitura e salvamento de arquivos Markdown e aplicação de regras de permissão de escrita na UI.
+ */
 
-// Inicializa o Editor
+import { state } from '../config.js';
+import { parseMarkdown, stringifyFrontmatter } from '../utils/markdown.js';
+import { showToast, normalizeItemMetadata } from '../utils/helpers.js';
+import { readFile, saveFile, autoOpenFileByPath } from '../core/fileService.js';
+
+/**
+ * Inicializa a instância do ToastUI Editor no DOM.
+ */
 export function initEditor() {
-
   const currentTheme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'default';
 
   state.editor = new toastui.Editor({
@@ -16,40 +22,35 @@ export function initEditor() {
     theme: currentTheme
   });
 
-  // Configura evento de salvar
   const btnSave = document.getElementById('btn-save');
   if (btnSave) {
     btnSave.addEventListener('click', saveCurrentFile);
   }
 
-  // Ativa a interceptação de links internos
   setupInternalLinkHandler();
 }
 
-// Escuta cliques dentro do container do editor para capturar links de arquivos .md
+/**
+ * Escuta cliques dentro do container do editor para capturar navegações por links internos de arquivos Markdown.
+ */
 function setupInternalLinkHandler() {
   const container = document.querySelector('#markdown-editor');
   if (!container) return;
 
   container.addEventListener('click', (e) => {
-    // Procura se o elemento clicado é uma tag <a> ou está dentro de uma
     const link = e.target.closest('a');
     if (!link) return;
 
     let href = link.getAttribute('href');
 
     if (href) {
-      // 1. Decodifica caracteres de URL (%C3%A7 -> ç)
       try {
         href = decodeURIComponent(href);
       } catch (err) {
         console.error('Erro ao decodificar URL do link:', err);
       }
 
-      // 2. Remove parâmetros de busca (?foo=bar) ou âncoras (#secao) se existirem
       const cleanHref = href.split('?')[0].split('#')[0];
-
-      // 3. Verifica se é um link interno de Markdown ou um caminho relativo/absoluto interno
       const isExternal = cleanHref.startsWith('http://') || cleanHref.startsWith('https://') || cleanHref.startsWith('mailto:');
       const isMarkdownFile = cleanHref.toLowerCase().endsWith('.md');
 
@@ -58,15 +59,16 @@ function setupInternalLinkHandler() {
         e.stopPropagation();
 
         console.log('[LINK INTERNO] Clique detectado para:', cleanHref);
-
-        // Dispara a busca flexível na árvore de arquivos
         autoOpenFileByPath(cleanHref);
       }
     }
   });
 }
 
-// Controla o estado de bloqueio (somente leitura) do editor e do botão salvar.
+/**
+ * Define o estado de leitura/escrita do editor de texto e dos controles associados na UI.
+ * @param {boolean} isReadOnly Define se o editor deve bloquear interações do usuário
+ */
 export function setEditorReadOnly(isReadOnly) {
   const editorContainer = document.querySelector('.toastui-editor-defaultUI');
   const btnSave = document.getElementById('btn-save');
@@ -80,7 +82,6 @@ export function setEditorReadOnly(isReadOnly) {
   if (isReadOnly) {
     editorContainer.classList.add('readonly-mode');
 
-    // Instancia os handlers globais se ainda não existirem
     if (!state.readOnlyKeyHandler) {
       state.readOnlyKeyHandler = (e) => {
         e.preventDefault();
@@ -116,63 +117,63 @@ export function setEditorReadOnly(isReadOnly) {
   }
 }
 
-// Leitura de arquivo via Electron
+/**
+ * Lê o conteúdo do arquivo usando o FileService e renderiza no editor.
+ * @param {string} fullPath Caminho absoluto no disco
+ * @param {string} relativePath Caminho relativo para exibição e gravação de histórico
+ */
 export async function openFileElectron(fullPath, relativePath) {
   state.currentFilePath = fullPath;
-  const rawText = await window.electronAPI.readFile(fullPath);
+  
+  // Solagado para o FileService lidar com a chamada de leitura
+  const rawText = await readFile(fullPath);
 
   if (rawText === null) return;
 
-  // Normalização com os fallbacks definidos
   const { metadata: rawMeta, body } = parseMarkdown(rawText);
-
-  // Extrai o nome do arquivo para usar de fallback caso não haja 'title' no YAML
   const fileName = relativePath.split(/[/\\]/).pop();
-
-  // Aplica os fallbacks centralizados
   const metadata = normalizeItemMetadata(rawMeta, fileName);
 
   state.currentFileMetadata = metadata;
-  // state.currentFileMetadata = normalizedMeta;
 
   if (state.editor) {
     state.editor.setMarkdown(body);
     state.editor.moveCursorToStart();
   }
 
-  // Esconde o overlay de "Nenhum arquivo selecionado"
   const noFileOverlay = document.getElementById('no-file-overlay');
   if (noFileOverlay) noFileOverlay.classList.add('hidden');
 
   document.getElementById('page-title').innerText = relativePath;
   localStorage.setItem('last_open_file', relativePath);
 
-  // Regra de escrita: Bloqueia se humanWrite for false
   const isReadOnly = !metadata.humanWrite;
-
   setEditorReadOnly(isReadOnly);
 }
 
-// Salvar via Electron
+/**
+ * Prepara o conteúdo visual do editor e delega a gravação para o FileService.
+ * @param {Event} [e] Evento opcional de clique
+ */
 export async function saveCurrentFile(e) {
-
   if (e) e.preventDefault();
   if (!state.currentFilePath) return;
 
-  // Usa o stringifyFrontmatter para converter o Objeto de volta em texto YAML
   const contentToSave = stringifyFrontmatter(state.currentFileMetadata, state.editor.getMarkdown());
-
-  const res = await window.electronAPI.saveFile(state.currentFilePath, contentToSave);
+  
+  // Delegado para o FileService!
+  const res = await saveFile(state.currentFilePath, contentToSave);
 
   if (res.success) {
-    // Dispara a animação visual do GSAP ao confirmar o salvamento
     showToast('✓ Arquivo salvo com sucesso!', 'success');
   } else {
     showToast('✕ Erro ao salvar: ' + res.error, 'error');
   }
 }
 
-// Adicione este helper em js/editor.js e importe no js/books.js
+/**
+ * Reseta a interface do editor para o estado inicial sem arquivo aberto.
+ */
 export function resetEditorState() {
   state.currentFilePath = null;
   state.currentFileMetadata = '';
@@ -188,5 +189,4 @@ export function resetEditorState() {
   if (pageTitle) pageTitle.innerText = 'Selecione um arquivo';
   if (btnSave) btnSave.disabled = true;
   if (noFileOverlay) noFileOverlay.classList.remove('hidden');
-
 }

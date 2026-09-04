@@ -1,4 +1,6 @@
-// ANIMAÇÕES UI (uiAnimations.js)
+/**
+ * @file Gerencia as animações da interface do usuário via GSAP, incluindo efeitos em botões, transições do drawer do assistente e a renderização do fundo de estrelas em canvas.
+ */
 
 // BOTÃO SALVAR
 
@@ -41,67 +43,8 @@ export function initSaveButtonAnimation() {
   btn.addEventListener('mouseleave', shrinkButton);
 }
 
-// DRAWER DE ASSISTENTE DE IA
 
-// 1. Alterna o estado da gaveta (Drawer) com fade-in no canvas
-export function toggleAiDrawer() {
-
-  const aiDrawer = document.getElementById('ai-assistant-drawer');
-  const canvas = document.getElementById('ai-bg-canvas');
-  if (!aiDrawer) return;
-
-  const isOpening = !aiDrawer.classList.contains('expanded');
-  aiDrawer.classList.toggle('expanded');
-
-  if (isOpening) {
-    if (canvas) gsap.set(canvas, { opacity: 0 });
-
-    if (typeof window.resetStarsPosition === 'function') {
-      setTimeout(window.resetStarsPosition, 50);
-      setTimeout(window.resetStarsPosition, 350);
-    }
-
-    if (canvas) {
-      gsap.to(canvas, {
-        opacity: 1,
-        duration: 0.5,
-        ease: 'power2.out',
-        delay: 0.1
-      });
-    }
-    document.getElementById('ai-chat-input').focus();
-  } 
-  else {
-    if (canvas) {
-      gsap.to(canvas, {
-        opacity: 0,
-        duration: 0.2
-      });
-    }
-  }
-}
-
-// 2. Configura os gatilhos de clique na interface
-export function setupDrawerEvents() {
-
-  console.log('[DRAWER] Configurando eventos de clique para a gaveta do assistente de IA...');
-
-  const aiHeader = document.getElementById('ai-assistant-header');
-  const btnToggleAi = document.getElementById('btn-toggle-ai');
-
-  if (aiHeader) {
-    aiHeader.addEventListener('click', toggleAiDrawer);
-  }
-
-  if (btnToggleAi) {
-    btnToggleAi.addEventListener('click', (e) => {
-      e.stopPropagation();
-      toggleAiDrawer();
-    });
-  }
-}
-
-// 3. Animação do fundo estrelado
+// Animação do fundo estrelado
 // --- Funções Auxiliares de Construção e Desenho ---
 function createStars(count, width, height) {
   const stars = [];

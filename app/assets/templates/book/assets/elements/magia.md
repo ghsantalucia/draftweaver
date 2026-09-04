@@ -4,8 +4,7 @@ humanWrite: true
 aiRead: true
 aiWrite: true
 advanced: false
-title: Manuscrito
-description: null
+title: "Sistema de Magia"
 ---
 
-# CAPÍTULO
+# MAGIA.MD

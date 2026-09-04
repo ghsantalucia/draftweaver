@@ -1,3 +1,7 @@
+/**
+ * @file Expõe a API segura via IPC para comunicação entre o processo de renderização e o Node.js.
+ */
+
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {

@@ -4,8 +4,7 @@ humanWrite: true
 aiRead: true
 aiWrite: true
 advanced: true
-title: Plano Executivo
-description: null
+title: "Metadados do Capítulo"
 ---
 
-# PLANO EXECUTIVO - CAPÍTULO
+# METADADOS - CAPÍTULO

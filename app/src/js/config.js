@@ -1,3 +1,7 @@
+/**
+ * @file Gerencia o estado global compartilhado e define os valores padrão para os metadados e permissões dos arquivos.
+ */
+
 // Estado Global Compartilhado
 export const state = {
   editor: null,

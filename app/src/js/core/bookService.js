@@ -1,14 +1,20 @@
-import { state } from './config.js';
-import { renderTree } from './tree.js';
-import { resetEditorState } from './editor.js';
+/**
+ * @file Serviço responsável por gerenciar a lista de livros, dados de configuração por projeto e verificação de travas da IA no Electron.
+ */
 
+import { state } from '../config.js';
+import { renderTree } from '../explorer/index.js';
+import { resetEditorState } from '../editor/index.js';
+import { readFile } from './fileService.js';
 
-// 1. Função com Responsabilidade ÚNICA: Verificar Trava da IA
+/**
+ * Verifica o arquivo config.json do livro atual para gerenciar a exibição do overlay de trava da IA.
+ */
 export async function checkAILock() {
   if (!state.currentBookPath) return;
 
   const configPath = `${state.currentBookPath}/config.json`;
-  const text = await window.electronAPI.readFile(configPath);
+  const text = await readFile(configPath);
 
   if (!text) return;
 
@@ -24,11 +30,13 @@ export async function checkAILock() {
       }
     }
   } catch (err) {
-    // Silencia erro enquanto o arquivo é gravado
+    // Silencia erro enquanto o arquivo está sendo gravado
   }
 }
 
-// 2. Função com Responsabilidade ÚNICA: Polling para atualizar os títulos dos livros no Select
+/**
+ * Executa o polling para manter atualizados os títulos dos livros no elemento <select>.
+ */
 export async function updateBookTitlesInSelect() {
   const selectBook = document.getElementById('select-book');
   if (!selectBook) return;
@@ -46,7 +54,9 @@ export async function updateBookTitlesInSelect() {
   });
 }
 
-// Popula o <select> com os livros encontrados na pasta /books
+/**
+ * Popula o <select> da interface com a lista de livros encontrados na pasta /books.
+ */
 export async function popularSelectDeLivros() {
   const selectBook = document.getElementById('select-book');
   if (!selectBook) return;
@@ -66,7 +76,7 @@ export async function popularSelectDeLivros() {
     selectBook.appendChild(option);
   });
 
-  // Verifica se o usuário já tinha um livro aberto anteriormente
+  // Tenta restaurar o último livro selecionado no localStorage ou assume o primeiro da lista
   const lastSelectedBook = localStorage.getItem('last_selected_book');
   const bookToLoad = books.find(b => b.fullPath === lastSelectedBook) || books[0];
 
@@ -74,15 +84,18 @@ export async function popularSelectDeLivros() {
   state.currentBookPath = bookToLoad.fullPath;
   localStorage.setItem('last_selected_book', bookToLoad.fullPath);
 
-  // CHAMADA 1: Atualiza o título no carregamento inicial
+  // Atualiza a janela com o título do livro
   updateWindowTitle(bookToLoad.title);
 
-  // Renderiza a árvore do livro selecionado
-  resetEditorState(); // Bloqueia o editor ao trocar de livro
+  // Reseta o editor e renderiza a árvore de diretórios do livro selecionado
+  resetEditorState();
   await renderTree();
 }
 
-// Exemplo no js/books.js na troca do livro ou inicialização:
+/**
+ * Atualiza o título da janela principal da aplicação.
+ * @param {string} bookTitle Título do livro selecionado
+ */
 export function updateWindowTitle(bookTitle) {
   if (bookTitle) {
     document.title = `${bookTitle} — DraftWeaver`;

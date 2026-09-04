@@ -1,31 +1,35 @@
-import { state } from './config.js';
-import { openFileElectron } from './editor.js';
-import { parseMarkdown, normalizeItemMetadata } from './utils.js';
+/**
+ * @file Constrói e gerencia a interface da árvore de arquivos e pastas no painel lateral com suporte a filtros YAML e permissões de exibição.
+ */
 
+import { state } from '../config.js';
+import { openFileElectron } from '../editor/index.js';
+import { parseMarkdown, normalizeItemMetadata } from '../utils/helpers.js';
 
+/**
+ * Renderiza a árvore de arquivos no container DOM principal.
+ */
 export async function renderTree() {
-
   const container = document.getElementById('file-tree');
   if (!container || !state.currentBookPath) return;
 
   container.innerHTML = ''; // Limpa a árvore antes de re-renderizar
 
-  // Chama a construção passando o caminho no disco e o nome base
   const folderName = state.currentBookPath.split(/[/\\]/).pop();
   const ul = await buildTree(state.currentBookPath, folderName);
   container.appendChild(ul);
-
 }
 
-// Função principal: busca as entradas da pasta e coordena a montagem da árvore.
+/**
+ * Função principal de montagem: busca entradas no disco e coordena a hierarquia.
+ */
 export async function buildTree(directoryPath, currentPath, parentMeta = null) {
-  
   const ul = document.createElement('ul');
 
   const folderData = await window.electronAPI.getTree(directoryPath);
   const rawEntries = folderData && folderData.children ? folderData.children : [];
 
-  // FIXME: +++ INSERIR LOG +++
+  // TODO: Integrar com o novo sistema de Logs
   console.log(`[DEBUG buildTree] Pasta: "${directoryPath}" | Total de itens lidos:`, rawEntries.length, rawEntries.map(e => e.name));
 
   const entries = rawEntries.filter(e => {
@@ -51,31 +55,29 @@ export async function buildTree(directoryPath, currentPath, parentMeta = null) {
     }
   }
 
-  // Função auxiliar para comparar o título visível nos elementos <span>
   const compareByTitle = (a, b) => {
     const titleA = a.querySelector('span')?.innerText || '';
     const titleB = b.querySelector('span')?.innerText || '';
     return titleA.localeCompare(titleB, undefined, { numeric: true, sensitivity: 'base' });
   };
 
-  // Ordena as pastas e arquivos separadamente pelo título (meta.title)
   folderNodes.sort(compareByTitle);
   fileNodes.sort(compareByTitle);
 
-  // Anexa na árvore (primeiro pastas, depois arquivos)
   [...folderNodes, ...fileNodes].forEach(node => ul.appendChild(node));
 
   return ul;
 }
 
-// Processa a pasta, lê o folder.yml e monta o nó <li> se permitido.
+/**
+ * Processa uma pasta, lê seu `folder.yml` e monta o nó de pasta (`<li>`) se visível.
+ */
 async function createFolderNode(entry, relativePath, parentMeta = null) {
   const folderYmlPath = `${entry.path}/folder.yml`;
   let rawMeta = {};
 
   const rawText = await window.electronAPI.readFile(folderYmlPath);
 
-  // FIXME: +++ INSERIR LOG +++
   console.log(`[DEBUG Folder YML] Lendo "${folderYmlPath}" -> Sucesso? ${!!rawText}`);
 
   if (rawText) {
@@ -83,19 +85,15 @@ async function createFolderNode(entry, relativePath, parentMeta = null) {
     rawMeta = parsed.metadata || {};
   }
 
-  // Normalização unificada
   const meta = normalizeItemMetadata(rawMeta, entry.name);
   state.fileMetadataMap[relativePath] = meta;
 
-  // FIXME: +++ INSERIR LOG +++
   console.log(`[DEBUG Folder Meta] Pasta: "${entry.name}" | humanRead:`, meta.humanRead, '| Meta final:', meta);
 
-  // Regra 1: Se humanRead for false, ignora a pasta e a subárvore
   if (!meta.humanRead) {
     return null;
   }
 
-  // Herda a propriedade advanced da pasta pai caso ela exista
   if (parentMeta && parentMeta.advanced === true) {
     meta.advanced = true;
   }
@@ -125,10 +123,10 @@ async function createFolderNode(entry, relativePath, parentMeta = null) {
   return li;
 }
 
-// Lê o arquivo, processa metadados e cria o nó <li> para arquivos .md
+/**
+ * Lê o arquivo Markdown, avalia permissões no Frontmatter e cria o nó de arquivo (`<li>`).
+ */
 async function createFileNode(entry, relativePath, parentMeta = null) {
-
-  // FIXME: +++ INSERIR LOG +++
   console.log(`[DEBUG File Process] Processando arquivo: "${relativePath}"`);
 
   let rawMeta = {};
@@ -139,21 +137,17 @@ async function createFileNode(entry, relativePath, parentMeta = null) {
     rawMeta = parsed.metadata || {};
   }
 
-  // Normalização unificada
   const meta = normalizeItemMetadata(rawMeta, entry.name);
   state.fileMetadataMap[relativePath] = meta;
 
-  // FIXME: +++ INSERIR LOG +++
-  console.log(`[DEBUG File Meta] Arquivo: "${entry.name}" | humanRead:`, meta.humanRead, '| humanWrite:', meta.humanWrite, '| Retorna NULL?', (!meta.humanRead && !meta.humanWrite));
+  console.log(`[DEBUG File Meta] Arquivo: "${entry.name}" | humanRead:`, meta.humanRead, '| humanWrite:', meta.humanWrite);
 
-  // Oculta se o humano não puder ler nem escrever no arquivo
   if (!meta.humanRead && !meta.humanWrite) {
     return null;
   }
 
   const li = document.createElement('li');
 
-  // Herança: O arquivo assume avançado se a pasta pai for avançada OU se o próprio arquivo for avançado
   const isAdvanced = (parentMeta && parentMeta.advanced === true) || meta.advanced === true;
   if (isAdvanced) {
     li.classList.add('advanced-item');
@@ -173,92 +167,4 @@ async function createFileNode(entry, relativePath, parentMeta = null) {
 
   li.appendChild(span);
   return li;
-}
-
-// Função para encontrar, abrir pastas pai e clicar no arquivo
-export function autoOpenFileByPath(targetPath) {
-  if (!targetPath) return;
-
-  // 1. Decodifica caracteres e normaliza barras
-  let decodedPath = targetPath;
-  try {
-    decodedPath = decodeURIComponent(targetPath);
-  } catch (e) {
-    console.error('Erro ao decodificar targetPath:', e);
-  }
-
-  // Limpa barras do início/fim e remove prefixos conhecidos como 'content/', '../books/', etc.
-  const cleanTargetPath = decodedPath
-    .replace(/\\/g, '/')
-    .replace(/^\/+/, '')
-    .replace(/^content\//, '')
-    .replace(/^\.\.\/books\//, '');
-
-  const fileSpans = document.querySelectorAll('.file-name');
-
-  console.log(`[RESTORE] Elementos .file-name encontrados no DOM: ${fileSpans.length}`);
-
-  if (fileSpans.length === 0) {
-    console.warn('[RESTORE] Nenhum elemento de arquivo encontrado no DOM no momento do clique!');
-    return;
-  }
-
-  let found = false;
-
-  for (const span of fileSpans) {
-    const attrPath = (span.getAttribute('data-path') || '').replace(/\\/g, '/').replace(/^\/+/, '');
-
-    // 2. Comparações flexíveis:
-    // - Igualdade exata sem prefixos
-    // - Se a árvore termina com o caminho do link
-    // - Se o link termina com o caminho da árvore
-    const isMatch =
-      attrPath === cleanTargetPath ||
-      attrPath.endsWith(cleanTargetPath) ||
-      cleanTargetPath.endsWith(attrPath);
-
-    if (isMatch) {
-      found = true;
-      console.log('[RESTORE] Match encontrado para o arquivo:', attrPath);
-
-      // Expande todas as pastas pai
-      let parentLi = span.closest('li.folder');
-      while (parentLi) {
-        parentLi.classList.remove('collapsed');
-        parentLi = parentLi.parentElement.closest('li.folder');
-      }
-
-      // Se for um arquivo avançado e o modo estiver desligado, ativa-o
-      const parentFileLi = span.closest('li');
-      if (parentFileLi && parentFileLi.classList.contains('advanced-item')) {
-        const modeToggle = document.getElementById('mode-toggle');
-        const container = document.getElementById('file-tree');
-        if (modeToggle) modeToggle.checked = true;
-        if (container) container.classList.add('show-advanced');
-      }
-
-      // Dispara o clique nativo
-      span.click();
-      console.log("Arquivo restaurado/aberto com sucesso:", attrPath);
-      break;
-    }
-  }
-
-  if (!found) {
-    console.warn('[RESTORE] O arquivo existe no link/storage, mas não foi localizado na árvore atual:', cleanTargetPath);
-  }
-}
-
-// Tenta reabrir o arquivo salvo no localStorage (Executar SOMENTE na inicialização)
-export function restoreLastOpenedFile() {
-  const lastFile = localStorage.getItem('last_open_file');
-  console.log('[RESTORE] Tentando restaurar arquivo salvo:', lastFile);
-
-  if (!lastFile) {
-    console.log('[RESTORE] Nenhum arquivo salvo no localStorage.');
-    return;
-  }
-
-  // Tenta encontrar o elemento na árvore
-  autoOpenFileByPath(lastFile);
 }
