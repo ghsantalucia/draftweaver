@@ -13,19 +13,16 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <!-- CSS Modo Escuro do Toast UI -->
   <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/theme/toastui-editor-dark.min.css" />
-  <link rel="stylesheet" href="src/css/style.css">
 </head>
 
 <body>
 
   <header id="window-header">
-    <!-- <div id="icon"><img src="assets/img/icon.png"/></div> -->
-
+    <!-- <div id="icon"><img src="/public/icon.png"/></div> -->
   </header>
 
   <div class="app-container">
 
-    <!-- Painel Lateral Esquerdo -->
     <!-- Painel Lateral Esquerdo -->
     <aside class="sidebar">
       <div class="sidebar-header">
@@ -121,12 +118,11 @@
 
     </aside>
 
-    <!-- Área Principal do Editor (TAMBÉM PRECISA ESTAR AQUI) -->
+    <!-- Área Principal do Editor -->
     <main class="editor-area">
 
       <div class="editor-header">
         <span id="page-title">Nenhum arquivo selecionado</span>
-        <!-- <button id="btn-save" type="button" class="btn-success" disabled>Salvar Alterações</button> -->
 
         <button id="btn-save" class="btn-save-gsap">
           <svg class="btn-border-svg">
@@ -172,7 +168,6 @@
     </div>
 
     <div class="drawer-content">
-      <!-- O Modo Escuro foi movido para cá -->
       <div class="toggle-container">
         <span>Modo Escuro</span>
         <label class="switch">
@@ -183,7 +178,8 @@
     </div>
   </div>
 
-  <script type="module" src="src/js/app.js"></script>
+  <!-- Ponto de entrada do Vite para carregar CSS e Scripts JS -->
+  <script type="module" src="./renderer.js"></script>
 </body>
 
 </html>
