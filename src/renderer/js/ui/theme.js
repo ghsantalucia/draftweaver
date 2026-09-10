@@ -3,11 +3,19 @@
  */
 
 export function initTheme() {
+
   const savedTheme = localStorage.getItem('theme');
   const isDark = savedTheme === 'dark';
 
   applyTheme(isDark);
-  return isDark;
+
+  const themeToggle = document.getElementById('theme-toggle');
+  if (themeToggle) {
+    themeToggle.checked = isDark;
+    themeToggle.addEventListener('change', (e) => {
+      toggleTheme(e.target.checked);
+    });
+  }
 }
 
 export function toggleTheme(isDark) {
@@ -16,6 +24,7 @@ export function toggleTheme(isDark) {
 }
 
 function applyTheme(isDark) {
+
   // 1. Altera a classe no body
   if (isDark) {
     document.body.classList.add('dark-theme');

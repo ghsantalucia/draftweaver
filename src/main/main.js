@@ -102,24 +102,22 @@ app.on('window-all-closed', () => {
 
 // === COMUNICAÇÕES COM O SISTEMA (IPC HANDLERS) ===
 
-// Atualizar tema da barra de título nativa
 ipcMain.on('update-titlebar-theme', (event, isDark) => {
   if (!mainWindow) return;
 
   if (isDark) {
     mainWindow.setTitleBarOverlay({
-      color: '#181926',      // Modo escuro
+      color: '#181926',
       symbolColor: '#cdd6f4',
     });
   } else {
     mainWindow.setTitleBarOverlay({
-      color: '#1e1e2f',      // Modo claro
+      color: '#1e1e2f',
       symbolColor: '#ffffff',
     });
   }
 });
 
-// Selecionar pasta no HD
 ipcMain.handle('select-folder', async () => {
   const result = await dialog.showOpenDialog(mainWindow, {
     properties: ['openDirectory'],
@@ -128,57 +126,77 @@ ipcMain.handle('select-folder', async () => {
   return result.filePaths[0];
 });
 
-// Ler arquivo
 ipcMain.handle('read-file', async (event, filePath) => {
   try {
-    return fs.readFileSync(filePath, 'utf-8');
+    if (!filePath || !fs.existsSync(filePath)) return null;
+    return await fs.promises.readFile(filePath, 'utf-8');
   } catch (err) {
+    console.error(`[IPC] Erro ao ler arquivo ${filePath}:`, err);
     return null;
   }
 });
 
-// Salvar arquivo
 ipcMain.handle('save-file', async (event, filePath, content) => {
   try {
-    fs.writeFileSync(filePath, content, 'utf-8');
+    // Garante que o diretório pai exista antes de salvar
+    const dir = path.dirname(filePath);
+    if (!fs.existsSync(dir)) {
+      await fs.promises.mkdir(dir, { recursive: true });
+    }
+    await fs.promises.writeFile(filePath, content, 'utf-8');
     return { success: true };
   } catch (err) {
     return { success: false, error: err.message };
   }
 });
 
-// Mapear pasta e subpastas
+// Mapear pasta e subpastas (Assíncrono e Seguro)
 ipcMain.handle('get-tree', async (event, folderPath) => {
-  function buildTree(dir) {
-    const stats = fs.statSync(dir);
-    const item = {
-      name: path.basename(dir),
-      path: dir,
-      isDirectory: stats.isDirectory(),
-    };
+  if (!folderPath) return null;
 
-    if (stats.isDirectory()) {
-      const children = fs.readdirSync(dir);
-      item.children = children.map((child) => buildTree(path.join(dir, child)));
-    }
-    return item;
-  }
+  // Normaliza o caminho de acordo com o Sistema Operacional
+  const targetPath = path.normalize(folderPath);
 
-  try {
-    return buildTree(folderPath);
-  } catch (err) {
+  if (!fs.existsSync(targetPath)) {
     return null;
   }
+
+  async function buildTree(dir) {
+    try {
+      const stats = await fs.promises.stat(dir);
+      const isDirectory = stats.isDirectory();
+
+      const item = {
+        name: path.basename(dir),
+        path: dir,
+        type: isDirectory ? 'directory' : 'file',
+        isDirectory: isDirectory
+      };
+
+      if (isDirectory) {
+        const children = await fs.promises.readdir(dir);
+        const childrenNodes = await Promise.all(
+          children.map((child) => buildTree(path.join(dir, child)))
+        );
+        item.children = childrenNodes.filter(Boolean);
+      }
+      return item;
+    } catch (err) {
+      console.error(`[IPC get-tree] Erro ao ler ${dir}:`, err);
+      return null;
+    }
+  }
+
+  return await buildTree(targetPath);
 });
 
 // Listar livros dentro da pasta /books
 ipcMain.handle('get-books-list', async () => {
-  // Busca a pasta /books na raiz do projeto
   const booksDir = path.join(process.cwd(), 'books');
   try {
     if (!fs.existsSync(booksDir)) return [];
 
-    const entries = fs.readdirSync(booksDir, { withFileTypes: true });
+    const entries = await fs.promises.readdir(booksDir, { withFileTypes: true });
     const books = [];
 
     for (const entry of entries) {
@@ -189,7 +207,7 @@ ipcMain.handle('get-books-list', async () => {
 
         if (fs.existsSync(configPath)) {
           try {
-            const configContent = fs.readFileSync(configPath, 'utf-8');
+            const configContent = await fs.promises.readFile(configPath, 'utf-8');
             const config = JSON.parse(configContent);
             if (config.book_title) title = config.book_title;
           } catch (e) {

@@ -1,0 +1,27 @@
+[
+  {
+    "role": "user",
+    "content": "fksjdfkjfsdjk",
+    "timestamp": "2026-09-10T01:23:33.942Z"
+  },
+  {
+    "role": "assistant",
+    "content": "Anotei sua ideia! Posso estruturar um resumo detalhado ou ajustar este trecho do capítulo se você desejar.",
+    "timestamp": "2026-09-10T01:23:35.150Z"
+  },
+  {
+    "role": "user",
+    "content": "sdjfksdkfjkjsd",
+    "timestamp": "2026-09-10T01:23:36.254Z"
+  },
+  {
+    "role": "assistant",
+    "content": "Analisando a estrutura da sua narrativa, este desenvolvimento traz um bom ritmo para a trama.",
+    "timestamp": "2026-09-10T01:23:37.461Z"
+  },
+  {
+    "role": "user",
+    "content": "fsjkfsdkj",
+    "timestamp": "2026-09-10T01:23:39.998Z"
+  }
+]

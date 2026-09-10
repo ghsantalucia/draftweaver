@@ -3,13 +3,19 @@
  */
 
 import { state } from './config.js';
-import { initEditor, resetEditorState } from './editor/index.js';
-import { renderTree } from './explorer/index.js';
-import { setupAutoResizeInput, setupAiDrawerEvents } from './chat/index.js';
+import { initEditor } from './editor/index.js';
+import { initExplorerEvents } from './explorer/index.js';
+import { setupAiDrawerEvents } from './chat/index.js';
 import { initSettingsEvents } from './settings/index.js';
-import { popularSelectDeLivros, checkAILock, updateBookTitlesInSelect, updateWindowTitle } from './core/bookService.js';
+import { 
+  popularSelectDeLivros, 
+  restoreLastSelectedBook, 
+  setupBookEvents, 
+  checkAILock, 
+  updateBookTitlesInSelect
+} from './core/bookService.js';
 import { restoreLastOpenedFile } from './core/fileService.js';
-import { initTheme, toggleTheme } from './ui/theme.js';
+import { initTheme } from './ui/theme.js';
 import { initSaveButtonAnimation, initStarryBackground } from './ui/animations.js';
 
 // Inicialização principal quando o DOM estiver carregado
@@ -19,28 +25,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   initEditor();
 
   // 2. Inicializa e aplica o tema salvo
-  const isDark = initTheme();
+  initTheme();
 
-  const themeToggle = document.getElementById('theme-toggle');
-  if (themeToggle) {
-    themeToggle.checked = isDark;
-    themeToggle.addEventListener('change', (e) => {
-      toggleTheme(e.target.checked);
-    });
-  }
+  // 3. Popula a lista de livros no <select>
+  const books = await popularSelectDeLivros();
 
-  // 3. Carrega a lista de livros disponíveis
-  await popularSelectDeLivros();
+  // 4. Seleciona o livro (restaura o último ou seleciona o primeiro) e carrega seu Chat/Tree
+  await restoreLastSelectedBook(books);
 
-  // 4. Restaura o último arquivo aberto via FileService
+  // 5. Restaura o último arquivo aberto via FileService
   restoreLastOpenedFile();
+
+  // 6. Registra todos os eventos de interface
+  setupUIEvents();
 
   // TODO: Migrar pollings para arquitetura orientada a eventos/websocket
   setInterval(checkAILock, 500);
   setInterval(updateBookTitlesInSelect, 1000);
-
-  // 5. Registra todos os eventos de interface
-  setupUIEvents();
 });
 
 /**
@@ -52,52 +53,13 @@ function setupUIEvents() {
   initSaveButtonAnimation();
   initStarryBackground();
   setupAiDrawerEvents();
-  setupAutoResizeInput();
+  initSettingsEvents();
+  initExplorerEvents();
+  setupBookEvents();
 
   // Previne comportamento padrão de arrastar elementos na janela
   document.addEventListener('dragstart', (e) => {
     e.preventDefault();
   }, true);
 
-  // Evento de troca de Livro no Select
-  const selectBook = document.getElementById('select-book');
-  if (selectBook) {
-    selectBook.addEventListener('change', async (e) => {
-      state.currentBookPath = e.target.value;
-      localStorage.setItem('last_selected_book', state.currentBookPath);
-
-      const selectedOption = selectBook.options[selectBook.selectedIndex];
-      if (selectedOption) {
-        updateWindowTitle(selectedOption.innerText);
-      }
-
-      // Reseta estado do editor e renderiza a nova árvore de arquivos
-      resetEditorState();
-      await renderTree();
-
-      // Atualiza trava da IA para o livro selecionado
-      checkAILock();
-    });
-  }
-
-  // Alternador de exibição de itens avançados na árvore
-  const modeToggle = document.getElementById('mode-toggle');
-  if (modeToggle) {
-    modeToggle.addEventListener('change', (e) => {
-      const container = document.getElementById('file-tree');
-      if (container) {
-        if (e.target.checked) {
-          container.classList.add('show-advanced');
-        } else {
-          container.classList.remove('show-advanced');
-        }
-      }
-    });
-  }
-
-  // Inicializa o menu/gaveta de configurações
-  const btnOpenMenu = document.getElementById('btn-open-menu');
-  if (btnOpenMenu) {
-    initSettingsEvents();
-  }
 }
