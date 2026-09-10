@@ -9,7 +9,6 @@ Estrutura do Projeto com Descrições:
 │   ├── roadmap.md
 │   └── ui-controls.md
 ├── forge.config.js
-├── index.html
 ├── LICENCE
 ├── package-lock.json
 ├── package.json
@@ -18,47 +17,47 @@ Estrutura do Projeto com Descrições:
 │   └── icon.png
 ├── README.md
 ├── [src]
-│   ├── index.css
 │   ├── [main]
 │   │   └── main.js — Ponto de entrada do Electron, gerencia a janela principal e manipuladores IPC do sistema de arquivos.
-│   ├── main.js
 │   ├── [preload]
 │   │   └── preload.js — Expõe a API segura via IPC para comunicação entre o processo de renderização e o Node.js.
-│   ├── preload.js
-│   ├── [renderer]
-│   │   ├── [assets]
-│   │   │   └── [css]
-│   │   │       └── style.css
-│   │   ├── index.html
-│   │   └── [js]
-│   │       ├── app.js — Ponto de entrada do frontend (Renderer), responsável por inicializar módulos, escutadores de eventos de UI e orquestrar a aplicação.
-│   │       ├── [chat]
-│   │       │   ├── chatStorage.js — Módulo de armazenamento do chat, responsável por gerenciar o histórico de mensagens e a persistência dos dados do chat.
-│   │       │   ├── chatUi.js — Responsável pelos eventos e comportamentos da interface do Chat com a IA (auto-resize do input, envio com tecla Enter, etc).
-│   │       │   └── index.js — Barrel do módulo Chat, exportando funções e componentes essenciais para a interface do chat.
-│   │       ├── config.js — Gerencia o estado global compartilhado e define os valores padrão para os metadados e permissões dos arquivos.
-│   │       ├── [core]
-│   │       │   ├── bookService.js — Serviço responsável por gerenciar a lista de livros, dados de configuração por projeto e verificação de travas da IA no Electron.
-│   │       │   └── fileService.js — Serviço responsável por centralizar as operações de CRUD de arquivos (leitura, escrita, restauração e resolução de caminhos), servindo como ponte entre o Editor e o Sistema de Arquivos.
-│   │       ├── [editor]
-│   │       │   ├── editor.js — Controla a inicialização do ToastUI Editor, leitura e salvamento de arquivos Markdown e aplicação de regras de permissão de escrita na UI.
-│   │       │   └── index.js — Barrel do módulo Editor, exportando funções e componentes essenciais para a construção do editor de texto e interação com o usuário.
-│   │       ├── [explorer]
-│   │       │   ├── explorerUi.js — Funções da UI do explorador de arquivos (File Explorer), incluindo a renderização da árvore de arquivos, eventos de interação e manipulação de elementos DOM relacionados.
-│   │       │   ├── index.js — Barrel do módulo Explorer, exportando funções e componentes essenciais para a construção da árvore de arquivos e interação com o usuário.
-│   │       │   └── tree.js — Constrói e gerencia a interface da árvore de arquivos e pastas no painel lateral com suporte a filtros YAML e permissões de exibição.
-│   │       ├── [settings]
-│   │       │   ├── index.js — Barrel do módulo Settings, exportando funções e componentes essenciais para a configuração das preferências do usuário.
-│   │       │   └── settingsUi.js — Responsável pelos eventos e comportamentos da interface do Menu de Configurações (Settings Drawer).
-│   │       ├── [ui]
-│   │       │   ├── animations.js — Gerencia as animações da interface do usuário via GSAP, incluindo efeitos em botões, transições do drawer do assistente e a renderização do fundo de estrelas em canvas.
-│   │       │   └── theme.js — Gerencia a alternância e a persistência dos temas claro/escuro na aplicação e no editor de texto.
-│   │       └── [utils]
-│   │           ├── helpers.js — Funções auxiliares genéricas para apoio à interface do usuário, controle de menus e normalizações.
-│   │           └── markdown.js — Utilitário para conversão, parsing e serialização de conteúdos Markdown e metadados Frontmatter YAML.
-│   └── renderer.js
+│   └── [renderer]
+│       ├── [assets]
+│       │   └── [css]
+│       │       └── style.css
+│       ├── index.html
+│       ├── [js]
+│       │   ├── app.js — Ponto de entrada do frontend (Renderer), responsável por inicializar módulos, escutadores de eventos de UI e orquestrar a aplicação.
+│       │   ├── [chat]
+│       │   │   ├── chatStorage.js — Módulo de armazenamento do chat, responsável por gerenciar o histórico de mensagens e a persistência dos dados do chat.
+│       │   │   ├── chatUi.js — Responsável pelos eventos e comportamentos da interface do Chat com a IA (auto-resize do input, envio com tecla Enter, etc).
+│       │   │   └── index.js — Barrel do módulo Chat, exportando funções e componentes essenciais para a interface do chat.
+│       │   ├── config.js — Gerencia o estado global compartilhado e define os valores padrão para os metadados e permissões dos arquivos.
+│       │   ├── [core]
+│       │   │   ├── bookService.js — Serviço responsável por gerenciar a lista de livros, dados de configuração por projeto e verificação de travas da IA no Electron.
+│       │   │   └── fileService.js — Serviço responsável por centralizar as operações de CRUD de arquivos (leitura, escrita, restauração e resolução de caminhos), servindo como ponte entre o Editor e o Sistema de Arquivos.
+│       │   ├── [editor]
+│       │   │   ├── editor.js — Controla a inicialização do ToastUI Editor, leitura e salvamento de arquivos Markdown e aplicação de regras de permissão de escrita na UI.
+│       │   │   └── index.js — Barrel do módulo Editor, exportando funções e componentes essenciais para a construção do editor de texto e interação com o usuário.
+│       │   ├── [explorer]
+│       │   │   ├── explorerUi.js — Funções da UI do explorador de arquivos (File Explorer), incluindo a renderização da árvore de arquivos, eventos de interação e manipulação de elementos DOM relacionados.
+│       │   │   ├── index.js — Barrel do módulo Explorer, exportando funções e componentes essenciais para a construção da árvore de arquivos e interação com o usuário.
+│       │   │   └── tree.js — Constrói e gerencia a interface da árvore de arquivos e pastas no painel lateral com suporte a filtros YAML e permissões de exibição.
+│       │   ├── [settings]
+│       │   │   ├── index.js — Barrel do módulo Settings, exportando funções e componentes essenciais para a configuração das preferências do usuário.
+│       │   │   └── settingsUi.js — Responsável pelos eventos e comportamentos da interface do Menu de Configurações (Settings Drawer).
+│       │   ├── [ui]
+│       │   │   ├── animations.js — Gerencia as animações da interface do usuário via GSAP, incluindo efeitos em botões, transições do drawer do assistente e a renderização do fundo de estrelas em canvas.
+│       │   │   └── theme.js — Gerencia a alternância e a persistência dos temas claro/escuro na aplicação e no editor de texto.
+│       │   └── [utils]
+│       │       ├── helpers.js — Funções auxiliares genéricas para apoio à interface do usuário, controle de menus e normalizações.
+│       │       └── markdown.js — Utilitário para conversão, parsing e serialização de conteúdos Markdown e metadados Frontmatter YAML.
+│       └── renderer.js
 ├── [templates]
 │   └── [book]
+│       ├── [.system]
+│       │   ├── [changelog]
+│       │   └── [chatlog]
 │       ├── [assets]
 │       │   ├── [characters]
 │       │   │   ├── folder.yml
@@ -90,9 +89,8 @@ Estrutura do Projeto com Descrições:
 │       │   ├── index.md
 │       │   └── plot.md
 │       ├── index.md
-│       ├── [notes]
-│       │   └── folder.yml
-│       └── system.md
+│       └── [notes]
+│           └── folder.yml
 ├── vite.main.config.mjs
 ├── vite.preload.config.mjs
 └── vite.renderer.config.mjs

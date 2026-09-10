@@ -791,7 +791,7 @@ li.folder.collapsed>.folder-name::before {
   justify-content: flex-end;
   align-items: center;
   width: 100%;
-  padding-top: 4px;
+  padding: 0px;
 }
 
 /* Botão Redondo Perfeito */
