@@ -1,0 +1,7 @@
+humanRead: true
+humanWrite: true
+aiRead: true
+aiWrite: true
+advanced: false
+title: "Ambientes"
+description: "Contém informações sobre os locais e ambientes do livro."

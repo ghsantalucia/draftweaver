@@ -1,12 +1,252 @@
 [
   {
     "role": "user",
-    "content": ".",
-    "timestamp": "2026-09-10T22:14:44.175Z"
+    "content": "...",
+    "timestamp": "2026-09-10T20:34:47.004Z"
+  },
+  {
+    "role": "assistant",
+    "content": "Analisando a estrutura da sua narrativa, este desenvolvimento traz um bom ritmo para a trama.",
+    "timestamp": "2026-09-10T20:34:48.221Z"
+  },
+  {
+    "role": "user",
+    "content": "...",
+    "timestamp": "2026-09-10T20:35:01.708Z"
+  },
+  {
+    "role": "assistant",
+    "content": "Anotei sua ideia! Posso estruturar um resumo detalhado ou ajustar este trecho do capítulo se você desejar.",
+    "timestamp": "2026-09-10T20:35:02.920Z"
+  },
+  {
+    "role": "user",
+    "content": "...",
+    "timestamp": "2026-09-10T20:35:06.372Z"
+  },
+  {
+    "role": "assistant",
+    "content": "Anotei sua ideia! Posso estruturar um resumo detalhado ou ajustar este trecho do capítulo se você desejar.",
+    "timestamp": "2026-09-10T22:48:49.568Z"
+  },
+  {
+    "role": "user",
+    "content": "teste 2",
+    "timestamp": "2026-09-10T22:48:50.640Z"
   },
   {
     "role": "assistant",
     "content": "Excelente direcionamento. Gostaria que eu sugerisse alguns diálogos ou desdobramentos de cena para apoiar este ponto?",
-    "timestamp": "2026-09-10T22:14:45.382Z"
+    "timestamp": "2026-09-10T22:48:51.845Z"
+  },
+  {
+    "role": "user",
+    "content": "a",
+    "timestamp": "2026-09-10T22:49:41.463Z"
+  },
+  {
+    "role": "assistant",
+    "content": "Anotei sua ideia! Posso estruturar um resumo detalhado ou ajustar este trecho do capítulo se você desejar.",
+    "timestamp": "2026-09-10T22:49:42.673Z"
+  },
+  {
+    "role": "user",
+    "content": "a",
+    "timestamp": "2026-09-10T22:49:56.983Z"
+  },
+  {
+    "role": "assistant",
+    "content": "Excelente direcionamento. Gostaria que eu sugerisse alguns diálogos ou desdobramentos de cena para apoiar este ponto?",
+    "timestamp": "2026-09-10T22:49:58.191Z"
+  },
+  {
+    "role": "user",
+    "content": "a",
+    "timestamp": "2026-09-10T22:50:30.231Z"
+  },
+  {
+    "role": "assistant",
+    "content": "Anotei sua ideia! Posso estruturar um resumo detalhado ou ajustar este trecho do capítulo se você desejar.",
+    "timestamp": "2026-09-10T22:50:31.438Z"
+  },
+  {
+    "role": "user",
+    "content": "a",
+    "timestamp": "2026-09-10T22:49:56.983Z"
+  },
+  {
+    "role": "assistant",
+    "content": "Excelente direcionamento. Gostaria que eu sugerisse alguns diálogos ou desdobramentos de cena para apoiar este ponto?",
+    "timestamp": "2026-09-10T22:49:58.191Z"
+  },
+  {
+    "role": "user",
+    "content": "a",
+    "timestamp": "2026-09-10T22:50:30.231Z"
+  },
+  {
+    "role": "assistant",
+    "content": "Anotei sua ideia! Posso estruturar um resumo detalhado ou ajustar este trecho do capítulo se você desejar.",
+    "timestamp": "2026-09-10T22:50:31.438Z"
+  },
+  {
+    "role": "user",
+    "content": "...",
+    "timestamp": "2026-09-10T20:34:47.004Z"
+  },
+  {
+    "role": "assistant",
+    "content": "Analisando a estrutura da sua narrativa, este desenvolvimento traz um bom ritmo para a trama.",
+    "timestamp": "2026-09-10T20:34:48.221Z"
+  },
+  {
+    "role": "user",
+    "content": "...",
+    "timestamp": "2026-09-10T20:35:01.708Z"
+  },
+  {
+    "role": "assistant",
+    "content": "Anotei sua ideia! Posso estruturar um resumo detalhado ou ajustar este trecho do capítulo se você desejar.",
+    "timestamp": "2026-09-10T20:35:02.920Z"
+  },
+  {
+    "role": "user",
+    "content": "...",
+    "timestamp": "2026-09-10T20:35:06.372Z"
+  },
+  {
+    "role": "assistant",
+    "content": "Anotei sua ideia! Posso estruturar um resumo detalhado ou ajustar este trecho do capítulo se você desejar.",
+    "timestamp": "2026-09-10T22:48:49.568Z"
+  },
+  {
+    "role": "user",
+    "content": "teste 2",
+    "timestamp": "2026-09-10T22:48:50.640Z"
+  },
+  {
+    "role": "assistant",
+    "content": "Excelente direcionamento. Gostaria que eu sugerisse alguns diálogos ou desdobramentos de cena para apoiar este ponto?",
+    "timestamp": "2026-09-10T22:48:51.845Z"
+  },
+  {
+    "role": "user",
+    "content": "a",
+    "timestamp": "2026-09-10T22:49:41.463Z"
+  },
+  {
+    "role": "assistant",
+    "content": "Anotei sua ideia! Posso estruturar um resumo detalhado ou ajustar este trecho do capítulo se você desejar.",
+    "timestamp": "2026-09-10T22:49:42.673Z"
+  },
+  {
+    "role": "user",
+    "content": "a",
+    "timestamp": "2026-09-10T22:49:56.983Z"
+  },
+  {
+    "role": "assistant",
+    "content": "Excelente direcionamento. Gostaria que eu sugerisse alguns diálogos ou desdobramentos de cena para apoiar este ponto?",
+    "timestamp": "2026-09-10T22:49:58.191Z"
+  },
+  {
+    "role": "user",
+    "content": "a",
+    "timestamp": "2026-09-10T22:50:30.231Z"
+  },
+  {
+    "role": "assistant",
+    "content": "Anotei sua ideia! Posso estruturar um resumo detalhado ou ajustar este trecho do capítulo se você desejar.",
+    "timestamp": "2026-09-10T22:50:31.438Z"
+  },
+  {
+    "role": "user",
+    "content": "a",
+    "timestamp": "2026-09-10T22:49:56.983Z"
+  },
+  {
+    "role": "assistant",
+    "content": "Excelente direcionamento. Gostaria que eu sugerisse alguns diálogos ou desdobramentos de cena para apoiar este ponto?",
+    "timestamp": "2026-09-10T22:49:58.191Z"
+  },
+  {
+    "role": "user",
+    "content": "a",
+    "timestamp": "2026-09-10T22:50:30.231Z"
+  },
+  {
+    "role": "assistant",
+    "content": "Anotei sua ideia! Posso estruturar um resumo detalhado ou ajustar este trecho do capítulo se você desejar.",
+    "timestamp": "2026-09-10T22:50:31.438Z"
+  },
+  {
+    "role": "user",
+    "content": "a",
+    "timestamp": "2026-09-10T22:49:56.983Z"
+  },
+  {
+    "role": "assistant",
+    "content": "Excelente direcionamento. Gostaria que eu sugerisse alguns diálogos ou desdobramentos de cena para apoiar este ponto?",
+    "timestamp": "2026-09-10T22:49:58.191Z"
+  },
+  {
+    "role": "user",
+    "content": "a",
+    "timestamp": "2026-09-10T22:50:30.231Z"
+  },
+  {
+    "role": "assistant",
+    "content": "Anotei sua ideia! Posso estruturar um resumo detalhado ou ajustar este trecho do capítulo se você desejar.",
+    "timestamp": "2026-09-10T22:50:31.438Z"
+  },
+  {
+    "role": "user",
+    "content": "a",
+    "timestamp": "2026-09-10T22:49:56.983Z"
+  },
+  {
+    "role": "assistant",
+    "content": "Excelente direcionamento. Gostaria que eu sugerisse alguns diálogos ou desdobramentos de cena para apoiar este ponto?",
+    "timestamp": "2026-09-10T22:49:58.191Z"
+  },
+  {
+    "role": "user",
+    "content": "teste 50",
+    "timestamp": "2026-09-10T22:52:54.294Z"
+  },
+  {
+    "role": "assistant",
+    "content": "teste",
+    "timestamp": "2026-09-10T22:54:39.263Z"
+  },
+  {
+    "role": "user",
+    "content": "...",
+    "timestamp": "2026-09-10T20:34:47.004Z"
+  },
+  {
+    "role": "assistant",
+    "content": "Analisando a estrutura da sua narrativa, este desenvolvimento traz um bom ritmo para a trama.",
+    "timestamp": "2026-09-10T20:34:48.221Z"
+  },
+  {
+    "role": "user",
+    "content": "a",
+    "timestamp": "2026-09-10T22:57:55.101Z"
+  },
+  {
+    "role": "assistant",
+    "content": "Excelente direcionamento. Gostaria que eu sugerisse alguns diálogos ou desdobramentos de cena para apoiar este ponto?",
+    "timestamp": "2026-09-10T22:57:56.307Z"
+  },
+  {
+    "role": "user",
+    "content": "a",
+    "timestamp": "2026-09-10T22:59:10.573Z"
+  },
+  {
+    "role": "assistant",
+    "content": "Com base nos personagens cadastrados no seu projeto, essa decisão gera um conflito interno interessante para o protagonista.",
+    "timestamp": "2026-09-10T22:59:11.784Z"
   }
 ]

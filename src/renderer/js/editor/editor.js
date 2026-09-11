@@ -6,6 +6,7 @@ import { state } from '../config.js';
 import { parseMarkdown, stringifyFrontmatter } from '../utils/markdown.js';
 import { showToast, normalizeItemMetadata } from '../utils/helpers.js';
 import { readFile, saveFile, autoOpenFileByPath } from '../core/fileService.js';
+import { syncTreeSelection } from '../explorer';
 
 /**
  * Inicializa a instância do ToastUI Editor no DOM.
@@ -122,7 +123,11 @@ export function setEditorReadOnly(isReadOnly) {
  * @param {string} fullPath Caminho absoluto no disco
  * @param {string} relativePath Caminho relativo para exibição e gravação de histórico
  */
-export async function openFileElectron(fullPath, relativePath) {
+export async function openFileEditor(fullPath, relativePath) {
+
+  // Sincroniza a árvore e a aba
+  syncTreeSelection(relativePath);
+
   state.currentFilePath = fullPath;
   
   // Solagado para o FileService lidar com a chamada de leitura

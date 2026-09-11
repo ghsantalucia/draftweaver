@@ -1,3 +1,12 @@
+---
+humanRead: true
+humanWrite: true
+aiRead: true
+aiWrite: true
+advanced: true
+title: "Análise"
+---
+
 # 01_ANALYSIS.MD — ANÁLISE E REFLEXÃO PÓS-CAPÍTULO
 
 > **Natureza do Arquivo:** Dinâmico (Atualizado após a redação de cada capítulo).

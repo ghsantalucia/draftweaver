@@ -1,3 +1,10 @@
-﻿# ÍNDICE DE PERSONAGENS
+---
+humanRead: true
+humanWrite: false
+aiRead: true
+aiWrite: false
+advanced: true
+title: "Índice de Personagens"
+---
 
-* 🗡️ **[Protagonista X](./protagonista_x.md)** — Status: Vivo
+# PERSONAGENS

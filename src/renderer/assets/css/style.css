@@ -1,5 +1,5 @@
 /* ==========================================================================
-   1. RESET, TEMAS & ESTRUTURA GLOBAL (CSS Variables)
+   RESET, TEMAS & ESTRUTURA GLOBAL (CSS Variables)
    ========================================================================== */
 
 /* Tema Claro (Padrão) */
@@ -37,6 +37,9 @@
   /* Scrollbars */
   --scrollbar-thumb: rgba(74, 109, 167, 0.4);
   --scrollbar-thumb-hover: rgba(74, 109, 167, 0.7);
+
+  --sidebar-controls-bg: rgba(0, 0, 0, 0.2);
+  --sidebar-separator: rgba(255, 255, 255, 0.06);
 }
 
 /* Modo Escuro Completo */
@@ -66,7 +69,7 @@ body.dark-theme {
   --toggle-bg: #24253b;
   --slider-bg: #585b70;
   --card-overlay-bg: #181926;
-  --no-file-overlay-bg: rgba(30, 30, 46, 0.92);
+  --no-file-overlay-bg: rgb(20 22 31 / 69%);
   --overlay-backdrop: rgba(18, 19, 26, 0.8);
 
   /* Scrollbars */
@@ -99,6 +102,7 @@ body.dark-theme .toastui-editor-defaultUI *::-webkit-scrollbar-thumb:hover {
   margin: 0;
   padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  outline: none;
 }
 
 body,
@@ -180,7 +184,7 @@ html,
 }
 
 /* ==========================================================================
-   2. COMPONENTES REUTILIZÁVEIS (Botões, Swaps/Toggles, Toasts)
+   COMPONENTES REUTILIZÁVEIS (Botões, Swaps/Toggles, Toasts)
    ========================================================================== */
 
 /* Botões */
@@ -211,23 +215,25 @@ html,
   cursor: not-allowed;
 }
 
-/* Toggle Switch (Chave Deslizante) */
-.toggle-container {
+/* ============ [ SWITCH ] ============ */
+
+/* Controles Auxiliares (Toggle Avançado) */
+.sidebar-controls {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
-  font-size: 0.8rem;
-  background-color: var(--toggle-bg);
-  padding: 10px 20px;
-  border-radius: 20px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--sidebar-separator);
+  font-size: 0.75rem;
+  color: #6c7086;
 }
 
+/* Container do Switch */
 .switch {
   position: relative;
   display: inline-block;
-  width: 40px;
-  height: 20px;
+  width: 34px;
+  height: 18px;
 }
 
 .switch input {
@@ -236,36 +242,39 @@ html,
   height: 0;
 }
 
+/* Trilho */
 .slider {
   position: absolute;
   cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #485460;
-  transition: 0.3s;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #2b2b3b;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
+  transition: 0.2s ease;
 }
 
-.slider:before {
+/* Bolinha interna */
+.slider::before {
   position: absolute;
   content: "";
-  height: 14px;
-  width: 14px;
-  left: 3px;
-  bottom: 3px;
-  background-color: white;
-  transition: 0.3s;
+  height: 12px;
+  width: 12px;
+  left: 2px;
+  bottom: 2px;
+  background-color: #767676;
   border-radius: 50%;
+  transition: 0.2s ease;
 }
 
-input:checked+.slider {
-  background-color: var(--btn-primary-bg);
+/* Estado Ativo (Checked) */
+input:checked + .slider {
+  background-color: rgba(137, 180, 250, 0.2); /* Fundo azul suave idêntico ao hover do menu */
+  border-color: #89b4fa;
 }
 
-input:checked+.slider:before {
-  transform: translateX(20px);
+input:checked + .slider::before {
+  transform: translateX(16px);
+  background-color: #89b4fa; /* Bolinha acesa em tom pastel */
 }
 
 /* Notificação Toast */
@@ -306,7 +315,7 @@ input:checked+.slider:before {
 
 
 /* ==========================================================================
-   3. SIDEBAR (Estrutura lateral)
+   SIDEBAR (Estrutura lateral)
    ========================================================================== */
 
 .sidebar {
@@ -314,26 +323,28 @@ input:checked+.slider:before {
   min-width: 480px;
   max-width: 480px;
   height: 100%;
-  padding: 15px;
   padding-top: 0px;
   background-color: var(--bg-header);
   color: var(--text-sidebar);
   border-right: 1px solid var(--border-app);
   display: flex;
   flex-direction: column;
-  gap: 15px;
   flex-shrink: 0;
   min-height: 0;
   overflow: hidden;
+  position: relative;
 }
 
 .sidebar-header {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  border-bottom: 1px solid var(--sidebar-separator);
 }
 
 #select-book {
+  height: 100%;
+  margin-bottom: 10px;
   padding: 5px 10px;
   font-size: 25px;
   font-weight: bold;
@@ -382,11 +393,13 @@ select#select-book:hover {
 
 /* Container que coloca o Select e o Botão na mesma linha */
 .book-title-container {
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
   width: 100%;
+  padding: 0px 15px;
 }
 
 /* Ajuste fino no botão do menu (engrenagem) */
@@ -411,62 +424,179 @@ select#select-book:hover {
 }
 
 /* ==========================================================================
-   4. ÁRVORE DE ARQUIVOS (File Tree)
+   ÁRVORE DE ARQUIVOS (File Tree - Modelo Fiel Ajustado)
    ========================================================================== */
 
 .file-tree {
   flex-grow: 1;
-  /* Preenche todo o espaço vertical disponível na sidebar */
   min-height: 0;
-  /* OBRIGATÓRIO: Permite que o scroll funcione dentro do flexbox */
   overflow-y: auto;
-  /* Cria a barra de rolagem APENAS dentro da árvore de arquivos */
   overflow-x: hidden;
-  padding-right: 5px;
-  /* Espaço para a barra de rolagem não cobrir o texto */
+  padding-left: 12px;
+  padding-right: 12px;
+  padding-bottom: 15px;
+  padding-top: 5px;
+  margin-bottom: 50px;
+  user-select: none;
 }
 
 .file-tree ul {
   list-style: none;
-  padding-left: 12px;
+  padding-left: 16px;
+  margin: 0;
+}
+
+.file-tree ul.main-ul {
+  padding-left: 0px;
+  margin: 0;
 }
 
 .file-tree li {
   margin: 4px 0;
 }
 
-.folder-name {
-  cursor: pointer;
-  font-weight: 600;
-  color: var(--text-folder);
+/* Oculta/Exibe itens avançados */
+.file-tree li.advanced-item {
+  display: none;
+}
+.file-tree.show-advanced li.advanced-item {
   display: block;
-  padding: 2px 0;
 }
 
-/* Ícones de Pastas (Abertas / Fechadas) */
-li.folder>.folder-name::before {
-  content: "📂 ";
+/* Esconde todas as pastas raiz por padrão */
+.file-tree li.folder-root {
+  display: none !important;
 }
 
-li.folder.collapsed>.folder-name::before {
-  content: "📁 ";
+/* Exibe apenas a pasta raiz correspondente à aba ativa no container */
+.file-tree.active-tab-notes li.folder-root.notes-folder,
+.file-tree.active-tab-content li.folder-root.content-folder,
+.file-tree.active-tab-assets li.folder-root.assets-folder {
+  display: block !important;
 }
 
+/* Faz a sub-UL da pasta raiz ativa ficar sempre visível e sem recuo extra */
+.file-tree li.folder-root > ul {
+  display: block !important;
+  padding-left: 0 !important;
+}
+
+/* Oculta a linha da própria pasta raiz (seta/nome) para parecer que o conteúdo já é a aba */
+.file-tree li.folder-root > .folder-name {
+  display: none !important;
+}
+
+/* Estilização e Espaçamento dos Itens Clicáveis */
+.folder-name,
 .file-name {
   cursor: pointer;
-  color: var(--text-file);
-  display: block;
-  padding: 2px 5px 4px 5px;
-  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px; /* Espaçamento idêntico ao modelo */
+  border-radius: 5px;
+  font-size: 0.82rem;
+  color: #cdd6f4;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
+/* Hover e Seleção Ativa */
+.folder-name:hover,
 .file-name:hover {
-  background-color: #2f364099;
+  background-color: rgba(255, 255, 255, 0.04);
 }
 
-.file-name.active {
-  background-color: #4a69bd38;
-  color: white;
+.file-name.active,
+.folder-name.active {
+  background-color: rgba(137, 180, 250, 0.08); /* Fundo de seleção suave */
+  color: #ffffff;
+}
+
+/* --------------------------------------------------------------------------
+   PASTAS (Seta e Pasta no início, mantendo animação e cores separadas)
+   -------------------------------------------------------------------------- */
+
+.folder-name {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Força qualquer texto direto dentro do .folder-name a ir para o final */
+.folder-name {
+  flex-direction: row;
+}
+
+/* 1. SETA (no ::before) - Posição 1 */
+.folder-name::before {
+  content: "\f054"; /* Arrow Chevron */
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  font-size: 0.6rem;
+  color: #767676;
+  width: 10px;
+  display: inline-block;
+  transition: transform 0.2s ease, color 0.15s ease;
+  order: -2; /* Força ficar em primeiro lugar de todos */
+}
+
+/* Rotação exclusiva da seta */
+.folder:not(.collapsed) > .folder-name::before {
+  transform: rotate(90deg);
+  color: #767676;
+}
+
+/* 2. PASTA (no ::after) - Posição 2 */
+.folder-name::after {
+  content: "\f07c"; /* Pasta Aberta */
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  font-size: 0.85rem;
+  color: #f9e2af;
+  display: inline-block;
+  order: -1; /* Força ficar em segundo lugar, antes do texto */
+}
+
+/* Troca apenas o ícone da pasta quando colapsada */
+.folder.collapsed > .folder-name::after {
+  content: "\f07b"; /* Pasta Fechada */
+}
+
+/* --------------------------------------------------------------------------
+   ARQUIVOS (fa-file-lines com 3 variações de cores absolutas)
+   -------------------------------------------------------------------------- */
+
+.file-name {
+  padding-left: 24px; /* Alinha o arquivo exatamente abaixo do ícone da pasta */
+}
+
+/* Base do ícone de linhas de documento (\f15b -> fa-file-lines) */
+.file-name::before {
+  content: "\f15c";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 400; /* Regular style */
+  font-size: 0.85rem;
+  margin-right: 2px;
+  display: inline-block;
+}
+
+/* TIPO 1: Arquivo Normal (Verde #a6e3a1 - ex: Anotações/Backlog) */
+.file-name::before {
+  color: #89b4fa;
+}
+
+/* Desbotado caso esteja somente-leitura */
+.readonly .file-name {
+  opacity: 0.6;
+}
+.readonly .file-name.active {
+  background-color: #1e2335;
+}
+
+/* TIPO 3: Arquivo Avançado (Linhas avançadas dentro do backlog) */
+li.advanced-item > .file-name::before {
+  color: #d98cdf; /* Verde idêntico aos itens avançados do modelo */
 }
 
 .collapsed>ul {
@@ -480,7 +610,7 @@ li.folder.collapsed>.folder-name::before {
 
 /* Customização da Scrollbar da File Tree */
 .file-tree::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 .file-tree::-webkit-scrollbar-track {
@@ -488,63 +618,113 @@ li.folder.collapsed>.folder-name::before {
 }
 
 .file-tree::-webkit-scrollbar-thumb {
-  background-color: rgba(74, 109, 167, 0.4);
+  background-color: rgba(50, 66, 93, 0.4);
   border-radius: 4px;
+  border: 3px solid transparent;
 }
 
 .file-tree::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(74, 109, 167, 0.7);
+  background-color: rgba(45, 66, 99, 0.7);
 }
 
 /* ==========================================================================
-   7. NAVEGAÇÃO POR ABAS NA SIDEBAR
+   ÍCONES E ARROWS (Adicionar quando atualizar o JS)
    ========================================================================== */
 
-.sidebar {
-  position: relative;
-  /* Necessário para posicionamento absoluto da gaveta de IA */
+/* Seta de Colapsar/Expandir */
+.file-tree .tree-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  font-size: 0.65rem;
+  color: #6c7086;
+  transition: transform 0.2s ease, color 0.15s ease;
 }
+
+/* Rodar a seta quando a pasta estiver aberta */
+.file-tree li.folder:not(.collapsed)>.folder-name>.tree-arrow {
+  transform: rotate(90deg);
+  color: #cdd6f4;
+}
+
+/* Ícones Personalizados por Tipo */
+.file-tree .tree-icon {
+  font-size: 0.85rem;
+  width: 16px;
+  text-align: center;
+  display: inline-block;
+}
+
+/* Cores específicas para cada tipo de ícone FontAwesome */
+.file-tree .tree-icon.icon-folder {
+  color: #f9e2af;
+}
+
+/* Amarelo Pastas */
+.file-tree .tree-icon.icon-file {
+  color: #89b4fa;
+}
+
+/* Azul Arquivos Padrao */
+.file-tree .tree-icon.icon-notes {
+  color: #a6e3a1;
+}
+
+/* Verde Anotações */
+.file-tree .tree-icon.icon-world {
+  color: #f5c2e7;
+}
+
+/* ==========================================================================
+   NAVEGAÇÃO POR ABAS NA SIDEBAR
+   ========================================================================== */
 
 .sidebar-tabs {
   display: flex;
-  gap: 4px;
-  background-color: var(--toggle-bg);
-  padding: 4px;
-  border-radius: 8px;
+  gap: 10px;
+  background-color: var(--sidebar-controls-bg);
+  padding: 5px 15px;
+  border-bottom: 1px solid var(--sidebar-separator);
 }
 
 .tab-btn {
   flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   background: transparent;
-  border: none;
-  color: var(--text-muted);
-  padding: 8px 4px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  border: 1px solid transparent;
+  color: #6c7086;
+  padding: 8px 10px;
+  font-size: 0.78rem;
+  /* font-weight: 500; */
   letter-spacing: 0.4px;
   border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: all 0.2s ease;
   white-space: nowrap;
 }
 
 .tab-btn:hover {
-  color: var(--text-sidebar);
+  color: #cdd6f4;
+  background-color: rgba(255, 255, 255, 0.04);
 }
 
 .tab-btn.active {
-  background-color: var(--btn-primary-bg);
-  color: #ffffff;
+  background-color: rgba(137, 180, 250, 0.08);
+  color: #89b4fa;
+  border-color: rgba(137, 180, 250, 0.2);
 }
 
-/* Ajuste fino na área da file-tree para não encostar no footer */
-.file-tree {
-  margin-bottom: 50px;
-  /* Garante espaço para o footer recolhido */
+.tab-btn i {
+  font-size: 0.82rem;
 }
 
 /* ==========================================================================
-   8. FOOTER E DRAWER DO ASSISTENTE DE IA
+   FOOTER E DRAWER DO ASSISTENTE DE IA
    ========================================================================== */
 
 .ai-assistant-drawer {
@@ -553,8 +733,7 @@ li.folder.collapsed>.folder-name::before {
   left: 0;
   width: 100%;
   height: 45.5px;
-  background-color: #09090b;
-  /* Fundo preto sólido */
+  background-color: var(--bg-header);
   border-top: 1px solid rgba(137, 180, 250, 0.2);
   display: flex;
   flex-direction: column;
@@ -579,8 +758,8 @@ li.folder.collapsed>.folder-name::before {
   justify-content: space-between;
   cursor: pointer;
   user-select: none;
-  background-color: #09090b;
-  border-bottom: 1px solid var(--border-app);
+  background-color: var(--sidebar-controls-bg);
+  border-bottom: 1px solid var(--sidebar-separator);
   z-index: 2;
 }
 
@@ -762,7 +941,7 @@ li.folder.collapsed>.folder-name::before {
   max-width: 85%;
 
   /* Tipografia sutil de notificação */
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: 0.5px;
@@ -890,7 +1069,7 @@ li.folder.collapsed>.folder-name::before {
 }
 
 /* ==========================================================================
-   5. ÁREA DO EDITOR DE TEXTO
+   ÁREA DO EDITOR DE TEXTO
    ========================================================================== */
 
 /* Correção para o Toast UI escurecer totalmente */
@@ -1005,7 +1184,7 @@ body.dark-theme .toastui-editor-defaultUI-toolbar {
 }
 
 /* ==========================================================================
-   6. OVERLAY & MODAIS (Loading / IA)
+   OVERLAY & MODAIS (Loading / IA)
    ========================================================================== */
 
 /* Preenche 100% da .editor-area (que possui position: relative) */
@@ -1078,16 +1257,17 @@ body.dark-theme .toastui-editor-defaultUI-toolbar {
 /* Overlay de editor sem arquivo selecionado */
 .no-file-overlay {
   position: absolute;
-  top: 0;
+  top: 1px;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: calc(100% - 1px);
   background-color: var(--no-file-overlay-bg);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 90;
-  color: #888;
+  backdrop-filter: blur(2px);
+  color: #4a4d6c;
   font-size: 1.1rem;
   font-weight: 500;
 

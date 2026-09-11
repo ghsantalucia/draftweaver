@@ -1,3 +1,13 @@
+---
+humanRead: true
+humanWrite: true
+aiRead: true
+aiWrite: true
+advanced: true
+title: Planejamento
+description: null
+---
+
 # 02_ROADMAP.MD — ESBOÇO DOS PRÓXIMOS CAPÍTULOS
 
 > **Natureza do Arquivo:** Dinâmico (Atualizado continuamente a cada novo capítulo).

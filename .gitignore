@@ -90,3 +90,11 @@ typings/
 
 # Electron-Forge
 out/
+
+# Ignora tudo dentro de qualquer pasta chatlog ou changelog
+**/chatlog/*
+**/changelog/*
+
+# Impede que o Git ignore os arquivos .gitkeep dentro delas
+!**/chatlog/.gitkeep
+!**/changelog/.gitkeep

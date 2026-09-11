@@ -1,4 +1,14 @@
-\# PLANO EXECUTIVO \- CAPÍTULO 01
+---
+humanRead: true
+humanWrite: true
+aiRead: true
+aiWrite: true
+advanced: true
+title: Plano Executivo
+description: null
+---
+
+# PLANO EXECUTIVO - CAPÍTULO 01
 
 > **Função:** Roteiro pré-escrita gerado pela IA ou autor.
 

@@ -1,3 +1,10 @@
-﻿# ÍNDICE DE CAPÍTULOS
+---
+humanRead: true
+humanWrite: false
+aiRead: true
+aiWrite: false
+advanced: true
+title: "Índice de Capítulos"
+---
 
-* 🟢 **[Capítulo 01](./cap_01/02_conteudo.md)** — Status: ✅ Concluído
+# INDEX.MD

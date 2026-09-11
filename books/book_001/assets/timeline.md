@@ -1,4 +1,13 @@
-﻿# LINHA DO TEMPO GLOBAL
+---
+humanRead: true
+humanWrite: false
+aiRead: true
+aiWrite: true
+advanced: false
+title: "Linha do Tempo"
+---
+
+# LINHA DO TEMPO GLOBAL
 
 > **Função:** Cronologia geral de acontecimentos e marcos da história.
 

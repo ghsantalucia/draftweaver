@@ -1,4 +1,14 @@
-﻿# 03_FORESHADOWING.MD — BANCO DE IDEIAS E PISTAS ATIVAS
+---
+humanRead: true
+humanWrite: true
+aiRead: true
+aiWrite: true
+advanced: true
+title: Predições
+description: null
+---
+
+# 03_FORESHADOWING.MD — BANCO DE IDEIAS E PISTAS ATIVAS
 
 > **Natureza do Arquivo:** Dinâmico.
 > **Regra de Higienização:** Ideias com status **"Concluído"** são mantidas no snapshot do capítulo em que foram concluídas, mas são **removidas** deste arquivo no ciclo seguinte para manter a tabela limpa.

@@ -1,4 +1,13 @@
-﻿# PERSONAGEM: PROTAGONISTA X
+---
+humanRead: true
+humanWrite: true
+aiRead: true
+aiWrite: true
+advanced: false
+title: "Protagonista X"
+---
+
+# PERSONAGEM: PROTAGONISTA X
 
 > **Função:** Ficha do personagem com arquétipo, simbologia e amostras de voz.
 

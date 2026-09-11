@@ -3,5 +3,5 @@ humanWrite: false
 aiRead: true
 aiWrite: true
 advanced: false
-title: "📖 Escrita"
+title: "Escrita"
 description: "Contém os manuscritos dos capítulos do livro."

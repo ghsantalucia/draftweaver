@@ -27,17 +27,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 2. Inicializa e aplica o tema salvo
   initTheme();
 
-  // 3. Popula a lista de livros no <select>
+  // 3. Registra todos os eventos de interface
+  setupUIEvents();
+
+  // 4. Popula a lista de livros no <select>
   const books = await popularSelectDeLivros();
 
-  // 4. Seleciona o livro (restaura o último ou seleciona o primeiro) e carrega seu Chat/Tree
+  // 5. Seleciona o livro (restaura o último ou seleciona o primeiro) e carrega seu Chat/Tree
   await restoreLastSelectedBook(books);
 
-  // 5. Restaura o último arquivo aberto via FileService
+  // 6. Restaura o último arquivo aberto via FileService
   restoreLastOpenedFile();
-
-  // 6. Registra todos os eventos de interface
-  setupUIEvents();
 
   // TODO: Migrar pollings para arquitetura orientada a eventos/websocket
   setInterval(checkAILock, 500);

@@ -3,13 +3,14 @@
  */
 
 import { state } from '../config.js';
-import { openFileElectron } from '../editor/index.js';
+import { openFileEditor } from '../editor/index.js';
 import { parseMarkdown, normalizeItemMetadata } from '../utils/helpers.js';
 
 /**
  * Renderiza a árvore de arquivos no container DOM principal.
  */
 export async function renderTree() {
+
   const container = document.getElementById('file-tree');
   if (!container || !state.currentBookPath) return;
 
@@ -17,6 +18,7 @@ export async function renderTree() {
 
   const folderName = state.currentBookPath.split(/[/\\]/).pop();
   const ul = await buildTree(state.currentBookPath, folderName);
+  ul.className = "main-ul";
   container.appendChild(ul);
 }
 
@@ -101,6 +103,23 @@ async function createFolderNode(entry, relativePath, parentMeta = null) {
   const li = document.createElement('li');
   li.className = 'folder collapsed';
 
+  // Se parentMeta for null, significa que é uma pasta da raiz
+  if (!parentMeta) {
+    li.classList.add('folder-root');
+
+    const folderKey = entry.name;
+    if (folderKey.includes('content')) {
+      li.classList.add('content-folder');
+    }
+    else if (folderKey.includes('assets')) {
+      li.classList.add('assets-folder');
+    }
+    else {
+      li.classList.add('notes-folder');
+    }
+  }
+
+  // Se a pasta for marcada como avançada, adiciona a classe CSS correspondente
   if (meta.advanced) {
     li.classList.add('advanced-item');
   }
@@ -140,7 +159,7 @@ async function createFileNode(entry, relativePath, parentMeta = null) {
   const meta = normalizeItemMetadata(rawMeta, entry.name);
   state.fileMetadataMap[relativePath] = meta;
 
-  console.log(`[DEBUG File Meta] Arquivo: "${entry.name}" | humanRead:`, meta.humanRead, '| humanWrite:', meta.humanWrite);
+  // console.log(`[DEBUG File Meta] Arquivo: "${entry.name}" | humanRead:`, meta.humanRead, '| humanWrite:', meta.humanWrite);
 
   if (!meta.humanRead && !meta.humanWrite) {
     return null;
@@ -153,18 +172,125 @@ async function createFileNode(entry, relativePath, parentMeta = null) {
     li.classList.add('advanced-item');
   }
 
+  if (meta.humanRead && !meta.humanWrite) {
+    li.classList.add('readonly');
+  }
+
   const span = document.createElement('span');
   span.className = 'file-name';
   span.setAttribute('data-path', relativePath);
-  span.innerText = `📄 ${meta.title}`;
+  span.innerText = `${meta.title}`;
 
   span.onclick = async (e) => {
     e.stopPropagation();
     document.querySelectorAll('.file-name').forEach(el => el.classList.remove('active'));
     span.classList.add('active');
-    await openFileElectron(entry.path, relativePath);
+    await openFileEditor(entry.path, relativePath);
   };
 
   li.appendChild(span);
   return li;
+}
+
+/**
+ * Sincroniza a árvore de arquivos e as abas visuais ao abrir um arquivo.
+ * @param {string} relativePath - O caminho relativo do arquivo aberto.
+ */
+export function syncTreeSelection(relativePath) {
+  console.log('[DEBUG syncTree] Iniciando sincronização para:', relativePath);
+
+  if (!relativePath) {
+    console.warn('[DEBUG syncTree] relativePath está vazio ou indefinido.');
+    return;
+  }
+
+  // 1. Normaliza as barras do caminho para evitar incompatibilidade entre Windows/Linux
+  const normalizedPath = relativePath.replace(/\\/g, '/');
+
+  // 2. Procura pelo elemento no DOM usando querySelector ou iteração manual de segurança
+  let fileSpan = document.querySelector(`.file-name[data-path="${CSS.escape(normalizedPath)}"]`);
+  
+  if (!fileSpan) {
+    // Fallback: itera sobre todos os file-names caso a busca exata falhe
+    const allFiles = document.querySelectorAll('.file-name');
+    for (const span of allFiles) {
+      const spanPath = span.getAttribute('data-path')?.replace(/\\/g, '/');
+      if (spanPath === normalizedPath) {
+        fileSpan = span;
+        break;
+      }
+    }
+  }
+
+  if (!fileSpan) {
+    console.error('[DEBUG syncTree] Não foi encontrado nenhum span.file-name com data-path:', normalizedPath);
+    return;
+  }
+
+  console.log('[DEBUG syncTree] Elemento span localizado no DOM:', fileSpan);
+
+  // 3. Destaca o arquivo ativo
+  document.querySelectorAll('.file-name').forEach(el => el.classList.remove('active'));
+  fileSpan.classList.add('active');
+
+  // 4. Busca a aba (data-tab) subindo pelos nós pais OU descobrindo via raiz
+  let rootFolderLi = fileSpan.closest('li.folder-root');
+  let tabName = null;
+
+  if (rootFolderLi) {
+    // Identifica qual das classes de raiz a pasta pai possui
+    if (rootFolderLi.classList.contains('content-folder')) tabName = 'escrita';
+    else if (rootFolderLi.classList.contains('assets-folder')) tabName = 'mundo';
+    else if (rootFolderLi.classList.contains('notes-folder')) tabName = 'anotações';
+  } else {
+    // Se a li.folder-root não estiver configurada, tenta buscar o atributo data-tab subindo a árvore
+    const tabElement = fileSpan.closest('[data-tab]');
+    if (tabElement) {
+      tabName = tabElement.getAttribute('data-tab');
+    }
+  }
+
+  console.log('[DEBUG syncTree] Aba detectada para o arquivo:', tabName);
+
+  // 5. Executa a troca visual de aba no container se uma aba for encontrada
+  if (tabName) {
+    const fileTreeContainer = document.getElementById('file-tree');
+    if (fileTreeContainer) {
+      fileTreeContainer.classList.remove('active-tab-notes', 'active-tab-content', 'active-tab-assets');
+
+      const folderKey = tabName.toLowerCase();
+      if (folderKey.includes('escrita') || folderKey.includes('content')) {
+        fileTreeContainer.classList.add('active-tab-content');
+      } else if (folderKey.includes('mundo') || folderKey.includes('assets')) {
+        fileTreeContainer.classList.add('active-tab-assets');
+      } else {
+        fileTreeContainer.classList.add('active-tab-notes');
+      }
+    }
+
+    // Atualiza o estado ativo nos botões de aba do topo
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      const btnText = btn.innerText.trim().toLowerCase();
+      const targetKey = tabName.toLowerCase();
+
+      if (
+        (targetKey.includes('escrita') && btnText.includes('escrita')) ||
+        (targetKey.includes('mundo') && btnText.includes('mundo')) ||
+        (targetKey.includes('anotações') && btnText.includes('anotações'))
+      ) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+
+  // 6. Expande todas as pastas colapsadas acima do arquivo para torná-lo visível
+  let parentFolder = fileSpan.closest('.folder');
+  while (parentFolder) {
+    parentFolder.classList.remove('collapsed');
+    parentFolder = parentFolder.parentElement?.closest('.folder');
+  }
+
+  console.log('[DEBUG syncTree] Sincronização concluída com sucesso.');
 }
