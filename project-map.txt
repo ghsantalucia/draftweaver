@@ -27,6 +27,10 @@ Estrutura do Projeto com Descrições:
 │       │       └── style.css
 │       ├── index.html
 │       ├── [js]
+│       │   ├── [ai]
+│       │   │   ├── aiService.js
+│       │   │   ├── [providers]
+│       │   │   └── [tools]
 │       │   ├── app.js — Ponto de entrada do frontend (Renderer), responsável por inicializar módulos, escutadores de eventos de UI e orquestrar a aplicação.
 │       │   ├── [chat]
 │       │   │   ├── chatPipeline.js — Controlador da pipeline do assistente de IA, gerenciando o fluxo entre o envio do usuário e a resposta da IA.
@@ -40,10 +44,17 @@ Estrutura do Projeto com Descrições:
 │       │   ├── [editor]
 │       │   │   ├── editor.js — Controla a inicialização do ToastUI Editor, leitura e salvamento de arquivos Markdown e aplicação de regras de permissão de escrita na UI.
 │       │   │   └── index.js — Barrel do módulo Editor, exportando funções e componentes essenciais para a construção do editor de texto e interação com o usuário.
+│       │   ├── [events]
+│       │   │   └── emitter.js
 │       │   ├── [explorer]
 │       │   │   ├── explorerUi.js — Funções da UI do explorador de arquivos (File Explorer), incluindo a renderização da árvore de arquivos, eventos de interação e manipulação de elementos DOM relacionados.
 │       │   │   ├── index.js — Barrel do módulo Explorer, exportando funções e componentes essenciais para a construção da árvore de arquivos e interação com o usuário.
 │       │   │   └── tree.js — Constrói e gerencia a interface da árvore de arquivos e pastas no painel lateral com suporte a filtros YAML e permissões de exibição.
+│       │   ├── [pipeline]
+│       │   │   ├── [handlers]
+│       │   │   │   ├── chapterHandler.js
+│       │   │   │   └── characterHandler.js
+│       │   │   └── pipelineManager.js
 │       │   ├── [settings]
 │       │   │   ├── index.js — Barrel do módulo Settings, exportando funções e componentes essenciais para a configuração das preferências do usuário.
 │       │   │   └── settingsUi.js — Responsável pelos eventos e comportamentos da interface do Menu de Configurações (Settings Drawer).

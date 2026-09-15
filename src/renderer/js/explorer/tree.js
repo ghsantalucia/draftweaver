@@ -3,8 +3,9 @@
  */
 
 import { state } from '../config.js';
-import { openFileEditor } from '../editor/index.js';
+import { openFileEditor } from '../editor';
 import { parseMarkdown, normalizeItemMetadata } from '../utils/helpers.js';
+import { readFile } from '../core/fileService.js';
 
 /**
  * Renderiza a árvore de arquivos no container DOM principal.
@@ -166,7 +167,9 @@ async function createFileNode(entry, relativePath, parentMeta = null) {
 
   let rawMeta = {};
 
-  const rawText = await window.electronAPI.readFile(entry.path);
+  // Usa o readFile do fileService para verificar se existe .temp prioritariamente
+  const { content: rawText, isTemp } = await readFile(entry.path);
+
   if (rawText) {
     const parsed = parseMarkdown(rawText);
     rawMeta = parsed.metadata || {};
@@ -192,14 +195,24 @@ async function createFileNode(entry, relativePath, parentMeta = null) {
     li.classList.add('readonly');
   }
 
+  // Se for um rascunho temporário, marca o li para CSS e identificação
+  if (isTemp) {
+    li.classList.add('has-temp');
+  }
+
   const span = document.createElement('span');
   span.className = 'file-name';
   span.setAttribute('data-path', relativePath);
 
+  // Adicionado a classe/asterisco condicional
+  const dirtyAsterisk = isTemp ? '<span class="dirty-asterisk">*</span>' : '';
+
   // Injeta o ícone HTML do arquivo (fa-file-lines) e o título
-  span.innerHTML = `
+ span.innerHTML = `
     <i class="fa-regular fa-file-lines notes-icon icon-file"></i>
-    <span class="file-title">${meta.title}</span>
+    <span class="file-title-wrapper">
+      <span class="file-title">${meta.title}</span>${dirtyAsterisk}
+    </span>
   `;
 
   span.onclick = async (e) => {
@@ -210,7 +223,22 @@ async function createFileNode(entry, relativePath, parentMeta = null) {
   };
 
   li.appendChild(span);
+
+  // Atualiza o estado do botão de salvar global após montar cada arquivo
+  updateSaveButtonState();
+
   return li;
+}
+
+/**
+ * Verifica se existe algum arquivo com .temp na árvore para habilitar/desabilitar o botão de Salvar/Sincronizar
+ */
+export function updateSaveButtonState() {
+  const btnSave = document.getElementById('btn-save');
+  if (!btnSave) return;
+
+  const hasAnyTemp = document.querySelectorAll('#file-tree li.has-temp').length > 0;
+  btnSave.disabled = !hasAnyTemp;
 }
 
 /**

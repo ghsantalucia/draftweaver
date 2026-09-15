@@ -10,7 +10,7 @@ import { state } from '../config.js';
 import { parseMarkdown, stringifyFrontmatter } from '../utils/markdown.js';
 import { showToast, normalizeItemMetadata } from '../utils/helpers.js';
 import { readFile, saveFile, saveTempFile, autoOpenFileByPath } from '../core/fileService.js';
-import { syncTreeSelection } from '../explorer';
+import { syncTreeSelection, updateSaveButtonState } from '../explorer';
 
 let autoSaveTimer = null;
 
@@ -99,6 +99,21 @@ async function triggerAutoSave() {
 
   if (res.success) {
     setSaveStatus('saved');
+
+    // Marca o item na árvore visualmente com asterisco se ainda não tiver
+    const activeSpan = document.querySelector('.file-name.active');
+    if (activeSpan) {
+      const parentLi = activeSpan.closest('li');
+      if (parentLi && !parentLi.classList.contains('has-temp')) {
+        parentLi.classList.add('has-temp');
+        
+        let titleWrapper = activeSpan.querySelector('.file-title-wrapper');
+        if (titleWrapper && !titleWrapper.querySelector('.dirty-asterisk')) {
+          titleWrapper.insertAdjacentHTML('beforeend', '<span class="dirty-asterisk">*</span>');
+        }
+      }
+    }
+    updateSaveButtonState();
   } else {
     setSaveStatus('error');
   }
@@ -117,7 +132,8 @@ function setSaveStatus(status) {
   const textEl = statusEl.querySelector('.status-text');
 
   if (status === 'unsaved') {
-    if (iconEl) iconEl.className = 'fas fa-circle';
+    if (iconEl) iconEl.className = 'fas fa-spinner fa-spin';
+    // if (iconEl) iconEl.className = 'fas fa-circle';
     if (textEl) textEl.textContent = 'Alterações pendentes...';
   } else if (status === 'saving') {
     if (iconEl) iconEl.className = 'fas fa-spinner fa-spin';
@@ -197,7 +213,7 @@ export async function openFileEditor(fullPath, relativePath) {
 
   // Cancela qualquer autosave pendente do arquivo anterior
   if (autoSaveTimer) clearTimeout(autoSaveTimer);
-  
+
   const { content: rawText, isTemp } = await readFile(fullPath);
 
   if (rawText === null) return;
@@ -226,7 +242,7 @@ export async function openFileEditor(fullPath, relativePath) {
   setEditorReadOnly(isReadOnly);
 
   // Exibe o status inicial
-  setSaveStatus(isTemp ? 'unsaved' : 'saved');
+  setSaveStatus('hidden');
 }
 
 /**
@@ -245,6 +261,18 @@ export async function saveCurrentFile(e) {
   if (res.success) {
     setSaveStatus('saved');
     showToast('✓ Arquivo salvo com sucesso!', 'success');
+
+    // MUDANÇA: Remove o asterisco do item atual da árvore
+    const activeSpan = document.querySelector('.file-name.active');
+    if (activeSpan) {
+      const parentLi = activeSpan.closest('li');
+      if (parentLi) {
+        parentLi.classList.remove('has-temp');
+        const asterisk = activeSpan.querySelector('.dirty-asterisk');
+        if (asterisk) asterisk.remove();
+      }
+    }
+    updateSaveButtonState();
   } else {
     setSaveStatus('error');
     showToast('✕ Erro ao salvar: ' + res.error, 'error');

@@ -66,3 +66,4 @@ function tabSelectionEvents() {
         defaultTab.click();
     }
 }
+

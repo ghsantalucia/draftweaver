@@ -550,6 +550,31 @@ select#select-book:hover {
   padding-left: 24px; /* Alinha o arquivo exatamente abaixo do ícone da pasta */
 }
 
+/* Container do título com suporte a reticências + asterisco fixo */
+.file-title-wrapper {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* O texto do título encolhe e coloca reticências se necessário */
+.file-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 1;
+}
+
+/* O asterisco nunca encolhe e fica sempre visível no final */
+.dirty-asterisk {
+  color: white;
+  font-weight: bold;
+  margin-left: 2px;
+  flex-shrink: 0;
+}
+
 /* Base do ícone do arquivo */
 .file-tree .icon-file {
   font-size: 0.85rem;
@@ -1115,7 +1140,7 @@ body.dark-theme .toastui-editor-defaultUI-toolbar {
 }
 
 .save-status.unsaved {
-  color: #f39c12; /* Laranja */
+  color: #68688d; /* Laranja */
 }
 
 .save-status.unsaved i {
@@ -1127,11 +1152,15 @@ body.dark-theme .toastui-editor-defaultUI-toolbar {
 }
 
 .save-status.saved {
-  color: #2ecc71; /* Verde */
+  color: #42a36b; /* Verde */
 }
 
 .save-status.error {
   color: #e74c3c; /* Vermelho */
+}
+
+.save-status.hidden {
+  display: none;
 }
 
 /* ==========================================================================
