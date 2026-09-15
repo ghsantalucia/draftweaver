@@ -2,6 +2,78 @@
  * @file Serviço responsável por centralizar as operações de CRUD de arquivos (leitura, escrita, restauração e resolução de caminhos), servindo como ponte entre o Editor e o Sistema de Arquivos.
  */
 
+
+export function getTempPath(filePath) {
+  return filePath ? `${filePath}.temp` : null;
+}
+
+export async function deleteFile(fullPath) {
+  try {
+    return await window.electronAPI.deleteFile(fullPath);
+  } catch (error) {
+    console.error(`[FILE SERVICE] Erro ao deletar arquivo em ${fullPath}:`, error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Lê o conteúdo bruto de um arquivo via IPC. Tenta carregar o .temp prioritariamente.
+ */
+export async function readFile(fullPath) {
+  try {
+    const tempPath = getTempPath(fullPath);
+    
+    // Tenta ler o .temp primeiro
+    let rawText = await window.electronAPI.readFile(tempPath);
+    let isTemp = true;
+
+    // Se não existir .temp, lê o original
+    if (rawText === null) {
+      rawText = await window.electronAPI.readFile(fullPath);
+      isTemp = false;
+    }
+
+    return { content: rawText, isTemp };
+  } catch (error) {
+    console.error(`[FILE SERVICE] Erro ao ler arquivo em ${fullPath}:`, error);
+    return { content: null, isTemp: false };
+  }
+}
+
+/**
+ * Salva o rascunho no arquivo .temp
+ */
+export async function saveTempFile(fullPath, content) {
+  if (!fullPath) return { success: false, error: 'Caminho inválido.' };
+  const tempPath = getTempPath(fullPath);
+  return await window.electronAPI.saveFile(tempPath, content);
+}
+
+/**
+ * Persiste o conteúdo de um arquivo em disco substituindo o original pelo .temp e apagando o .temp.
+ */
+export async function saveFile(fullPath, content) {
+  if (!fullPath) {
+    return { success: false, error: 'Caminho de arquivo inválido.' };
+  }
+
+  try {
+    // 1. Grava no arquivo oficial
+    const res = await window.electronAPI.saveFile(fullPath, content);
+    
+    if (res.success) {
+      // 2. Remove o arquivo .temp
+      const tempPath = getTempPath(fullPath);
+      await deleteFile(tempPath);
+    }
+    
+    return res;
+  } catch (error) {
+    console.error(`[FILE SERVICE] Erro ao salvar arquivo em ${fullPath}:`, error);
+    return { success: false, error: error.message || 'Erro desconhecido ao salvar.' };
+  }
+}
+
 // Função para encontrar, abrir pastas pai e clicar no arquivo
 export function autoOpenFileByPath(targetPath) {
     if (!targetPath) return;
@@ -88,41 +160,4 @@ export function restoreLastOpenedFile() {
 
     // Tenta encontrar o elemento na árvore
     autoOpenFileByPath(lastFile);
-}
-
-/**
- * Lê o conteúdo bruto de um arquivo via IPC do Electron.
- * @param {string} fullPath Caminho absoluto no disco
- * @returns {Promise<string|null>} Conteúdo do arquivo ou null em caso de erro
- */
-export async function readFile(fullPath) {
-  try {
-    const rawText = await window.electronAPI.readFile(fullPath);
-    return rawText;
-  } catch (error) {
-    console.error(`[FILE SERVICE] Erro ao ler arquivo em ${fullPath}:`, error);
-    return null;
-  }
-}
-
-/**
- * Persiste o conteúdo de um arquivo em disco e futuramente registra os logs de alteração/diff.
- * @param {string} fullPath Caminho absoluto do arquivo a ser salvo
- * @param {string} content Content já formatado (Frontmatter + Body)
- * @returns {Promise<{ success: boolean, error?: string }>}
- */
-export async function saveFile(fullPath, content) {
-  if (!fullPath) {
-    return { success: false, error: 'Caminho de arquivo inválido.' };
-  }
-
-  try {
-    // TODO: [SISTEMA DE LOGS] Capturar estado anterior, gerar diff e registrar histórico antes de gravar
-    
-    const res = await window.electronAPI.saveFile(fullPath, content);
-    return res;
-  } catch (error) {
-    console.error(`[FILE SERVICE] Erro ao salvar arquivo em ${fullPath}:`, error);
-    return { success: false, error: error.message || 'Erro desconhecido ao salvar.' };
-  }
 }

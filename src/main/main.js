@@ -150,6 +150,17 @@ ipcMain.handle('save-file', async (event, filePath, content) => {
   }
 });
 
+ipcMain.handle('delete-file', async (event, filePath) => {
+  try {
+    if (!filePath || !fs.existsSync(filePath)) return { success: true };
+    await fs.promises.unlink(filePath);
+    return { success: true };
+  } catch (err) {
+    console.error(`[IPC] Erro ao deletar arquivo ${filePath}:`, err);
+    return { success: false, error: err.message };
+  }
+});
+
 // Mapear pasta e subpastas (Assíncrono e Seguro)
 ipcMain.handle('get-tree', async (event, folderPath) => {
   if (!folderPath) return null;

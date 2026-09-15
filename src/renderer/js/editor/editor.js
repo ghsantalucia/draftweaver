@@ -9,8 +9,10 @@ import '@toast-ui/editor/dist/theme/toastui-editor-dark.css';
 import { state } from '../config.js';
 import { parseMarkdown, stringifyFrontmatter } from '../utils/markdown.js';
 import { showToast, normalizeItemMetadata } from '../utils/helpers.js';
-import { readFile, saveFile, autoOpenFileByPath } from '../core/fileService.js';
+import { readFile, saveFile, saveTempFile, autoOpenFileByPath } from '../core/fileService.js';
 import { syncTreeSelection } from '../explorer';
+
+let autoSaveTimer = null;
 
 /**
  * Inicializa a instância do ToastUI Editor no DOM.
@@ -26,6 +28,9 @@ export function initEditor() {
     placeholder: 'Selecione um arquivo...',
     theme: currentTheme
   });
+
+  // Escuta edições no documento para disparar o autosave
+  state.editor.on('change', handleEditorChange);
 
   const btnSave = document.getElementById('btn-save');
   if (btnSave) {
@@ -68,6 +73,62 @@ function setupInternalLinkHandler() {
       }
     }
   });
+}
+
+/**
+ * Monitora digitação, altera indicador visual e aguarda 1s sem digitação para salvar no .temp
+ */
+function handleEditorChange() {
+  if (!state.currentFilePath) return;
+
+  setSaveStatus('unsaved');
+
+  if (autoSaveTimer) clearTimeout(autoSaveTimer);
+
+  autoSaveTimer = setTimeout(async () => {
+    await triggerAutoSave();
+  }, 1000);
+}
+async function triggerAutoSave() {
+  if (!state.currentFilePath || !state.editor) return;
+
+  setSaveStatus('saving');
+  const contentToSave = stringifyFrontmatter(state.currentFileMetadata, state.editor.getMarkdown());
+  
+  const res = await saveTempFile(state.currentFilePath, contentToSave);
+
+  if (res.success) {
+    setSaveStatus('saved');
+  } else {
+    setSaveStatus('error');
+  }
+}
+
+/**
+ * Atualiza o ícone visual de status de salvamento na UI
+ */
+function setSaveStatus(status) {
+  const statusEl = document.getElementById('save-status-indicator');
+  if (!statusEl) return;
+
+  statusEl.className = `save-status ${status}`;
+
+  const iconEl = statusEl.querySelector('i');
+  const textEl = statusEl.querySelector('.status-text');
+
+  if (status === 'unsaved') {
+    if (iconEl) iconEl.className = 'fas fa-circle';
+    if (textEl) textEl.textContent = 'Alterações pendentes...';
+  } else if (status === 'saving') {
+    if (iconEl) iconEl.className = 'fas fa-spinner fa-spin';
+    if (textEl) textEl.textContent = 'Salvando rascunho...';
+  } else if (status === 'saved') {
+    if (iconEl) iconEl.className = 'fas fa-check-circle';
+    if (textEl) textEl.textContent = 'Rascunho salvo';
+  } else if (status === 'error') {
+    if (iconEl) iconEl.className = 'fas fa-exclamation-circle';
+    if (textEl) textEl.textContent = 'Erro no autosave';
+  }
 }
 
 /**
@@ -133,9 +194,11 @@ export async function openFileEditor(fullPath, relativePath) {
   syncTreeSelection(relativePath);
 
   state.currentFilePath = fullPath;
+
+  // Cancela qualquer autosave pendente do arquivo anterior
+  if (autoSaveTimer) clearTimeout(autoSaveTimer);
   
-  // Solagado para o FileService lidar com a chamada de leitura
-  const rawText = await readFile(fullPath);
+  const { content: rawText, isTemp } = await readFile(fullPath);
 
   if (rawText === null) return;
 
@@ -146,8 +209,11 @@ export async function openFileEditor(fullPath, relativePath) {
   state.currentFileMetadata = metadata;
 
   if (state.editor) {
+    // Desativa o listener temporariamente para carregar sem disparar o 'change'
+    state.editor.off('change');
     state.editor.setMarkdown(body);
     state.editor.moveCursorToStart();
+    state.editor.on('change', handleEditorChange);
   }
 
   const noFileOverlay = document.getElementById('no-file-overlay');
@@ -158,6 +224,9 @@ export async function openFileEditor(fullPath, relativePath) {
 
   const isReadOnly = !metadata.humanWrite;
   setEditorReadOnly(isReadOnly);
+
+  // Exibe o status inicial
+  setSaveStatus(isTemp ? 'unsaved' : 'saved');
 }
 
 /**
@@ -168,14 +237,16 @@ export async function saveCurrentFile(e) {
   if (e) e.preventDefault();
   if (!state.currentFilePath) return;
 
+  if (autoSaveTimer) clearTimeout(autoSaveTimer);
+
   const contentToSave = stringifyFrontmatter(state.currentFileMetadata, state.editor.getMarkdown());
-  
-  // Delegado para o FileService!
   const res = await saveFile(state.currentFilePath, contentToSave);
 
   if (res.success) {
+    setSaveStatus('saved');
     showToast('✓ Arquivo salvo com sucesso!', 'success');
   } else {
+    setSaveStatus('error');
     showToast('✕ Erro ao salvar: ' + res.error, 'error');
   }
 }
