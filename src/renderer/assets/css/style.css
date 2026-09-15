@@ -513,7 +513,7 @@ select#select-book:hover {
 }
 
 /* --------------------------------------------------------------------------
-   PASTAS (Seta e Pasta no início, mantendo animação e cores separadas)
+   PASTAS & ARQUIVOS (Estilização dos ícones HTML embutidos via JS)
    -------------------------------------------------------------------------- */
 
 .folder-name {
@@ -521,69 +521,46 @@ select#select-book:hover {
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-/* Força qualquer texto direto dentro do .folder-name a ir para o final */
-.folder-name {
   flex-direction: row;
 }
 
-/* 1. SETA (no ::before) - Posição 1 */
-.folder-name::before {
-  content: "\f054"; /* Arrow Chevron */
-  font-family: "Font Awesome 6 Free";
-  font-weight: 900;
+/* Seta (Chevron) */
+.file-tree .tree-arrow {
   font-size: 0.6rem;
   color: #767676;
-  width: 10px;
+  width: 12px;
   display: inline-block;
   transition: transform 0.2s ease, color 0.15s ease;
-  order: -2; /* Força ficar em primeiro lugar de todos */
 }
 
-/* Rotação exclusiva da seta */
-.folder:not(.collapsed) > .folder-name::before {
+/* Rotação da seta quando a pasta está aberta */
+.folder:not(.collapsed) > .folder-name > .tree-arrow {
   transform: rotate(90deg);
   color: #767676;
 }
 
-/* 2. PASTA (no ::after) - Posição 2 */
-.folder-name::after {
-  content: "\f07c"; /* Pasta Aberta */
-  font-family: "Font Awesome 6 Free";
-  font-weight: 900;
+/* Ícone de Pasta (Aberta/Fechada) */
+.file-tree .icon-folder {
   font-size: 0.85rem;
   color: #f9e2af;
   display: inline-block;
-  order: -1; /* Força ficar em segundo lugar, antes do texto */
 }
-
-/* Troca apenas o ícone da pasta quando colapsada */
-.folder.collapsed > .folder-name::after {
-  content: "\f07b"; /* Pasta Fechada */
-}
-
-/* --------------------------------------------------------------------------
-   ARQUIVOS (fa-file-lines com 3 variações de cores absolutas)
-   -------------------------------------------------------------------------- */
 
 .file-name {
   padding-left: 24px; /* Alinha o arquivo exatamente abaixo do ícone da pasta */
 }
 
-/* Base do ícone de linhas de documento (\f15b -> fa-file-lines) */
-.file-name::before {
-  content: "\f15c";
-  font-family: "Font Awesome 6 Free";
-  font-weight: 400; /* Regular style */
+/* Base do ícone do arquivo */
+.file-tree .icon-file {
   font-size: 0.85rem;
   margin-right: 2px;
   display: inline-block;
+  color: #89b4fa; /* Arquivo Normal (#89b4fa) */
 }
 
-/* TIPO 1: Arquivo Normal (Verde #a6e3a1 - ex: Anotações/Backlog) */
-.file-name::before {
-  color: #89b4fa;
+/* Arquivo Avançado */
+li.advanced-item > .file-name > .icon-file {
+  color: #d98cdf; /* Cor lilás dos itens avançados */
 }
 
 /* Desbotado caso esteja somente-leitura */
@@ -594,12 +571,7 @@ select#select-book:hover {
   background-color: #1e2335;
 }
 
-/* TIPO 3: Arquivo Avançado (Linhas avançadas dentro do backlog) */
-li.advanced-item > .file-name::before {
-  color: #d98cdf; /* Verde idêntico aos itens avançados do modelo */
-}
-
-.collapsed>ul {
+.collapsed > ul {
   display: none;
 }
 
@@ -625,56 +597,6 @@ li.advanced-item > .file-name::before {
 
 .file-tree::-webkit-scrollbar-thumb:hover {
   background-color: rgba(45, 66, 99, 0.7);
-}
-
-/* ==========================================================================
-   ÍCONES E ARROWS (Adicionar quando atualizar o JS)
-   ========================================================================== */
-
-/* Seta de Colapsar/Expandir */
-.file-tree .tree-arrow {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 12px;
-  height: 12px;
-  font-size: 0.65rem;
-  color: #6c7086;
-  transition: transform 0.2s ease, color 0.15s ease;
-}
-
-/* Rodar a seta quando a pasta estiver aberta */
-.file-tree li.folder:not(.collapsed)>.folder-name>.tree-arrow {
-  transform: rotate(90deg);
-  color: #cdd6f4;
-}
-
-/* Ícones Personalizados por Tipo */
-.file-tree .tree-icon {
-  font-size: 0.85rem;
-  width: 16px;
-  text-align: center;
-  display: inline-block;
-}
-
-/* Cores específicas para cada tipo de ícone FontAwesome */
-.file-tree .tree-icon.icon-folder {
-  color: #f9e2af;
-}
-
-/* Amarelo Pastas */
-.file-tree .tree-icon.icon-file {
-  color: #89b4fa;
-}
-
-/* Azul Arquivos Padrao */
-.file-tree .tree-icon.icon-notes {
-  color: #a6e3a1;
-}
-
-/* Verde Anotações */
-.file-tree .tree-icon.icon-world {
-  color: #f5c2e7;
 }
 
 /* ==========================================================================

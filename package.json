@@ -10,7 +10,7 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "echo \"No linting configured\"", 
+    "lint": "echo \"No linting configured\"",
     "map": "node project-map.js > project-map.txt"
   },
   "keywords": [],
@@ -33,6 +33,10 @@
     "vite": "^5.4.21"
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.1"
+    "@fortawesome/fontawesome-free": "^7.3.1",
+    "@toast-ui/editor": "^3.2.2",
+    "electron-squirrel-startup": "^1.0.1",
+    "gsap": "^3.15.0",
+    "mitt": "^3.0.1"
   }
 }

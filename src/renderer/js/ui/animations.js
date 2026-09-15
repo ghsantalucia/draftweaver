@@ -2,6 +2,8 @@
  * @file Gerencia as animações da interface do usuário via GSAP, incluindo efeitos em botões, transições do drawer do assistente e a renderização do fundo de estrelas em canvas.
  */
 
+import { gsap } from 'gsap';
+
 // BOTÃO SALVAR
 
 // Módulo de Animação do Botão Salvar via GSAP
@@ -58,7 +60,7 @@ function createStars(count, width, height) {
       baseY: Math.random() * height,
       x: 0,
       y: 0,
-      size: isBrightStar ? Math.random() * 0.6 + 0.8 : Math.random() * 0.5 + 0.3,
+      size: isBrightStar ? Math.random() * 0.3 + 0.7 : Math.random() * 0.4 + 0.3,
       alpha: Math.random() * 0.1 + 0.05,
       maxAlpha: isBrightStar ? 1.0 : Math.random() * 0.4 + 0.5,
       zFactor
@@ -109,6 +111,7 @@ function drawShootingStar(ctx, shootingStar) {
 }
 // --- Função Principal ---
 export function initStarryBackground() {
+
   const canvas = document.getElementById('ai-bg-canvas');
   const bodyContainer = document.getElementById('ai-body-container');
   if (!canvas || !bodyContainer) return;
@@ -123,30 +126,47 @@ export function initStarryBackground() {
   let targetY = 0;
   let shootingStar = null;
 
+  // 1. Inicia o array de estrelas vazio
+  let stars = [];
+
   function updateDimensions() {
+    const prevHeight = height;
     width = canvas.width = bodyContainer.clientWidth;
     height = canvas.height = bodyContainer.clientHeight;
+
+    // Se o container não tinha altura e agora ganhou (abriu a drawer), 
+    // ou se o array ainda está vazio, gera as estrelas com a nova altura
+    if (height > 0 && (stars.length === 0 || prevHeight !== height)) {
+      repositionStars();
+    }
   }
 
-  updateDimensions();
-  new ResizeObserver(updateDimensions).observe(bodyContainer);
+  function repositionStars() {
+    if (stars.length === 0) {
+      // Cria as estrelas pela primeira vez
+      stars = createStars(250, width, height);
+    } else {
+      // Se já existem, só redistribui as coordenadas baseY e baseX
+      stars.forEach(star => {
+        star.baseX = Math.random() * width;
+        star.baseY = Math.random() * height;
+      });
+    }
+  }
 
-  const stars = createStars(150, width, height);
+  // O ResizeObserver agora vai recalcular as posições assim que a drawer abrir!
+  new ResizeObserver(updateDimensions).observe(bodyContainer);
 
   bodyContainer.addEventListener('mousemove', (e) => {
     const rect = bodyContainer.getBoundingClientRect();
-    targetX = ((e.clientX - rect.left) / width) - 0.5;
-    targetY = ((e.clientY - rect.top) / height) - 0.5;
+    targetX = ((e.clientX - rect.left) / (width || 1)) - 0.5;
+    targetY = ((e.clientY - rect.top) / (height || 1)) - 0.5;
   });
 
   window.resetStarsPosition = function() {
     updateDimensions();
     if (height <= 0) return;
-
-    stars.forEach(star => {
-      star.baseX = Math.random() * width;
-      star.baseY = Math.random() * height;
-    });
+    repositionStars();
   };
 
   function spawnShootingStar() {

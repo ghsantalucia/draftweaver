@@ -2,6 +2,10 @@
  * @file Controla a inicialização do ToastUI Editor, leitura e salvamento de arquivos Markdown e aplicação de regras de permissão de escrita na UI.
  */
 
+import Editor from '@toast-ui/editor';
+import '@toast-ui/editor/dist/toastui-editor.css';
+import '@toast-ui/editor/dist/theme/toastui-editor-dark.css';
+
 import { state } from '../config.js';
 import { parseMarkdown, stringifyFrontmatter } from '../utils/markdown.js';
 import { showToast, normalizeItemMetadata } from '../utils/helpers.js';
@@ -14,7 +18,7 @@ import { syncTreeSelection } from '../explorer';
 export function initEditor() {
   const currentTheme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'default';
 
-  state.editor = new toastui.Editor({
+  state.editor = new Editor({
     el: document.querySelector('#markdown-editor'),
     height: '100%',
     initialEditType: 'wysiwyg',

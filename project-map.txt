@@ -29,9 +29,10 @@ Estrutura do Projeto com Descrições:
 │       ├── [js]
 │       │   ├── app.js — Ponto de entrada do frontend (Renderer), responsável por inicializar módulos, escutadores de eventos de UI e orquestrar a aplicação.
 │       │   ├── [chat]
+│       │   │   ├── chatPipeline.js — Controlador da pipeline do assistente de IA, gerenciando o fluxo entre o envio do usuário e a resposta da IA.
 │       │   │   ├── chatStorage.js — Módulo de armazenamento do chat, responsável por gerenciar o histórico de mensagens e a persistência dos dados do chat.
-│       │   │   ├── chatUi.js — Responsável pelos eventos e comportamentos da interface do Chat com a IA (auto-resize do input, envio com tecla Enter, etc).
-│       │   │   └── index.js — Barrel do módulo Chat, exportando funções e componentes essenciais para a interface do chat.
+│       │   │   ├── chatUi.js — Responsável pelos eventos e comportamentos da interface do Chat com a IA (auto-resize do input, envio com tecla Enter, renderização e estado do chat).
+│       │   │   └── index.js — Barrel do módulo Chat, exportando funções e componentes essenciais para a interface e controle da IA.
 │       │   ├── config.js — Gerencia o estado global compartilhado e define os valores padrão para os metadados e permissões dos arquivos.
 │       │   ├── [core]
 │       │   │   ├── bookService.js — Serviço responsável por gerenciar a lista de livros, dados de configuração por projeto e verificação de travas da IA no Electron.
@@ -57,7 +58,9 @@ Estrutura do Projeto com Descrições:
 │   └── [book]
 │       ├── [.system]
 │       │   ├── [changelog]
+│       │   │   └── .gitkeep
 │       │   └── [chatlog]
+│       │       └── .gitkeep
 │       ├── [assets]
 │       │   ├── [characters]
 │       │   │   ├── folder.yml

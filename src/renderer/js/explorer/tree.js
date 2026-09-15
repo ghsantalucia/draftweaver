@@ -127,11 +127,27 @@ async function createFolderNode(entry, relativePath, parentMeta = null) {
   const span = document.createElement('span');
   span.className = 'folder-name';
   span.setAttribute('data-path', relativePath);
-  span.innerText = meta.title;
+
+  // Injeta os ícones HTML e o título da pasta
+  span.innerHTML = `
+    <i class="fa-solid fa-chevron-right tree-arrow"></i>
+    <i class="fa-solid fa-folder icon-folder"></i>
+    <span class="folder-title">${meta.title}</span>
+  `;
 
   span.onclick = (e) => {
     e.stopPropagation();
     li.classList.toggle('collapsed');
+
+    // Alterna o ícone de pasta aberta (fa-folder-open) e fechada (fa-folder) ao clicar
+    const folderIcon = span.querySelector('.icon-folder');
+    if (folderIcon) {
+      if (li.classList.contains('collapsed')) {
+        folderIcon.classList.replace('fa-folder-open', 'fa-folder');
+      } else {
+        folderIcon.classList.replace('fa-folder', 'fa-folder-open');
+      }
+    }
   };
 
   li.appendChild(span);
@@ -179,7 +195,12 @@ async function createFileNode(entry, relativePath, parentMeta = null) {
   const span = document.createElement('span');
   span.className = 'file-name';
   span.setAttribute('data-path', relativePath);
-  span.innerText = `${meta.title}`;
+
+  // Injeta o ícone HTML do arquivo (fa-file-lines) e o título
+  span.innerHTML = `
+    <i class="fa-regular fa-file-lines notes-icon icon-file"></i>
+    <span class="file-title">${meta.title}</span>
+  `;
 
   span.onclick = async (e) => {
     e.stopPropagation();
