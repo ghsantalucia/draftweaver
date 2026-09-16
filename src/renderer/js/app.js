@@ -7,11 +7,11 @@ import { initEditor } from './editor/index.js';
 import { initExplorerEvents } from './explorer/index.js';
 import { setupAiDrawerEvents } from './chat/index.js';
 import { initSettingsEvents } from './settings/index.js';
-import { 
-  popularSelectDeLivros, 
-  restoreLastSelectedBook, 
-  setupBookEvents, 
-  checkAILock, 
+import {
+  popularSelectDeLivros,
+  restoreLastSelectedBook,
+  setupBookEvents,
+  checkAILock,
   updateBookTitlesInSelect
 } from './core/bookService.js';
 import { restoreLastOpenedFile } from './core/fileService.js';
@@ -61,5 +61,19 @@ function setupUIEvents() {
   document.addEventListener('dragstart', (e) => {
     e.preventDefault();
   }, true);
+
+  // Impede que o TAB navegue pelos elementos do app fora do editor
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab') {
+      // Verifica se o foco atual está dentro do ToastUI / CodeMirror / ProseMirror
+      const isInsideEditor = e.target.closest('.toastui-editor-defaultUI') ||
+        e.target.closest('.CodeMirror') ||
+        e.target.closest('.ProseMirror');
+
+      if (!isInsideEditor) {
+        e.preventDefault();
+      }
+    }
+  }, true); // O argumento 'true' ativa a fase de captura para interceptar antes de qualquer elemento
 
 }

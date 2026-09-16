@@ -8,7 +8,7 @@ import '@toast-ui/editor/dist/theme/toastui-editor-dark.css';
 
 import { state } from '../config.js';
 import { parseMarkdown, stringifyFrontmatter } from '../utils/markdown.js';
-import { showToast, normalizeItemMetadata } from '../utils/helpers.js';
+import { showToast, normalizeItemMetadata, toggleEditorOverlay } from '../utils/helpers.js';
 import { readFile, saveFile, saveTempFile, autoOpenFileByPath } from '../core/fileService.js';
 import { syncTreeSelection, updateSaveButtonState } from '../explorer';
 
@@ -161,40 +161,41 @@ export function setEditorReadOnly(isReadOnly) {
 
   if (!editorContainer) return;
 
+  // Evita reprocessar se o estado atual já for o desejado (impede loops do setInterval)
+  const isCurrentlyReadOnly = editorContainer.classList.contains('readonly-mode');
+  if (isCurrentlyReadOnly === isReadOnly) return;
+
   if (isReadOnly) {
     editorContainer.classList.add('readonly-mode');
 
     if (!state.readOnlyKeyHandler) {
       state.readOnlyKeyHandler = (e) => {
+        // Permite atalhos de cópia e seleção total (Ctrl+C, Ctrl+A, Cmd+C, Cmd+A, setas do teclado)
+        const isCopyOrSelectAll = (e.ctrlKey || e.metaKey) && ['c', 'a', 'x'].includes(e.key.toLowerCase());
+        const isNavigationKey = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown'].includes(e.key);
+
+        if (isCopyOrSelectAll || isNavigationKey) {
+          return;
+        }
+
+        // Bloqueia apenas as teclas que alteram o texto
         e.preventDefault();
         e.stopPropagation();
       };
     }
 
-    if (!state.readOnlyMouseHandler) {
-      state.readOnlyMouseHandler = (e) => {
-        if (e.shiftKey || e.type === 'selectstart') {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      };
-    }
-
     editorContainer.addEventListener('keydown', state.readOnlyKeyHandler, true);
-    editorContainer.addEventListener('mousedown', state.readOnlyMouseHandler, true);
-    editorContainer.addEventListener('selectstart', state.readOnlyMouseHandler, true);
 
-    if (document.activeElement) document.activeElement.blur();
+    // Se o foco estiver ESPECIFICAMENTE dentro do editor ao travar, nós removemos o foco apenas dele
+    if (document.activeElement && editorContainer.contains(document.activeElement)) {
+      document.activeElement.blur();
+    }
 
   } else {
     editorContainer.classList.remove('readonly-mode');
 
     if (state.readOnlyKeyHandler) {
       editorContainer.removeEventListener('keydown', state.readOnlyKeyHandler, true);
-    }
-    if (state.readOnlyMouseHandler) {
-      editorContainer.removeEventListener('mousedown', state.readOnlyMouseHandler, true);
-      editorContainer.removeEventListener('selectstart', state.readOnlyMouseHandler, true);
     }
   }
 }
@@ -232,14 +233,39 @@ export async function openFileEditor(fullPath, relativePath) {
     state.editor.on('change', handleEditorChange);
   }
 
-  const noFileOverlay = document.getElementById('no-file-overlay');
-  if (noFileOverlay) noFileOverlay.classList.add('hidden');
+  // Oculta o overlay reutilizável do editor, pois um arquivo foi aberto
+  toggleEditorOverlay(false, 'no-file');
 
   document.getElementById('page-title').innerText = relativePath;
   localStorage.setItem('last_open_file', relativePath);
 
   const isReadOnly = !metadata.humanWrite;
   setEditorReadOnly(isReadOnly);
+
+  // Exibe o status inicial
+  setSaveStatus('hidden');
+}
+
+/**
+ * Reseta a interface do editor para o estado inicial sem arquivo aberto.
+ */
+export function resetEditorState() {
+  state.currentFilePath = null;
+  state.currentFileMetadata = '';
+
+  if (state.editor) {
+    state.editor.setMarkdown('');
+  }
+
+  const pageTitle = document.getElementById('page-title');
+  const btnSave = document.getElementById('btn-save');
+
+  if (pageTitle) pageTitle.innerText = 'Selecione um arquivo';
+  if (btnSave) btnSave.disabled = true;
+
+  // Exibe o overlay unificado informando que nenhum arquivo está selecionado (sem o spinner)
+  toggleEditorOverlay(true, 'no-file', 'Nenhum arquivo selecionado', false);
+  console.log('[EDITOR] Estado do editor resetado. Nenhum arquivo aberto.');
 
   // Exibe o status inicial
   setSaveStatus('hidden');
@@ -277,24 +303,4 @@ export async function saveCurrentFile(e) {
     setSaveStatus('error');
     showToast('✕ Erro ao salvar: ' + res.error, 'error');
   }
-}
-
-/**
- * Reseta a interface do editor para o estado inicial sem arquivo aberto.
- */
-export function resetEditorState() {
-  state.currentFilePath = null;
-  state.currentFileMetadata = '';
-
-  if (state.editor) {
-    state.editor.setMarkdown('');
-  }
-
-  const pageTitle = document.getElementById('page-title');
-  const btnSave = document.getElementById('btn-save');
-  const noFileOverlay = document.getElementById('no-file-overlay');
-
-  if (pageTitle) pageTitle.innerText = 'Selecione um arquivo';
-  if (btnSave) btnSave.disabled = true;
-  if (noFileOverlay) noFileOverlay.classList.remove('hidden');
 }

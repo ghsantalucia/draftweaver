@@ -1,0 +1,89 @@
+/* ==========================================================================
+   COMPONENTES REUTILIZÁVEIS (Botões, Swaps/Toggles, Toasts)
+   ========================================================================== */
+
+/* Botões */
+.btn-primary,
+.btn-success {
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-primary {
+  background: var(--btn-primary-bg);
+  color: white;
+  width: 100%;
+}
+
+.btn-success {
+  background: #2ed573;
+  color: white;
+}
+
+.btn-success:disabled,
+#btn-save:disabled {
+  background: #272d34;
+  color: rgb(128, 127, 127);
+  border: 1px solid rgb(70, 70, 70);
+  cursor: not-allowed;
+}
+
+/* --------------------------------------------------------------------------
+   BOTÃO GSAP Header Editor
+   -------------------------------------------------------------------------- */
+
+#btn-save {
+  position: relative;
+  width: 146px;
+  height: 35px;
+  background: linear-gradient(90deg, #1a3058, #264ea5, #1a3058);
+  background-size: 300% 100%;
+  /* Permite o GSAP mover o gradiente suavemente */
+  color: #ffffff;
+  border: 1px solid rgba(112, 161, 255, 0.25);
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.80rem;
+  cursor: pointer;
+  outline: none;
+  overflow: visible;
+  /* Necessário para o brilho expansivo */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  padding: 5px 10px;
+}
+
+.btn-text {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+  letter-spacing: 0.7px;
+}
+
+/* SVG do Borda */
+.btn-border-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.btn-border-path {
+  fill: none;
+  stroke: #60a5fa;
+  stroke-width: 2;
+  stroke-dasharray: 400;
+  /* Perímetro total do retângulo */
+  stroke-dashoffset: 400;
+  /* Começa invisível */
+  filter: drop-shadow(0px 0px 4px #60a5fa);
+}

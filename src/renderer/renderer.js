@@ -35,7 +35,7 @@
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 // Importa os estilos CSS locais (a rota parte da pasta src/renderer/)
-import './assets/css/style.css';
+import './assets/css/main.css';
 
 // Importa e inicializa o script principal da interface
 import './js/app.js';

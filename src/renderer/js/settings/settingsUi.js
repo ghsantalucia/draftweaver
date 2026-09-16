@@ -2,14 +2,17 @@
  * @file Responsável pelos eventos e comportamentos da interface do Menu de Configurações (Settings Drawer).
  */
 
+import { toggleAppOverlay } from '../utils/helpers.js'; // Ajuste o caminho do import conforme necessário
+
 /**
  * Abre a gaveta de configurações.
  */
 export function openSettingsDrawer() {
   const drawer = document.getElementById('settings-drawer');
-  const drawerOverlay = document.getElementById('drawer-overlay');
   drawer?.classList.add('open');
-  drawerOverlay?.classList.remove('hidden');
+  
+  // Aciona o overlay global usando a chave 'settings-drawer'
+  toggleAppOverlay(true, 'settings-drawer');
 }
 
 /**
@@ -17,9 +20,10 @@ export function openSettingsDrawer() {
  */
 export function closeSettingsDrawer() {
   const drawer = document.getElementById('settings-drawer');
-  const drawerOverlay = document.getElementById('drawer-overlay');
   drawer?.classList.remove('open');
-  drawerOverlay?.classList.add('hidden');
+  
+  // Remove a chave 'settings-drawer' da pilha do overlay global
+  toggleAppOverlay(false, 'settings-drawer');
 }
 
 /**
@@ -28,9 +32,11 @@ export function closeSettingsDrawer() {
 export function initSettingsEvents() {
   const btnOpenMenu = document.getElementById('btn-open-menu');
   const btnCloseMenu = document.getElementById('btn-close-menu');
-  const drawerOverlay = document.getElementById('drawer-overlay');
+  const globalOverlay = document.getElementById('app-modal-overlay');
 
   if (btnOpenMenu) btnOpenMenu.addEventListener('click', openSettingsDrawer);
   if (btnCloseMenu) btnCloseMenu.addEventListener('click', closeSettingsDrawer);
-  if (drawerOverlay) drawerOverlay.addEventListener('click', closeSettingsDrawer);
+  
+  // Ao clicar no overlay global, fecha a gaveta
+  if (globalOverlay) globalOverlay.addEventListener('click', closeSettingsDrawer);
 }

@@ -3,10 +3,11 @@
  */
 
 import { state } from '../config.js';
-import { renderTree } from '../explorer/index.js';
-import { resetEditorState } from '../editor/index.js';
+import { renderTree } from '../explorer';
+import { resetEditorState, setEditorReadOnly } from '../editor';
 import { readFile } from './fileService.js';
-import { reloadChatForCurrentBook } from '../chat/index.js';
+import { reloadChatForCurrentBook } from '../chat';
+import { toggleEditorOverlay } from '../utils/helpers.js';
 
 
 /**
@@ -102,7 +103,8 @@ export function updateWindowTitle(bookTitle) {
 }
 
 /**
- * Verifica o arquivo config.json do livro atual para gerenciar a exibição do overlay de trava da IA.
+ * Verifica o arquivo config.json do livro atual para gerenciar a exibição do overlay de trava da IA
+ * e o estado de leitura/escrita do editor.
  */
 export async function checkAILock() {
   if (!state.currentBookPath) return;
@@ -113,18 +115,30 @@ export async function checkAILock() {
   if (!text) return;
 
   try {
-    const config = JSON.parse(text);
-    const overlay = document.getElementById('overlay');
+    const config = JSON.parse(text.content);
 
-    if (overlay) {
-      if (config.ai_lock) {
-        overlay.classList.remove('hidden');
+    if (config.ai_lock) {
+      // 1. Exibe a mensagem de trava no overlay
+      toggleEditorOverlay(true, 'ai-lock', 'A IA está processando e atualizando a história. Aguarde...', true);
+      
+      // 2. Bloqueia o editor durante o processamento
+      setEditorReadOnly(true);
+    } else {
+      // 1. Remove a trava 'ai-lock' da pilha
+      toggleEditorOverlay(false, 'ai-lock');
+
+      // 2. Restaura o estado de escrita correto com base nas permissões do arquivo
+      if (state.currentFileMetadata) {
+        const isReadOnly = !state.currentFileMetadata.humanWrite;
+        setEditorReadOnly(isReadOnly);
       } else {
-        overlay.classList.add('hidden');
+        // Se nenhum arquivo estiver aberto, garante que fique desativado
+        setEditorReadOnly(true);
       }
     }
   } catch (err) {
     // Silencia erro enquanto o arquivo está sendo gravado
+    console.warn(`[BOOK SERVICE] Falha ao ler config.json: ${err.message}`);
   }
 }
 

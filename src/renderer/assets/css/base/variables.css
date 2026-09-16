@@ -1,0 +1,74 @@
+/* Tema Claro (Padrão) */
+:root {
+  /* Cores de Fundo Base */
+  --bg-app: #f4f5f7;
+  --bg-header: #0e0f17;
+  --bg-editor: #f4f5f7;
+  --editor-toolbar: #f7f9fc;
+  --border-app: rgba(255, 255, 255, 0.09);
+
+  /* Cores de Texto */
+  --text-header: #8b949e;
+  --text-sidebar: #ffffff;
+  --text-editor: #2f3640;
+  --text-muted: #888888;
+  --text-folder: #8ea4ee;
+  --text-file: #dcdde1;
+  --text-file-active: #ffffff;
+
+  /* Botões e Ações */
+  --btn-primary-bg: #394d84;
+  --btn-success-bg: #2ed573;
+  --btn-disabled-bg: #55687e;
+  --file-hover-bg: #2f3640;
+  --file-active-bg: #4a69bd;
+
+  /* Componentes (Switches, Toasts, Cards) */
+  --toggle-bg: #243154;
+  --slider-bg: #485460;
+  --card-overlay-bg: #243154;
+  --no-file-overlay-bg: rgba(255, 255, 255, 0.72);
+  --overlay-backdrop: rgba(30, 30, 47, 0.65);
+
+  /* Scrollbars */
+  --scrollbar-thumb: rgba(74, 109, 167, 0.4);
+  --scrollbar-thumb-hover: rgba(74, 109, 167, 0.7);
+
+  --sidebar-controls-bg: rgba(0, 0, 0, 0.2);
+  --sidebar-separator: rgba(255, 255, 255, 0.06);
+}
+
+/* Modo Escuro Completo */
+body.dark-theme {
+  /* Cores de Fundo Base */
+  --bg-app: #1a1217;
+  --bg-editor: #171820;
+  --editor-toolbar: #171820;
+
+  /* Cores de Texto */
+  --text-header: #a6adc8;
+  --text-sidebar: #cdd6f4;
+  --text-editor: #cdd6f4;
+  --text-muted: #6c7086;
+  --text-folder: #8ea4ee;
+  --text-file: #bac2de;
+  --text-file-active: #ffffff;
+
+  /* Botões e Ações */
+  /* --btn-primary-bg: #585b70; */
+  --btn-success-bg: #a6e3a1;
+  --btn-disabled-bg: #45475a;
+  --file-hover-bg: #313244;
+  --file-active-bg: #45475a;
+
+  /* Componentes (Switches, Toasts, Cards) */
+  --toggle-bg: #24253b;
+  --slider-bg: #585b70;
+  --card-overlay-bg: #181926;
+  --no-file-overlay-bg: rgb(20 22 31 / 69%);
+  --overlay-backdrop: rgba(18, 19, 26, 0.8);
+
+  /* Scrollbars */
+  --scrollbar-thumb: rgba(137, 180, 250, 0.3);
+  --scrollbar-thumb-hover: rgba(137, 180, 250, 0.6);
+}
