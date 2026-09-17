@@ -128,11 +128,39 @@ ipcMain.handle('select-folder', async () => {
 
 ipcMain.handle('read-file', async (event, filePath) => {
   try {
-    if (!filePath || !fs.existsSync(filePath)) return null;
-    return await fs.promises.readFile(filePath, 'utf-8');
+    if (!filePath) return null;
+    const normalizedPath = path.normalize(filePath);
+    
+    if (!fs.existsSync(normalizedPath)) return null;
+    
+    return await fs.promises.readFile(normalizedPath, 'utf-8');
   } catch (err) {
-    console.error(`[IPC] Erro ao ler arquivo ${filePath}:`, err);
+    console.error('[MAIN IPC read-file] Erro:', err);
     return null;
+  }
+});
+
+ipcMain.handle('delete-file', async (event, filePath) => {
+  // console.log('[MAIN IPC delete-file] Tentando deletar:', filePath);
+  try {
+    if (!filePath) {
+      return { success: false, error: 'Caminho não fornecido.' };
+    }
+
+    // Normaliza o caminho para o sistema operacional (resolve \ e / no Windows)
+    const normalizedPath = path.normalize(filePath);
+
+    if (!fs.existsSync(normalizedPath)) {
+      console.warn('[MAIN IPC delete-file] Arquivo NÃO existe:', normalizedPath);
+      return { success: false, error: `Arquivo temporário não encontrado: ${normalizedPath}` };
+    }
+
+    await fs.promises.unlink(normalizedPath);
+    // console.log('[MAIN IPC delete-file] Arquivo deletado com sucesso:', normalizedPath);
+    return { success: true };
+  } catch (err) {
+    console.error('[MAIN IPC delete-file] Erro ao deletar:', err);
+    return { success: false, error: err.message };
   }
 });
 
@@ -146,17 +174,6 @@ ipcMain.handle('save-file', async (event, filePath, content) => {
     await fs.promises.writeFile(filePath, content, 'utf-8');
     return { success: true };
   } catch (err) {
-    return { success: false, error: err.message };
-  }
-});
-
-ipcMain.handle('delete-file', async (event, filePath) => {
-  try {
-    if (!filePath || !fs.existsSync(filePath)) return { success: true };
-    await fs.promises.unlink(filePath);
-    return { success: true };
-  } catch (err) {
-    console.error(`[IPC] Erro ao deletar arquivo ${filePath}:`, err);
     return { success: false, error: err.message };
   }
 });

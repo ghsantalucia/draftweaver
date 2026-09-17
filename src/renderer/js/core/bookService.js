@@ -7,7 +7,7 @@ import { renderTree } from '../explorer';
 import { resetEditorState, setEditorReadOnly } from '../editor';
 import { readFile } from './fileService.js';
 import { reloadChatForCurrentBook } from '../chat';
-import { toggleEditorOverlay } from '../utils/helpers.js';
+import { toggleEditorOverlay } from '../ui';
 
 
 /**
@@ -107,6 +107,7 @@ export function updateWindowTitle(bookTitle) {
  * e o estado de leitura/escrita do editor.
  */
 export async function checkAILock() {
+  
   if (!state.currentBookPath) return;
 
   const configPath = `${state.currentBookPath}/config.json`;
@@ -116,6 +117,10 @@ export async function checkAILock() {
 
   try {
     const config = JSON.parse(text.content);
+
+    // Se o estado do lock não mudou desde a última checagem, não faz nada
+    if (state.aiLockState === Boolean(config.ai_lock)) return;
+    state.aiLockState = Boolean(config.ai_lock);
 
     if (config.ai_lock) {
       // 1. Exibe a mensagem de trava no overlay

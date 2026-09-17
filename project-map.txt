@@ -24,7 +24,22 @@ Estrutura do Projeto com Descrições:
 │   └── [renderer]
 │       ├── [assets]
 │       │   └── [css]
-│       │       └── style.css
+│       │       ├── [base]
+│       │       │   ├── global.css
+│       │       │   ├── reset.css
+│       │       │   └── variables.css
+│       │       ├── [components]
+│       │       │   ├── ai-drawer.css
+│       │       │   ├── buttons.css
+│       │       │   ├── editor.css
+│       │       │   ├── file-tree.css
+│       │       │   ├── overlays.css
+│       │       │   ├── settings-drawer.css
+│       │       │   ├── sidebar.css
+│       │       │   ├── switch.css
+│       │       │   ├── toast.css
+│       │       │   └── window-header.css
+│       │       └── main.css
 │       ├── index.html
 │       ├── [js]
 │       │   ├── [ai]

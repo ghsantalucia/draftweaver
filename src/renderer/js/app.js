@@ -15,8 +15,7 @@ import {
   updateBookTitlesInSelect
 } from './core/bookService.js';
 import { restoreLastOpenedFile } from './core/fileService.js';
-import { initTheme } from './ui/theme.js';
-import { initSaveButtonAnimation, initStarryBackground } from './ui/animations.js';
+import { initTheme, initSaveButtonAnimation, initStarryBackground } from './ui';
 
 // Inicialização principal quando o DOM estiver carregado
 document.addEventListener('DOMContentLoaded', async () => {

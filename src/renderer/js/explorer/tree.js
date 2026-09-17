@@ -185,6 +185,8 @@ async function createFileNode(entry, relativePath, parentMeta = null) {
   }
 
   const li = document.createElement('li');
+  li.setAttribute('data-path', relativePath); 
+  li.setAttribute('data-absolute-path', entry.path);
 
   const isAdvanced = (parentMeta && parentMeta.advanced === true) || meta.advanced === true;
   if (isAdvanced) {
@@ -203,6 +205,7 @@ async function createFileNode(entry, relativePath, parentMeta = null) {
   const span = document.createElement('span');
   span.className = 'file-name';
   span.setAttribute('data-path', relativePath);
+  span.setAttribute('data-absolute-path', entry.path);
 
   // Adicionado a classe/asterisco condicional
   const dirtyAsterisk = isTemp ? '<span class="dirty-asterisk">*</span>' : '';
@@ -224,21 +227,7 @@ async function createFileNode(entry, relativePath, parentMeta = null) {
 
   li.appendChild(span);
 
-  // Atualiza o estado do botão de salvar global após montar cada arquivo
-  updateSaveButtonState();
-
   return li;
-}
-
-/**
- * Verifica se existe algum arquivo com .temp na árvore para habilitar/desabilitar o botão de Salvar/Sincronizar
- */
-export function updateSaveButtonState() {
-  const btnSave = document.getElementById('btn-save');
-  if (!btnSave) return;
-
-  const hasAnyTemp = document.querySelectorAll('#file-tree li.has-temp').length > 0;
-  btnSave.disabled = !hasAnyTemp;
 }
 
 /**

@@ -2,28 +2,33 @@
  * @file Responsável pelos eventos e comportamentos da interface do Menu de Configurações (Settings Drawer).
  */
 
-import { toggleAppOverlay } from '../utils/helpers.js'; // Ajuste o caminho do import conforme necessário
+import { toggleAppOverlay, Modal } from '../ui';
 
 /**
  * Abre a gaveta de configurações.
  */
 export function openSettingsDrawer() {
+  // Impede abrir as configurações se houver algum modal ativo na tela
+  if (Modal.activeModals.length > 0) return;
+
   const drawer = document.getElementById('settings-drawer');
   drawer?.classList.add('open');
   
-  // Aciona o overlay global usando a chave 'settings-drawer'
-  toggleAppOverlay(true, 'settings-drawer');
+  toggleAppOverlay('show');
 }
 
 /**
  * Fecha a gaveta de configurações.
  */
 export function closeSettingsDrawer() {
+  
+  console.log("closeSettingsDrawer();");
+  
   const drawer = document.getElementById('settings-drawer');
   drawer?.classList.remove('open');
   
   // Remove a chave 'settings-drawer' da pilha do overlay global
-  toggleAppOverlay(false, 'settings-drawer');
+  toggleAppOverlay('hide');
 }
 
 /**
@@ -37,6 +42,13 @@ export function initSettingsEvents() {
   if (btnOpenMenu) btnOpenMenu.addEventListener('click', openSettingsDrawer);
   if (btnCloseMenu) btnCloseMenu.addEventListener('click', closeSettingsDrawer);
   
-  // Ao clicar no overlay global, fecha a gaveta
-  if (globalOverlay) globalOverlay.addEventListener('click', closeSettingsDrawer);
+  // Ao clicar no overlay global, fecha a gaveta APENAS se NÃO houver modais abertos
+  if (globalOverlay) {
+    globalOverlay.addEventListener('click', (e) => {
+      // Se clicar direto no overlay e NÃO houver modais na pilha, fecha a gaveta
+      if (e.target === globalOverlay && Modal.activeModals.length === 0) {
+        closeSettingsDrawer();
+      }
+    });
+  }
 }

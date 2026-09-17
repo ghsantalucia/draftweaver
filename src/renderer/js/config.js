@@ -8,7 +8,8 @@ export const state = {
   currentBookPath: null,
   currentFilePath: null,
   currentFileMetadata: {},
-  fileMetadataMap: {}
+  fileMetadataMap: {}, 
+  aiLockState: false
 };
 
 // Valores padrão para metadados de arquivos, caso não estejam presentes no arquivo .md

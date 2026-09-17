@@ -2,6 +2,7 @@
  * @file Serviço responsável por centralizar as operações de CRUD de arquivos (leitura, escrita, restauração e resolução de caminhos), servindo como ponte entre o Editor e o Sistema de Arquivos.
  */
 
+import { refreshSaveButtonState } from '../editor';
 
 export function getTempPath(filePath) {
   return filePath ? `${filePath}.temp` : null;
@@ -21,13 +22,19 @@ export async function deleteFile(fullPath) {
  */
 export async function readFile(fullPath) {
   try {
+    if (!fullPath) return { content: null, isTemp: false };
+
+    // Se o caminho já for o arquivo .temp, lê diretamente sem chamar getTempPath
+    if (fullPath.endsWith('.temp')) {
+      const rawText = await window.electronAPI.readFile(fullPath);
+      return { content: rawText, isTemp: true };
+    }
+
+    // Se for o caminho original, tenta o .temp primeiro
     const tempPath = getTempPath(fullPath);
-    
-    // Tenta ler o .temp primeiro
     let rawText = await window.electronAPI.readFile(tempPath);
     let isTemp = true;
 
-    // Se não existir .temp, lê o original
     if (rawText === null) {
       rawText = await window.electronAPI.readFile(fullPath);
       isTemp = false;
@@ -46,7 +53,9 @@ export async function readFile(fullPath) {
 export async function saveTempFile(fullPath, content) {
   if (!fullPath) return { success: false, error: 'Caminho inválido.' };
   const tempPath = getTempPath(fullPath);
-  return await window.electronAPI.saveFile(tempPath, content);
+  const file = await window.electronAPI.saveFile(tempPath, content);
+  refreshSaveButtonState();
+  return file;
 }
 
 /**
@@ -74,80 +83,71 @@ export async function saveFile(fullPath, content) {
   }
 }
 
-// Função para encontrar, abrir pastas pai e clicar no arquivo
+// Função que abre arquivo no editor e seleciona na árvore
 export function autoOpenFileByPath(targetPath) {
-    if (!targetPath) return;
+  console.log('[DEBUG autoOpenFileByPath] Entrada targetPath:', targetPath);
+  if (!targetPath) return;
 
-    // 1. Decodifica caracteres e normaliza barras
-    let decodedPath = targetPath;
-    try {
-        decodedPath = decodeURIComponent(targetPath);
-    } catch (e) {
-        console.error('Erro ao decodificar targetPath:', e);
+  let decodedPath = targetPath;
+  try {
+    decodedPath = decodeURIComponent(targetPath);
+  } catch (e) {
+    console.error('[DEBUG] Erro ao decodificar targetPath:', e);
+  }
+
+  const cleanTargetPath = decodedPath
+    .replace(/\\/g, '/')
+    .replace(/^\/+/, '')
+    .replace(/^content\//, '')
+    .replace(/^\.\.\/books\//, '');
+
+  console.log('[DEBUG autoOpenFileByPath] cleanTargetPath:', cleanTargetPath);
+
+  const fileSpans = document.querySelectorAll('.file-name');
+  console.log('[DEBUG autoOpenFileByPath] Spans .file-name encontrados:', fileSpans.length);
+
+  if (fileSpans.length === 0) return;
+
+  let found = false;
+
+  for (const span of fileSpans) {
+    const parentLi = span.closest('li');
+    const rawAttrPath = span.getAttribute('data-path') || parentLi?.getAttribute('data-path') || '';
+    const attrPath = rawAttrPath.replace(/\\/g, '/').replace(/^\/+/, '');
+
+    const isMatch =
+      attrPath === cleanTargetPath ||
+      attrPath.endsWith(cleanTargetPath) ||
+      cleanTargetPath.endsWith(attrPath);
+
+    console.log(`[DEBUG Comparação] attrPath: "${attrPath}" vs cleanTarget: "${cleanTargetPath}" => Match: ${isMatch}`);
+
+    if (isMatch) {
+      found = true;
+      console.log('[DEBUG autoOpenFileByPath] MATCH ENCONTRADO! Clicando no span...', span);
+
+      let folderLi = span.closest('li.folder');
+      while (folderLi) {
+        folderLi.classList.remove('collapsed');
+        folderLi = folderLi.parentElement.closest('li.folder');
+      }
+
+      if (parentLi && parentLi.classList.contains('advanced-item')) {
+        const modeToggle = document.getElementById('mode-toggle');
+        const container = document.getElementById('file-tree');
+        if (modeToggle) modeToggle.checked = true;
+        if (container) container.classList.add('show-advanced');
+      }
+
+      span.click();
+      break;
     }
+  }
 
-    // Limpa barras do início/fim e remove prefixos conhecidos como 'content/', '../books/', etc.
-    const cleanTargetPath = decodedPath
-        .replace(/\\/g, '/')
-        .replace(/^\/+/, '')
-        .replace(/^content\//, '')
-        .replace(/^\.\.\/books\//, '');
-
-    const fileSpans = document.querySelectorAll('.file-name');
-
-    console.log(`[RESTORE] Elementos .file-name encontrados no DOM: ${fileSpans.length}`);
-
-    if (fileSpans.length === 0) {
-        console.warn('[RESTORE] Nenhum elemento de arquivo encontrado no DOM no momento do clique!');
-        return;
-    }
-
-    let found = false;
-
-    for (const span of fileSpans) {
-        const attrPath = (span.getAttribute('data-path') || '').replace(/\\/g, '/').replace(/^\/+/, '');
-
-        // 2. Comparações flexíveis:
-        // - Igualdade exata sem prefixos
-        // - Se a árvore termina com o caminho do link
-        // - Se o link termina com o caminho da árvore
-        const isMatch =
-            attrPath === cleanTargetPath ||
-            attrPath.endsWith(cleanTargetPath) ||
-            cleanTargetPath.endsWith(attrPath);
-
-        if (isMatch) {
-            found = true;
-            console.log('[RESTORE] Match encontrado para o arquivo:', attrPath);
-
-            // Expande todas as pastas pai
-            let parentLi = span.closest('li.folder');
-            while (parentLi) {
-                parentLi.classList.remove('collapsed');
-                parentLi = parentLi.parentElement.closest('li.folder');
-            }
-
-            // Se for um arquivo avançado e o modo estiver desligado, ativa-o
-            const parentFileLi = span.closest('li');
-            if (parentFileLi && parentFileLi.classList.contains('advanced-item')) {
-                const modeToggle = document.getElementById('mode-toggle');
-                const container = document.getElementById('file-tree');
-                if (modeToggle) modeToggle.checked = true;
-                if (container) container.classList.add('show-advanced');
-            }
-
-            // Dispara o clique nativo
-            span.click();
-            console.log("Arquivo restaurado/aberto com sucesso:", attrPath);
-            break;
-        }
-    }
-
-    if (!found) {
-        console.warn('[RESTORE] O arquivo existe no link/storage, mas não foi localizado na árvore atual:', cleanTargetPath);
-    }
+  if (!found) {
+    console.warn('[DEBUG autoOpenFileByPath] NENHUM MATCH ENCONTRADO para:', cleanTargetPath);
+  }
 }
-
 // Tenta reabrir o arquivo salvo no localStorage (Executar SOMENTE na inicialização)
 export function restoreLastOpenedFile() {
     const lastFile = localStorage.getItem('last_open_file');

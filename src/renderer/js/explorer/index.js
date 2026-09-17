@@ -3,5 +3,5 @@
  * Este arquivo serve como ponto de entrada para a interface do explorador de arquivos, facilitando a importação e organização do código.
  */
 
-export { renderTree, syncTreeSelection, updateSaveButtonState } from './tree.js';
+export { renderTree, syncTreeSelection } from './tree.js';
 export { initExplorerEvents } from './explorerUi.js';
