@@ -1,0 +1,131 @@
+=== MAPA DETALHADO DE CÓDIGO DA PASTA /SRC ===
+.
+├── [main]
+│   ├── file-watcher.js — [Monitora o sistema de arquivos utilizando a biblioteca Chokidar na pasta /books, disparando eventos via IPC para o processo de renderização sempre que houver alterações em arquivos de configuração, markdowns ou pastas de livros.]
+│   │   └── ⚙️ setupFileWatcher(mainWindow) — Configura e inicia o observador do sistema de arquivos para a pasta de livros.
+│   ├── ipc-handlers.js — [Gerencia todos os canais de comunicação IPC (Inter-Process Communication) entre o processo de renderização e o processo principal do Electron (sistema de arquivos, diálogos e temas).]
+│   │   └── ⚙️ setupIpcHandlers(mainWindow) — Configura todos os ouvintes de eventos IPC do processo principal.
+│   └── main.js — [Ponto de entrada do Electron, gerencia a janela principal e manipuladores IPC do sistema de arquivos.]
+├── [preload]
+│   └── preload.js — [Expõe a API segura via IPC para comunicação entre o processo de renderização e o Node.js.]
+└── [renderer]
+    ├── [ai]
+    │   ├── aiGateway.js — [Gerencia as conexões e o roteamento de requisições para os gateways de Inteligência Artificial.]
+    │   └── aiTools.js — [Define as ferramentas, funções auxiliares e utilitários integrados para uso dos modelos de Inteligência Artificial.]
+    ├── app.js — [Ponto de entrada do frontend (Renderer), responsável por inicializar módulos, escutadores de eventos de UI e orquestrar a aplicação.]
+    │   └── ⚙️ setupUIEvents() — Configura os ouvintes de eventos da interface global (Select de livros, Menus, Modos de exibição, etc).
+    ├── [components]
+    │   ├── animations.js — [Gerencia as animações da interface do usuário]
+    │   │   └── ⚙️ initSaveButtonAnimation()
+    │   ├── [chat]
+    │   │   ├── chatAnimations.js — [Gerencia as animações da interface do chat de IA]
+    │   │   │   ├── ⚙️ initStarryBackground() — Inicializa o canvas e o loop de renderização do fundo estrelado interativo.
+    │   │   │   ├── ⚙️ createStars(count, width, height) — Cria e retorna a coleção inicial de objetos de estrelas com animações de brilho via GSAP.
+    │   │   │   ├── ⚙️ drawStar(ctx, star, mouseX, mouseY) — Desenha uma estrela individual no canvas considerando o efeito de paralaxe do mouse.
+    │   │   │   └── ⚙️ drawShootingStar(ctx, shootingStar) — Renderiza o efeito de estrela cadente com rastro em gradiente no canvas.
+    │   │   ├── chatPipeline.js — [Controlador da pipeline do assistente de IA, gerenciando o fluxo entre o envio do usuário e a resposta da IA.]
+    │   │   │   ├── ⚙️ getRandomMockResponse() — Respostas pré-definidas para simulação da IA. / const MOCK_AI_RESPONSES = [ 'Anotei sua ideia! Posso estruturar um resumo detalhado ou ajustar este trecho do capítulo se você desejar.', 'Analisando a estrutura da sua narrativa, este desenvolvimento traz um bom ritmo para a trama.', 'Excelente direcionamento. Gostaria que eu sugerisse alguns diálogos ou desdobramentos de cena para apoiar este ponto?', 'Com base nos personagens cadastrados no seu projeto, essa decisão gera um conflito interno interessante para o protagonista.', ]; /** Retorna uma resposta aleatória da simulação de IA. @returns {string} Resposta simulada.
+    │   │   │   ├── ⚙️ injectMessageIntoChat({ role, content }, renderCallback) — Injeta diretamente uma mensagem no chat (usada por gatilhos do sistema ou pela IA) e persiste no log. @returns {Promise<void>}
+    │   │   │   └── ⚙️ handleUserPrompt(userPrompt, callbacks) — Processa a instrução enviada pelo usuário na pipeline da IA.
+    │   │   ├── chatStorage.js — [Módulo de armazenamento do chat, responsável por gerenciar o histórico de mensagens e a persistência dos dados do chat.]
+    │   │   │   ├── ⚙️ getTodaySessionDate() — Obtém a data atual formatada como YYYY-MM-DD para nomear a sessão do chat. @returns {string} Data formatada.
+    │   │   │   ├── ⚙️ getCurrentChatLogFilePath(sessionIndex = 1) — Monta o caminho completo do arquivo da sessão atual do chat. @returns {string|null} Caminho do arquivo .json ou null se não houver livro ativo.
+    │   │   │   ├── ⚙️ resolveTargetLogFile() — Garante a rotação de arquivos caso o arquivo atual exceda o limite de mensagens. @returns {Promise<string|null>} Caminho do arquivo pronto para escrita.
+    │   │   │   ├── ⚙️ saveChatMessage(message) — Salva uma nova mensagem no arquivo de log da sessão atual. @returns {Promise<boolean>} Sucesso da gravação.
+    │   │   │   └── ⚙️ loadChatHistory() — Carrega todo o histórico de mensagens de todas as sessões do livro ativo. @returns {Promise<Array<{role: string, content: string, timestamp: string}>>} Lista com o histórico de mensagens.
+    │   │   ├── chatUi.js — [Responsável pelos eventos e comportamentos da interface do Chat com a IA (auto-resize do input, envio com tecla Enter, renderização e estado do chat).]
+    │   │   │   ├── ⚙️ scrollToBottom() — Garante que a caixa de mensagens role até o final para mostrar o conteúdo mais recente.
+    │   │   │   ├── ⚙️ renderChatMessage({ role, content }) — Renderiza uma mensagem no DOM da caixa de mensagens do Chat.
+    │   │   │   ├── ⚙️ setChatLoadingState(isLoading) — Define o estado de carregamento do chat (bloqueando ou liberando a digitação).
+    │   │   │   ├── ⚙️ clearChatContainer() — Limpa o container de mensagens da interface.
+    │   │   │   ├── ⚙️ reloadChatForCurrentBook() — Recarrega o histórico salvo e exibe as mensagens no chat. Caso o histórico esteja vazio, exibe a mensagem de boas-vindas do sistema.
+    │   │   │   ├── ⚙️ triggerSendMessage() — Dispara o envio da instrução do usuário.
+    │   │   │   ├── ⚙️ setupAutoResizeInput() — Configura o redimensionamento automático e eventos do campo de digitação do chat.
+    │   │   │   ├── ⚙️ toggleAiDrawer() — Alterna o estado da gaveta (Drawer) com fade-in no canvas.
+    │   │   │   └── ⚙️ setupAiDrawerEvents() — Configura os gatilhos de clique na interface para a gaveta do assistente.
+    │   │   └── index.js — [Barrel do módulo Chat, exportando funções e componentes essenciais para a interface e controle da IA.]
+    │   ├── [editor]
+    │   │   ├── editor.js — [Controla a inicialização do ToastUI Editor, leitura e salvamento de arquivos Markdown e aplicação de regras de permissão de escrita na UI.]
+    │   │   │   ├── ⚙️ initEditor() — Inicializa a instância do ToastUI Editor no DOM.
+    │   │   │   ├── ⚙️ setupInternalLinkHandler() — Escuta cliques dentro do container do editor para capturar navegações por links internos de arquivos Markdown.
+    │   │   │   ├── ⚙️ handleEditorChange() — Monitora digitação, altera indicador visual e aguarda 1s sem digitação para salvar no .temp
+    │   │   │   ├── ⚙️ triggerAutoSave() — Executa o salvamento automático do arquivo atual, criando um rascunho temporário e atualizando a interface.
+    │   │   │   ├── ⚙️ setSaveStatus(status) — Atualiza o ícone visual de status de salvamento na UI.
+    │   │   │   ├── ⚙️ setEditorReadOnly(isReadOnly) — Define o estado de leitura/escrita do editor de texto e dos controles associados na UI.
+    │   │   │   ├── ⚙️ refreshSaveButtonState() — Centraliza a regra de ativação/desativação do botão Salvar/Sincronizar
+    │   │   │   ├── ⚙️ openFileEditor(fullPath, relativePath) — Lê o conteúdo do arquivo usando o FileService e renderiza no editor.
+    │   │   │   ├── ⚙️ resetEditorState() — Reseta a interface do editor para o estado inicial sem arquivo aberto.
+    │   │   │   ├── ⚙️ syncFile(filePath) — Persiste as alterações de um único arquivo (socreve original com .temp e limpa estado)
+    │   │   │   ├── ⚙️ syncMultipleFiles(filePaths) — Sincroniza uma lista de caminhos de arquivos em lote.
+    │   │   │   ├── ⚙️ openSyncModal() — Abre o modal de gerenciamento de alterações temporárias pendentes.
+    │   │   │   ├── ⚙️ renderSyncModalContent(tempFiles) — Gera o HTML dinâmico contendo a lista de arquivos temporários para exibição no modal de sincronização. @returns {string} String HTML estruturada para o conteúdo do modal.
+    │   │   │   ├── ⚙️ handleDiscardTemp(path, name, targetLi, syncModal, updateListState) — Manipula o processo de descarte e exclusão de um arquivo temporário (.temp) do disco e da interface.
+    │   │   │   └── ⚙️ attachSyncModalEvents(syncModal) — Gerencia os ouvintes de eventos e interações dentro do modal de sincronização (cliques em links, seleção de checkboxes e exclusão de itens).
+    │   │   └── index.js — [Barrel do módulo Editor, exportando funções e componentes essenciais para a construção do editor de texto e interação com o usuário.]
+    │   ├── [explorer]
+    │   │   ├── explorerUi.js — [Funções da UI do explorador de arquivos (File Explorer), incluindo a renderização da árvore de arquivos, eventos de interação e manipulação de elementos DOM relacionados.]
+    │   │   │   ├── ⚙️ initExplorerEvents() — Inicializa todos os ouvintes de eventos e comportamentos do explorador de arquivos.
+    │   │   │   ├── ⚙️ toggleAdvancedExplorerView() — Controla e alterna a visibilidade dos elementos avançados no explorador de arquivos com base no estado do interruptor.
+    │   │   │   └── ⚙️ tabSelectionEvents() — Gerencia a seleção de abas de navegação do explorador e alterna as classes visuais correspondentes no container.
+    │   │   ├── index.js — [Barrel do módulo Explorer, exportando funções e componentes essenciais para a construção da árvore de arquivos e interação com o usuário.]
+    │   │   └── tree.js — [Constrói e gerencia a interface da árvore de arquivos e pastas no painel lateral com suporte a filtros YAML e permissões de exibição.]
+    │   │       ├── ⚙️ renderTree() — Renderiza a árvore de arquivos no container DOM principal.
+    │   │       ├── ⚙️ buildTree(directoryPath, currentPath, parentMeta = null) — Função principal de montagem: busca entradas no disco e coordena a hierarquia. @returns {Promise<HTMLUListElement>} Elemento de lista não ordenada (`<ul>`) contendo a árvore de nós gerada.
+    │   │       ├── ⚙️ createFolderNode(entry, relativePath, parentMeta = null) — Processa uma pasta, lê seu `folder.yml` e monta o nó de pasta (`<li>`) se visível. @returns {Promise<HTMLLIElement|null>} Elemento de lista (`<li>`) formatado da pasta ou `null` se oculto.
+    │   │       ├── ⚙️ createFileNode(entry, relativePath, parentMeta = null) — Lê o arquivo Markdown, avalia permissões no Frontmatter e cria o nó de arquivo (`<li>`). @returns {Promise<HTMLLIElement|null>} Elemento de lista (`<li>`) formatado do arquivo ou `null` se oculto.
+    │   │       └── ⚙️ syncTreeSelection(relativePath) — Sincroniza a árvore de arquivos e as abas visuais ao abrir um arquivo.
+    │   ├── [modal]
+    │   │   └── modal.js — [Classe gerenciadora de modais em pilha (Stack).]
+    │   ├── overlays.js — [Funções utilitárias para controlar overlays na interface.]
+    │   │   ├── ⚙️ toggleEditorOverlay(show, key, message = '', showSpinner = true) — Controla o estado do overlay interno do editor usando uma pilha por chaves.
+    │   │   └── ⚙️ toggleAppOverlay(action = 'toggle') — Controla o estado de exibição do overlay global (fundo escuro/desfocado).
+    │   ├── [settings]
+    │   │   ├── index.js — [Barrel do módulo Settings, exportando funções e componentes essenciais para a configuração das preferências do usuário.]
+    │   │   └── settingsUi.js — [Responsável pelos eventos e comportamentos da interface do Menu de Configurações (Settings Drawer).]
+    │   │       ├── ⚙️ openSettingsDrawer() — Abre a gaveta de configurações.
+    │   │       ├── ⚙️ closeSettingsDrawer() — Fecha a gaveta de configurações.
+    │   │       └── ⚙️ initSettingsEvents() — Registra os ouvintes de evento para os botões do menu de configurações.
+    │   └── [toast]
+    │       └── toast.js — [Funções utilitárias para exibir notificações do tipo Toast na interface.]
+    │           └── ⚙️ showToast(message, type = 'success') — Exibe notificações do tipo Toast na interface.
+    ├── [controllers]
+    │   ├── controller.js
+    │   └── [handlers]
+    │       ├── chapterHandler.js
+    │       └── characterHandler.js
+    ├── [core]
+    │   ├── appContainer.js
+    │   ├── config.js — [Gerencia o estado global compartilhado e define os valores padrão para os metadados e permissões dos arquivos.]
+    │   └── theme.js — [Gerencia a alternância e a persistência dos temas claro/escuro na aplicação e no editor de texto.]
+    │       ├── ⚙️ initTheme()
+    │       ├── ⚙️ toggleTheme(isDark)
+    │       └── ⚙️ applyTheme(isDark)
+    ├── [events]
+    │   ├── domainBus.js — [Barramento de eventos (Pub-Sub) dedicado à camada de negócio da aplicação, processando atualizações de dados vindas do sistema de arquivos e regras do fluxo literário.]
+    │   └── uiBus.js — [Barramento de eventos (Pub-Sub) dedicado exclusivamente para a interface do usuário (UI), gerenciando interações visuais, abertura de drawers, toasts e modais.]
+    ├── renderer.js
+    ├── [services]
+    │   ├── bookService.js — [Serviço responsável por gerenciar a lista de livros, dados de configuração por projeto e verificação de travas da IA no Electron.]
+    │   │   ├── ⚙️ selectBook(bookPath, bookTitle = '') — Função centralizada para aplicar a seleção de um livro. Executada tanto na troca manual pelo <select> quanto na restauração inicial.
+    │   │   ├── ⚙️ popularSelectDeLivros() — Popula estritamente o elemento <select> com os livros disponíveis. @returns {Promise<Array>} Lista de livros retornados pela API.
+    │   │   ├── ⚙️ restoreLastSelectedBook(books = []) — Restaura o último livro selecionado salvo no localStorage ou assume o primeiro da lista.
+    │   │   ├── ⚙️ updateWindowTitle(bookTitle) — Atualiza o título da janela principal da aplicação.
+    │   │   ├── ⚙️ checkAILock() — Verifica o arquivo config.json do livro atual para gerenciar a exibição do overlay de trava da IA e o estado de leitura/escrita do editor.
+    │   │   ├── ⚙️ updateBookTitlesInSelect() — Executa o polling para manter atualizados os títulos dos livros no elemento <select>.
+    │   │   └── ⚙️ setupBookEvents() — Configura os eventos de interface específicos para gestão de livros.
+    │   └── fileService.js — [Serviço responsável por centralizar as operações de CRUD de arquivos (leitura, escrita, restauração e resolução de caminhos), servindo como ponte entre o Editor e o Sistema de Arquivos.]
+    │       ├── ⚙️ getTempPath(filePath)
+    │       ├── ⚙️ deleteFile(fullPath)
+    │       ├── ⚙️ readFile(fullPath) — Lê o conteúdo bruto de um arquivo via IPC. Tenta carregar o .temp prioritariamente.
+    │       ├── ⚙️ saveTempFile(fullPath, content) — Salva o rascunho no arquivo .temp
+    │       ├── ⚙️ saveFile(fullPath, content) — Persiste o conteúdo de um arquivo em disco substituindo o original pelo .temp e apagando o .temp.
+    │       ├── ⚙️ autoOpenFileByPath(targetPath)
+    │       └── ⚙️ restoreLastOpenedFile()
+    └── [utils]
+        ├── helpers.js — [Funções auxiliares genéricas para apoio à interface do usuário, controle de menus e normalizações.]
+        │   ├── ⚙️ normalizeItemMetadata(rawMetadata, fallbackTitle = '') — Garante que todas as chaves obrigatórias do objeto de metadados existam com valores padrão (fallbacks). @returns {Object} Metadados normalizados
+        │   ├── ⚙️ parseMarkdown(fileContent, isYmlOnly = false)
+        │   └── ⚙️ normalizePath(p) — Normaliza caminhos de arquivo para evitar quebras em seletores CSS ou chamadas do Node/IPC.
+        └── markdown.js — [Utilitário para conversão, parsing e serialização de conteúdos Markdown e metadados Frontmatter YAML.]
+            ├── ⚙️ parseMarkdown(fileContent, isYmlOnly = false) — Converte Frontmatter YAML em Objeto JS e retorna o corpo do Markdown separadamente. @returns {{ metadata: Object, body: string }}
+            └── ⚙️ stringifyFrontmatter(metadata, body) — Reconstrói o bloco Frontmatter YAML e anexa ao corpo em Markdown para salvamento. @returns {string} Conteúdo formatado pronto para gravação em disco
