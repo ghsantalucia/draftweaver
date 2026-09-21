@@ -4,6 +4,8 @@
 
 import './styles.css';
 
+import {gsap} from 'gsap';
+
 import { handleUserPrompt } from './chatPipeline.js';
 import { loadChatHistory } from './chatStorage.js';
 

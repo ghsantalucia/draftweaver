@@ -4,7 +4,7 @@
 
 import './styles.css';
 
-import { toggleAppOverlay } from '../ui'; // Ajuste o caminho de import se necessário
+import { toggleAppOverlay } from '../app-overlay/appOverlay.js'; 
 
 export class Modal {
   // Pilha estática que rastreia as instâncias ativas no app

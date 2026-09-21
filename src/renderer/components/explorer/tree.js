@@ -2,10 +2,10 @@
  * @file Constrói e gerencia a interface da árvore de arquivos e pastas no painel lateral com suporte a filtros YAML e permissões de exibição.
  */
 
-import { state } from '../config.js';
+import { state } from '../../core/config.js';
 import { openFileEditor } from '../editor';
-import { parseMarkdown, normalizeItemMetadata } from '../utils/helpers.js';
-import { readFile } from '../services/fileService.js';
+import { parseMarkdown, normalizeItemMetadata } from '../../utils/helpers.js';
+import { readFile } from '../../services/fileService.js';
 
 /**
  * Renderiza a árvore de arquivos no container DOM principal.

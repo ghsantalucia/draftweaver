@@ -1,23 +1,34 @@
 /**
- * @file Ponto de entrada do frontend (Renderer), responsável por inicializar módulos, escutadores de eventos de UI e orquestrar a aplicação.
+ * @file Ponto de entrada do frontend (Renderer), responsável por inicializar o container principal da aplicação.
  */
+
+// import { AppContainer } from './core/appContainer.js';
+
+// // Inicialização principal quando o DOM estiver carregado utilizando o Container IoC
+// document.addEventListener('DOMContentLoaded', async () => {
+//   const appContainer = new AppContainer();
+//   await appContainer.init();
+// });
+
 
 import { state } from './core/config.js';
 import { initTheme } from './core/theme.js';
 
-// import { initEditor } from './components/editor';
-// import { initExplorerEvents } from './components/explorer';
-// import { setupAiDrawerEvents } from './components/chat';
-// import { initSettingsEvents } from './components/settings';
-// import {
-//   popularSelectDeLivros,
-//   restoreLastSelectedBook,
-//   setupBookEvents,
-//   checkAILock,
-//   updateBookTitlesInSelect
-// } from './services/bookService.js';
-// import { restoreLastOpenedFile } from './services/fileService.js';
-// import { initTheme, initSaveButtonAnimation, initStarryBackground } from './ui';
+import { initEditor } from './components/editor';
+import { initExplorerEvents } from './components/explorer';
+import { setupAiDrawerEvents } from './components/chat';
+import { initSettingsEvents } from './components/settings';
+import {
+  popularSelectDeLivros,
+  restoreLastSelectedBook,
+  setupBookEvents,
+  checkAILock,
+  updateBookTitlesInSelect
+} from './services/bookService.js';
+import { restoreLastOpenedFile } from './services/fileService.js';
+import { initSaveButtonAnimation } from './components/toolbar/animations.js';
+import { initStarryBackground } from './components/chat/chatAnimations.js';
+import './components/sidebar/sidebar.js';
 
 
 // Inicialização principal quando o DOM estiver carregado

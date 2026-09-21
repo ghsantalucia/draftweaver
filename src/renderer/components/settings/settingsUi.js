@@ -5,7 +5,8 @@
 
 import './styles.css';
 
-import { toggleAppOverlay, Modal } from '../ui';
+import { toggleAppOverlay } from '../app-overlay/appOverlay.js';
+import { Modal } from '../modal/modal.js';
 
 /**
  * Abre a gaveta de configurações.

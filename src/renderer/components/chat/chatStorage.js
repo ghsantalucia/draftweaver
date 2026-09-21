@@ -2,7 +2,7 @@
  * @file Módulo de armazenamento do chat, responsável por gerenciar o histórico de mensagens e a persistência dos dados do chat.
  */
 
-import { state } from '../config.js';
+import { state } from '../../core/config.js';
 
 const MAX_MESSAGES_PER_FILE = 50;
 

@@ -2,7 +2,7 @@
  * @file Serviço responsável por centralizar as operações de CRUD de arquivos (leitura, escrita, restauração e resolução de caminhos), servindo como ponte entre o Editor e o Sistema de Arquivos.
  */
 
-import { refreshSaveButtonState } from '../editor';
+import { refreshSaveButtonState } from '../components/toolbar/toolbar.js';
 
 export function getTempPath(filePath) {
   return filePath ? `${filePath}.temp` : null;

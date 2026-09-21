@@ -2,12 +2,12 @@
  * @file Serviço responsável por gerenciar a lista de livros, dados de configuração por projeto e verificação de travas da IA no Electron.
  */
 
-import { state } from '../config.js';
-import { renderTree } from '../explorer/index.js';
-import { resetEditorState, setEditorReadOnly } from '../editor/index.js';
+import { state } from '../core/config.js';
+import { renderTree } from '../components/explorer/index.js';
+import { resetEditorState, setEditorReadOnly } from '../components/editor/index.js';
 import { readFile } from './fileService.js';
-import { reloadChatForCurrentBook } from '../chat/index.js';
-import { toggleEditorOverlay } from '../ui/index.js';
+import { reloadChatForCurrentBook } from '../components/chat/index.js';
+import { toggleEditorOverlay } from '../components/editor-overlay/editorOverlays.js';
 
 
 /**

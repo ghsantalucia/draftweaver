@@ -2,7 +2,7 @@
  * @file Funções auxiliares genéricas para apoio à interface do usuário, controle de menus e normalizações.
  */
 
-import { DEFAULT_TREE_METADATA } from '../config.js';
+import { DEFAULT_TREE_METADATA } from '../core/config.js';
 
 /**
  * Garante que todas as chaves obrigatórias do objeto de metadados existam com valores padrão (fallbacks).

@@ -1,0 +1,41 @@
+/* --------------------------------------------------------------------------
+   Header do Editor (Opções do Framework)
+   -------------------------------------------------------------------------- */
+
+.save-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-muted, #888);
+  transition: all 0.3s ease;
+}
+
+.save-status.unsaved {
+  color: #68688d;
+  /* Laranja */
+}
+
+.save-status.unsaved i {
+  font-size: 0.6rem;
+  /* Bolinha discreta */
+}
+
+.save-status.saving {
+  color: #3498db;
+  /* Azul */
+}
+
+.save-status.saved {
+  color: #42a36b;
+  /* Verde */
+}
+
+.save-status.error {
+  color: #e74c3c;
+  /* Vermelho */
+}
+
+.save-status.hidden {
+  display: none;
+}
