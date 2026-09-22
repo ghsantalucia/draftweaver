@@ -12,11 +12,12 @@
     ├── [ai]
     │   ├── aiGateway.js — [Gerencia as conexões e o roteamento de requisições para os gateways de Inteligência Artificial.]
     │   └── aiTools.js — [Define as ferramentas, funções auxiliares e utilitários integrados para uso dos modelos de Inteligência Artificial.]
-    ├── app.js — [Ponto de entrada do frontend (Renderer), responsável por inicializar módulos, escutadores de eventos de UI e orquestrar a aplicação.]
-    │   └── ⚙️ setupUIEvents() — Configura os ouvintes de eventos da interface global (Select de livros, Menus, Modos de exibição, etc).
+    ├── app.js — [Ponto de entrada do frontend (Renderer), responsável por inicializar o container principal da aplicação.]
+    │   └── ⚙️ setupUIEvents()
     ├── [components]
-    │   ├── animations.js — [Gerencia as animações da interface do usuário]
-    │   │   └── ⚙️ initSaveButtonAnimation()
+    │   ├── [app-overlay]
+    │   │   └── appOverlay.js — [Funções utilitárias para controlar o app overlay]
+    │   │       └── ⚙️ toggleAppOverlay(action = 'toggle') — Controla o estado de exibição do overlay global (fundo escuro/desfocado).
     │   ├── [chat]
     │   │   ├── chatAnimations.js — [Gerencia as animações da interface do chat de IA]
     │   │   │   ├── ⚙️ initStarryBackground() — Inicializa o canvas e o loop de renderização do fundo estrelado interativo.
@@ -52,16 +53,12 @@
     │   │   │   ├── ⚙️ triggerAutoSave() — Executa o salvamento automático do arquivo atual, criando um rascunho temporário e atualizando a interface.
     │   │   │   ├── ⚙️ setSaveStatus(status) — Atualiza o ícone visual de status de salvamento na UI.
     │   │   │   ├── ⚙️ setEditorReadOnly(isReadOnly) — Define o estado de leitura/escrita do editor de texto e dos controles associados na UI.
-    │   │   │   ├── ⚙️ refreshSaveButtonState() — Centraliza a regra de ativação/desativação do botão Salvar/Sincronizar
     │   │   │   ├── ⚙️ openFileEditor(fullPath, relativePath) — Lê o conteúdo do arquivo usando o FileService e renderiza no editor.
-    │   │   │   ├── ⚙️ resetEditorState() — Reseta a interface do editor para o estado inicial sem arquivo aberto.
-    │   │   │   ├── ⚙️ syncFile(filePath) — Persiste as alterações de um único arquivo (socreve original com .temp e limpa estado)
-    │   │   │   ├── ⚙️ syncMultipleFiles(filePaths) — Sincroniza uma lista de caminhos de arquivos em lote.
-    │   │   │   ├── ⚙️ openSyncModal() — Abre o modal de gerenciamento de alterações temporárias pendentes.
-    │   │   │   ├── ⚙️ renderSyncModalContent(tempFiles) — Gera o HTML dinâmico contendo a lista de arquivos temporários para exibição no modal de sincronização. @returns {string} String HTML estruturada para o conteúdo do modal.
-    │   │   │   ├── ⚙️ handleDiscardTemp(path, name, targetLi, syncModal, updateListState) — Manipula o processo de descarte e exclusão de um arquivo temporário (.temp) do disco e da interface.
-    │   │   │   └── ⚙️ attachSyncModalEvents(syncModal) — Gerencia os ouvintes de eventos e interações dentro do modal de sincronização (cliques em links, seleção de checkboxes e exclusão de itens).
+    │   │   │   └── ⚙️ resetEditorState() — Reseta a interface do editor para o estado inicial sem arquivo aberto.
     │   │   └── index.js — [Barrel do módulo Editor, exportando funções e componentes essenciais para a construção do editor de texto e interação com o usuário.]
+    │   ├── [editor-overlay]
+    │   │   └── editorOverlays.js — [Funções utilitárias para controlar overlays na interface.]
+    │   │       └── ⚙️ toggleEditorOverlay(show, key, message = '', showSpinner = true) — Controla o estado do overlay interno do editor usando uma pilha por chaves.
     │   ├── [explorer]
     │   │   ├── explorerUi.js — [Funções da UI do explorador de arquivos (File Explorer), incluindo a renderização da árvore de arquivos, eventos de interação e manipulação de elementos DOM relacionados.]
     │   │   │   ├── ⚙️ initExplorerEvents() — Inicializa todos os ouvintes de eventos e comportamentos do explorador de arquivos.
@@ -76,25 +73,35 @@
     │   │       └── ⚙️ syncTreeSelection(relativePath) — Sincroniza a árvore de arquivos e as abas visuais ao abrir um arquivo.
     │   ├── [modal]
     │   │   └── modal.js — [Classe gerenciadora de modais em pilha (Stack).]
-    │   ├── overlays.js — [Funções utilitárias para controlar overlays na interface.]
-    │   │   ├── ⚙️ toggleEditorOverlay(show, key, message = '', showSpinner = true) — Controla o estado do overlay interno do editor usando uma pilha por chaves.
-    │   │   └── ⚙️ toggleAppOverlay(action = 'toggle') — Controla o estado de exibição do overlay global (fundo escuro/desfocado).
     │   ├── [settings]
     │   │   ├── index.js — [Barrel do módulo Settings, exportando funções e componentes essenciais para a configuração das preferências do usuário.]
     │   │   └── settingsUi.js — [Responsável pelos eventos e comportamentos da interface do Menu de Configurações (Settings Drawer).]
     │   │       ├── ⚙️ openSettingsDrawer() — Abre a gaveta de configurações.
     │   │       ├── ⚙️ closeSettingsDrawer() — Fecha a gaveta de configurações.
     │   │       └── ⚙️ initSettingsEvents() — Registra os ouvintes de evento para os botões do menu de configurações.
-    │   └── [toast]
-    │       └── toast.js — [Funções utilitárias para exibir notificações do tipo Toast na interface.]
-    │           └── ⚙️ showToast(message, type = 'success') — Exibe notificações do tipo Toast na interface.
+    │   ├── [sidebar]
+    │   │   └── sidebar.js
+    │   ├── [toast]
+    │   │   └── toast.js — [Funções utilitárias para exibir notificações do tipo Toast na interface.]
+    │   │       └── ⚙️ showToast(message, type = 'success') — Exibe notificações do tipo Toast na interface.
+    │   └── [toolbar]
+    │       ├── animations.js — [Gerencia as animações da interface do usuário]
+    │       │   └── ⚙️ initSaveButtonAnimation()
+    │       └── toolbar.js — [Barra de Ferramentas do framework acima do editor]
+    │           ├── ⚙️ syncFile(filePath) — Persiste as alterações de um único arquivo (socreve original com .temp e limpa estado)
+    │           ├── ⚙️ syncMultipleFiles(filePaths) — Sincroniza uma lista de caminhos de arquivos em lote.
+    │           ├── ⚙️ openSyncModal() — Abre o modal de gerenciamento de alterações temporárias pendentes.
+    │           ├── ⚙️ renderSyncModalContent(tempFiles) — Gera o HTML dinâmico contendo a lista de arquivos temporários para exibição no modal de sincronização. @returns {string} String HTML estruturada para o conteúdo do modal.
+    │           ├── ⚙️ handleDiscardTemp(path, name, targetLi, syncModal, updateListState) — Manipula o processo de descarte e exclusão de um arquivo temporário (.temp) do disco e da interface.
+    │           ├── ⚙️ attachSyncModalEvents(syncModal) — Gerencia os ouvintes de eventos e interações dentro do modal de sincronização (cliques em links, seleção de checkboxes e exclusão de itens).
+    │           └── ⚙️ refreshSaveButtonState() — Centraliza a regra de ativação/desativação do botão Salvar/Sincronizar
     ├── [controllers]
     │   ├── controller.js
     │   └── [handlers]
     │       ├── chapterHandler.js
     │       └── characterHandler.js
     ├── [core]
-    │   ├── appContainer.js
+    │   ├── appContainer.js — [Contém a classe AppContainer, responsável por inicializar, instanciar e gerenciar]
     │   ├── config.js — [Gerencia o estado global compartilhado e define os valores padrão para os metadados e permissões dos arquivos.]
     │   └── theme.js — [Gerencia a alternância e a persistência dos temas claro/escuro na aplicação e no editor de texto.]
     │       ├── ⚙️ initTheme()

@@ -1,0 +1,35 @@
+<!-- Footer do Assistente de IA -->
+<div id="ai-assistant-header" class="ai-assistant-header">
+    <div class="ai-title-container">
+        <span class="ai-sparkles-icon">✦</span>
+        <span class="ai-title">Assistente de Escrita</span>
+    </div>
+    <button id="btn-toggle-ai" class="ai-toggle-btn" title="Expandir/Recolher Chat">▲</button>
+</div>
+
+<div class="ai-assistant-body" id="ai-body-container">
+
+    <canvas id="ai-bg-canvas"></canvas>
+
+    <div class="ai-chat-messages" id="ai-chat-messages">
+        <!-- Mensagens de chat do assistente de IA -->
+    </div>
+
+    <div class="ai-chat-input-container">
+        <div class="ai-input-wrapper">
+            <!-- Campo de Texto -->
+            <textarea id="ai-chat-input" placeholder="Digite uma instrução para a IA..." rows="2"></textarea>
+
+            <!-- Barra Inferior de Ações Embutida (Estilo Gemini) -->
+            <div class="ai-input-actions">
+                <button id="btn-send-ai" class="btn-send-round" title="Enviar mensagem">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="19" x2="12" y2="5"></line>
+                        <polyline points="5 12 12 5 19 12"></polyline>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

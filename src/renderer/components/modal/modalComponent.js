@@ -4,7 +4,6 @@
 
 import './styles.css';
 
-import { toggleAppOverlay } from '../app-overlay/appOverlay.js'; 
 
 export class Modal {
   // Pilha estática que rastreia as instâncias ativas no app
@@ -29,6 +28,25 @@ export class Modal {
   }
 
   /**
+     * Controla o estado de exibição do overlay global (fundo escuro/desfocado).
+     * @param {boolean|'show'|'hide'|'toggle'} [action='toggle'] Ação a ser executada
+     * @static
+     * @private
+     */
+  static toggleAppOverlay(action = 'toggle') {
+    const overlay = document.getElementById('app-modal-overlay');
+    if (!overlay) return;
+
+    if (action === 'show' || action === true) {
+      overlay.classList.remove('hidden');
+    } else if (action === 'hide' || action === false) {
+      overlay.classList.add('hidden');
+    } else {
+      overlay.classList.toggle('hidden');
+    }
+  }
+
+  /**
    * Renderiza a janela e a exibe no topo da pilha
    */
   show() {
@@ -43,7 +61,7 @@ export class Modal {
       }
     } else {
       // Se é o primeiro modal da pilha, exibe o overlay de fundo
-      toggleAppOverlay('show');
+      Modal.toggleAppOverlay('show');
     }
 
     // 2. Cria o elemento DOM da janela
@@ -75,7 +93,7 @@ export class Modal {
         const btn = document.createElement('button');
         btn.className = `btn-modal ${btnConfig.class || 'btn-secondary'}`;
         btn.textContent = btnConfig.text;
-        
+
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           if (btnConfig.onClick) {
@@ -84,7 +102,7 @@ export class Modal {
             this.close();
           }
         });
-        
+
         footer.appendChild(btn);
       });
     }
@@ -127,7 +145,7 @@ export class Modal {
       }
     } else {
       // Se não sobrou nenhum modal, oculta o overlay global escuro
-      toggleAppOverlay('hide');
+      Modal.toggleAppOverlay('hide');
     }
   }
 }

@@ -11,7 +11,7 @@
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "echo \"No linting configured\"",
-    "docs:web": "jsdoc -c jsdoc.json", 
+    "docs:web": "jsdoc -c jsdoc.json",
     "map": "node scripts/project-map.js > docs/project-map.txt",
     "code-map": "node scripts/code-map.js > docs/code-map.txt"
   },
@@ -41,6 +41,7 @@
     "chokidar": "^5.0.0",
     "electron-squirrel-startup": "^1.0.1",
     "gsap": "^3.15.0",
+    "handlebars": "^4.7.9",
     "mitt": "^3.0.1"
   }
 }

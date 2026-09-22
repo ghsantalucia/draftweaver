@@ -2,7 +2,7 @@
    SIDEBAR (Estrutura lateral)
    ========================================================================== */
 
-.sidebar {
+#sidebar-container {
   width: 480px;
   min-width: 480px;
   max-width: 480px;

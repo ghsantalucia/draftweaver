@@ -206,10 +206,10 @@ li.advanced-item>.file-name>.icon-file {
 }
 
 /* ==========================================================================
-   NAVEGAÇÃO POR ABAS NA SIDEBAR
+   NAVEGAÇÃO POR ABAS
    ========================================================================== */
 
-.sidebar-tabs {
+.explorer-tabs {
   display: flex;
   gap: 10px;
   background-color: var(--sidebar-controls-bg);

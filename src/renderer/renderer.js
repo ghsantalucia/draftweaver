@@ -14,3 +14,5 @@ window.api.onFileWatcher((eventType, data) => {
   domainBus.emit(`fs:${eventType}`, data);
   console.log(`[DomainBus] Evento de disco capturado: fs:${eventType}`, data);
 });
+
+console.log("[RENDERER]");

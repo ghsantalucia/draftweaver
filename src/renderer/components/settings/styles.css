@@ -3,7 +3,7 @@
    ========================================================================== */
 
 /* Painel da Gaveta */
-.settings-drawer {
+#settings-container {
   position: fixed;
   top: 0;
   left: -480px;
@@ -22,11 +22,11 @@
 }
 
 /* Estado aberto da gaveta */
-.settings-drawer.open {
+#settings-container.open {
   left: 0;
 }
 
-.drawer-header {
+.settings-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -43,7 +43,7 @@
   cursor: pointer;
 }
 
-.drawer-content {
+.settings-content {
   display: flex;
   flex-direction: column;
   gap: 15px;

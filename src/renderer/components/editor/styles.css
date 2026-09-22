@@ -2,7 +2,7 @@
    ÁREA DO EDITOR DE TEXTO
    ========================================================================== */
 
-.editor-area {
+#editor-container {
   flex-grow: 1;
   min-width: 0;
   display: flex;
@@ -76,9 +76,9 @@ body.dark-theme .toastui-editor-defaultUI *::-webkit-scrollbar-thumb:hover {
 }
 
 /* Libera a seleção de texto APENAS na área de escrita do Editor */
-.editor-area #markdown-editor,
-.editor-area .toastui-editor-defaultUI,
-.editor-area .toastui-editor-contents {
+#editor-container #markdown-editor,
+#editor-container .toastui-editor-defaultUI,
+#editor-container .toastui-editor-contents {
   user-select: text;
   -webkit-user-select: text;
 }

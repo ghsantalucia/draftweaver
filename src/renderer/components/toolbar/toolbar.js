@@ -4,7 +4,7 @@
 
 import './styles.css';
 
-import { state } from '../../core/config.js';
+import { state } from '../../core/state.js';
 import { stringifyFrontmatter } from '../../utils/markdown.js';
 import { normalizePath } from '../../utils/helpers.js';
 import { showToast } from '../toast/toast.js';

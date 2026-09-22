@@ -3,14 +3,22 @@
  * o ciclo de vida dos serviços e componentes utilizando o padrão de Inversão de Controle (IoC).
  */
 
-import { State } from './config.js';
-import { ThemeManager } from './theme.js';
-import { FileService } from '../services/fileService.js';
-import { BookService } from '../services/bookService.js';
-import { EditorComponent } from '../components/editor/editor.js';
-import { ExplorerComponent } from '../components/explorer/explorerUi.js';
-import { ChatComponent } from '../components/chat/chatUi.js';
-import { SettingsComponent } from '../components/settings/settingsUi.js';
+import { State } from './state.js';
+import { ThemeManager } from './themeManager.js';
+import { ServiceManager } from '../services/serviceManager.js';
+import { UiController } from '../controllers/uiController.js';
+import { DomainController } from '../controllers/domainController.js';
+
+// FIXME: Importar Componentes operantes
+// import { ChatComponent } from '../components/chat/chatComponent.js';
+// import { EditorComponent } from '../components/editor/editorComponent.js';
+// import { EditorOverlayComponent } from '../components/editor-overlay/editorOverlayComponent.js';
+// import { ExplorerComponent } from '../components/explorer/explorerComponent.js';
+// import { ModalComponent } from '../components/modal/modalComponent.js';
+// import { SettingsComponent } from '../components/settings/settingsComponent.js';
+import { SidebarComponent } from '../components/sidebar/sidebarComponent.js';
+// import { ToastComponent } from '../components/toast/toastComponent.js';
+// import { ToolbarComponent } from '../components/toolbar/toolbarComponent.js';
 
 
 /**
@@ -25,17 +33,25 @@ export class AppContainer {
    * @constructor
    */
     constructor() {
-        // 1. Camada de Estado e Serviços Core
+
+        console.log("AppContainer constructor");
+
+        // 1. Core e Serviços
         this.state = new State();
-        this.fileService = new FileService(this.state);
-        this.bookService = new BookService(this.state, this.fileService);
         this.themeManager = new ThemeManager();
 
-        // 2. Camada de Componentes de UI (Injetando dependências necessárias)
-        this.editorComponent = new EditorComponent(this.fileService, this.state);
-        this.explorerComponent = new ExplorerComponent(this.fileService, this.state);
-        this.chatComponent = new ChatComponent(this.state);
-        this.settingsComponent = new SettingsComponent(this.themeManager);
+        // 2. Centraliza os serviços em um único lugar
+        this.services = new ServiceManager(this.state);
+
+        // 3. Controllers
+        this.uiController = new UiController(this.services);
+        this.domainController = new DomainController(this.services);
+
+        // 4. Agrupamos os componentes de UI em um array/objeto central
+        this.components = [
+            // FIXME: Criar componentes POO
+            new SidebarComponent('#sidebar-container')
+        ];
     }
 
     /**
@@ -43,32 +59,27 @@ export class AppContainer {
    * @returns {Promise<void>}
    */
     async init() {
-        // Inicializa o tema salvo
         this.themeManager.init();
 
-        // Inicializa os componentes de UI
-        this.editorComponent.init();
-        this.explorerComponent.init();
-        this.chatComponent.init();
-        this.settingsComponent.init();
+        // Inicializa todos os componentes de uma vez só com um loop!
+        for (const component of this.components) {
+            if (typeof component.init === 'function') {
+                component.init();
+            }
+        }
 
-        // Configura eventos globais e restrições de janela
         this.setupGlobalEvents();
 
-        // Carrega e restaura dados iniciais de livros e arquivos
-        const books = await this.bookService.popularSelectDeLivros();
-        await this.bookService.restoreLastSelectedBook(books);
-        this.fileService.restoreLastOpenedFile();
-
-        // Pollings periódicos da aplicação
-        setInterval(() => this.bookService.checkAILock(), 500);
-        setInterval(() => this.bookService.updateBookTitlesInSelect(), 1000);
+        // FIXME: Implementar métodos de UI iniciais
+        // const books = await this.services.book.popularSelectDeLivros();
+        // await this.services.book.restoreLastSelectedBook(books);
+        // this.services.file.restoreLastOpenedFile();
     }
 
     /**
-   * Configura ouvintes globais de eventos na janela (arrastar arquivos, restrições de TAB, etc.).
-   * @private
-   */
+    * Configura ouvintes globais de eventos na janela (arrastar arquivos, restrições de TAB, etc.).
+    * @private
+    */
     setupGlobalEvents() {
         // Previne comportamento padrão de arrastar elementos na janela
         document.addEventListener('dragstart', (e) => {
@@ -89,3 +100,5 @@ export class AppContainer {
         }, true);
     }
 }
+
+console.log("[APP-CONTAINER.JS]");

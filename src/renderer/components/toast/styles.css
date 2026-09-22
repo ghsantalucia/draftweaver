@@ -1,5 +1,5 @@
 /* Notificação Toast */
-.toast {
+#toast-container {
   position: fixed;
   bottom: 20px;
   right: 20px;
@@ -18,18 +18,18 @@
   transform: translateY(0);
 }
 
-.toast.hidden {
+#toast-container.hidden {
   opacity: 0;
   transform: translateY(20px);
   pointer-events: none;
 }
 
-.toast.success {
+#toast-container.success {
   background-color: #5d9f60e3;
   border-left: 4px solid #4caf50;
 }
 
-.toast.error {
+#toast-container.error {
   background-color: #b84545db;
   border-left: 4px solid #ef5350;
 }
