@@ -10,15 +10,15 @@ import { UiController } from '../controllers/uiController.js';
 import { DomainController } from '../controllers/domainController.js';
 
 // FIXME: Importar Componentes operantes
-// import { ChatComponent } from '../components/chat/chatComponent.js';
-// import { EditorComponent } from '../components/editor/editorComponent.js';
+import { SidebarComponent } from '../components/sidebar/sidebarComponent.js';
+import { ToolbarComponent } from '../components/toolbar/toolbarComponent.js';
+import { EditorComponent } from '../components/editor/editorComponent.js';
+import { ChatComponent } from '../components/chat/chatComponent.js';
+import { ExplorerComponent } from '../components/explorer/explorerComponent.js';
 // import { EditorOverlayComponent } from '../components/editor-overlay/editorOverlayComponent.js';
-// import { ExplorerComponent } from '../components/explorer/explorerComponent.js';
 // import { ModalComponent } from '../components/modal/modalComponent.js';
 // import { SettingsComponent } from '../components/settings/settingsComponent.js';
-import { SidebarComponent } from '../components/sidebar/sidebarComponent.js';
 // import { ToastComponent } from '../components/toast/toastComponent.js';
-// import { ToolbarComponent } from '../components/toolbar/toolbarComponent.js';
 
 
 /**
@@ -34,8 +34,6 @@ export class AppContainer {
    */
     constructor() {
 
-        console.log("AppContainer constructor");
-
         // 1. Core e Serviços
         this.state = new State();
         this.themeManager = new ThemeManager();
@@ -48,10 +46,19 @@ export class AppContainer {
         this.domainController = new DomainController(this.services);
 
         // 4. Agrupamos os componentes de UI em um array/objeto central
-        this.components = [
-            // FIXME: Criar componentes POO
-            new SidebarComponent('#sidebar-container')
-        ];
+        this.components = {};
+
+        this.components.sidebar = new SidebarComponent('#sidebar-container');
+        if (this.components.sidebar) {
+            this.components.chat     = new ChatComponent('#chat-container', this.components.sidebar);
+            this.components.explorer = new ExplorerComponent('#explorer-container', this.components.sidebar);
+        }
+        this.components.editor = new EditorComponent('#editor-container');
+        if (this.components.editor) {
+            // this.components.editorOverlay = new EditorOverlayComponent('#editor-overlay-container', this.components.editor);
+        }
+        this.components.toolbar = new ToolbarComponent('#toolbar-container');
+
     }
 
     /**
@@ -59,14 +66,19 @@ export class AppContainer {
    * @returns {Promise<void>}
    */
     async init() {
+
         this.themeManager.init();
 
-        // Inicializa todos os componentes de uma vez só com um loop!
-        for (const component of this.components) {
-            if (typeof component.init === 'function') {
-                component.init();
-            }
-        }
+        // Percorre os valores do objeto de componentes de forma segura
+        // for (const component of Object.values(this.components)) {
+        //     if (component && typeof component.init === 'function') {
+        //         component.init();
+        //     }
+        // }
+
+        this.components.sidebar.init();
+        this.components.toolbar.init();
+        this.components.editor.init();
 
         this.setupGlobalEvents();
 

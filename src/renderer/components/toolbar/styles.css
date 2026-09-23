@@ -2,6 +2,18 @@
    Header do Editor (Opções do Framework)
    -------------------------------------------------------------------------- */
 
+#toolbar-container {
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-muted);
+  font-size: 12px;
+  letter-spacing: 1px;
+  background: var(--editor-toolbar);
+  border: solid var(--border-app) 1px;
+  border-left: none;
+  border-right: none;
+}
+
 .save-status {
   display: inline-flex;
   align-items: center;

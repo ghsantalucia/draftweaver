@@ -14,10 +14,13 @@
   </header>
 
   <!--========== [ APP CONTAINER ] ==========-->
-  <div class="app-container">
+  <div id="app-container">
 
     <!-- Painel Lateral Esquerdo -->
     <aside id="sidebar-container"></aside>
+
+    <!-- Ferramentas do framework -->
+    <div id="toolbar-container"></div>
 
     <!-- Área Principal do Editor -->
     <main id="editor-container"></main>
@@ -30,11 +33,12 @@
 
     <!-- Notificações Toast -->
     <div id="toast-container" class="hidden"></div>
-   
+
   </div>
   <!--========== [ FIM APP CONTAINER ] ==========-->
 
   <!-- Ponto de entrada do Vite para carregar CSS e Scripts JS -->
   <script type="module" src="./renderer.js"></script>
 </body>
+
 </html>

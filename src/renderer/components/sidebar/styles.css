@@ -3,20 +3,9 @@
    ========================================================================== */
 
 #sidebar-container {
-  width: 480px;
-  min-width: 480px;
-  max-width: 480px;
-  height: 100%;
-  padding-top: 0px;
   background-color: var(--bg-header);
   color: var(--text-sidebar);
   border-right: 1px solid var(--border-app);
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-  min-height: 0;
-  overflow: hidden;
-  position: relative;
 }
 
 .sidebar-header {

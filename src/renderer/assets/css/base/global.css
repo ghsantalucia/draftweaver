@@ -1,14 +1,34 @@
-.app-container {
-  display: flex;
-  flex-direction: row;
-  /* Sidebar na esquerda, Editor na direita */
-  flex-grow: 1;
-  /* Preenche a altura restante sem vazar 25px */
-  min-height: 0;
-  /* OBRIGATÓRIO: Impede que o conteúdo interno force o scroll da tela */
-  overflow: hidden;
+/* ==========================================================================
+   CABEÇALHO DA JANELA CUSTOMIZADO
+   ========================================================================== */
+
+#window-header {
+  background-color: var(--bg-header);
+  color: #8b949e;
+  align-items: center;
+  font-size: 0.75rem;
+  -webkit-app-region: drag;
+  /* Permite arrastar a janela clicando no cabeçalho */
+  user-select: none;
 }
 
+/* Garante que elementos clicáveis no cabeçalho recebam cliques */
+#window-header select,
+#window-header button,
+#window-header input,
+#window-header a {
+  -webkit-app-region: no-drag;
+}
+
+#icon img {
+  width: 25px;
+  height: 25px;
+  margin-top: 10px;
+  /* margin-left: 10px; */
+}
+
+
+/* Classes utilitárias */
 .hidden {
   display: none !important;
 }

@@ -17,7 +17,7 @@ export class ServiceManager {
      * @constructor
      */
     constructor(state) {
-        console.log("ServiceManager constructor");
+        
         this.state = state;
 
         // Instancia os serviços injetando as dependências necessárias

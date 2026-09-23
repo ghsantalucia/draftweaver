@@ -2,7 +2,7 @@
    DRAWER DO ASSISTENTE DE IA
    ========================================================================== */
 
-.ai-assistant-drawer {
+#chat-container {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -18,7 +18,7 @@
 }
 
 /* Estado expandido: sobe até cobrir o corpo da sidebar abaixo do header */
-.ai-assistant-drawer.expanded {
+#chat-container.expanded {
   height: calc(100% - 50px);
   /* Deixa apenas o header do livro visível */
   box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.5);
@@ -81,7 +81,7 @@
   transition: transform 0.3s ease, color 0.2s ease;
 }
 
-.ai-assistant-drawer.expanded .ai-toggle-btn {
+#chat-container.expanded .ai-toggle-btn {
   transform: rotate(180deg);
 }
 

@@ -3,28 +3,7 @@
    ========================================================================== */
 
 #editor-container {
-  flex-grow: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
   background: var(--editor-toolbar);
-  height: 100%;
-  overflow: hidden;
-  position: relative;
-  flex-grow: 1;
-}
-
-.editor-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: var(--text-muted);
-  font-size: 12px;
-  letter-spacing: 1px;
-  padding: 5px 10px;
-  border: solid var(--border-app) 1px;
-  border-left: none;
-  border-right: none;
 }
 
 .CodeMirror {
