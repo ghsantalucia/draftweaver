@@ -1,4 +1,4 @@
-# Documentação da Classe Component
+# Documentação da Classe [Component](/src/renderer/components/Component.js)
 
 A classe Component serve como a base abstrata para todos os elementos de interface (UI) do DraftWeaver. Ela implementa o padrão de projeto Composite (para gerenciar relações de pai e filho) combinado com o padrão Template Method (para padronizar o ciclo de vida).
 
