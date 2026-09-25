@@ -10,15 +10,19 @@ export class Component {
   /**
    * Cria uma instância do componente.
    * @param {string} selector - Seletor CSS do container alvo no DOM.
+   * @param {Object} context - Objeto de contexto e infraestrutura (state, uiBus, domainBus)
    * @param {Component|null} [parent=null] - Componente pai opcional para auto-registro.
    * @param {string} [templateHtml=''] - Template HTML em formato string para renderização.
    */
-  constructor(selector, templateHtml, parent = null) {
+  constructor(selector, context, templateHtml, parent = null) {
     this.selector = selector;
     this.templateHtml = templateHtml;
-    this.containerElement = null;
+    this.element = null;
     this.children = [];
     this.parent = parent;
+    this.state = context.state;
+    this.uiBus = context.uiBus; 
+    this.domainBus = context.domainBus;
 
     // Auto-registro no pai, se fornecido
     if (this.parent && typeof this.parent.setChildren === 'function') {
@@ -38,9 +42,9 @@ export class Component {
    * Ciclo de vida principal padronizado.
    */
   init() {
-    this.containerElement = document.querySelector(this.selector);
+    this.element = document.querySelector(this.selector);
 
-    if (!this.containerElement) {
+    if (!this.element) {
       console.error(`[${this.constructor.name}] Container alvo (${this.selector}) não fornecido para renderização.`);
       return;
     }
@@ -70,13 +74,13 @@ export class Component {
    * Motor de renderização centralizado usando Handlebars.
    */
   render() {
-    if (!this.containerElement || !this.templateHtml) return;
+    if (!this.element || !this.templateHtml) return;
 
     // Se a filha tiver o método getContext, usa ele. Se não, usa um objeto vazio {} por padrão.
     const context = typeof this.getContext === 'function' ? this.getContext() : {};
     
     const templateFn = Handlebars.compile(this.templateHtml);
-    this.containerElement.innerHTML = templateFn(context);
+    this.element.innerHTML = templateFn(context);
   }
 
   /**

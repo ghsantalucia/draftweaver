@@ -19,10 +19,11 @@ export class EditorComponent extends Component {
   /**
    * Cria uma instância da classe
    * @param {string} selector - Seletor CSS do elemento do DOM onde será injetada.
+   * @param {Object} context - Objeto de contexto e infraestrutura (state, uiBus, domainBus)
    * @param {Component} [parent=null]
    */
-  constructor(selector, parent = null) {
-    super(selector, templateHtml, parent);
+  constructor(selector, context, parent = null) {
+    super(selector, context, templateHtml, parent);
   }
 
   onInit() {
@@ -45,7 +46,7 @@ export class EditorComponent extends Component {
     // Pergunta de forma limpa ao DOM/ThemeManager se o tema atual é escuro
     const isDark = document.body.classList.contains('dark-theme');
     const currentTheme = isDark ? 'dark' : 'default';
-    const editorElement = this.containerElement.querySelector('#markdown-editor');
+    const editorElement = this.element.querySelector('#markdown-editor');
 
     if (!editorElement) {
       console.error('[EditorComponent] Elemento #markdown-editor não encontrado no template.');

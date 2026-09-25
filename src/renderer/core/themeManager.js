@@ -2,6 +2,8 @@
  * @file Gerencia a alternância e a persistência dos temas claro/escuro na aplicação e no editor de texto.
  */
 
+import { uiBus } from '../events/uiBus.js';
+
 /**
  * Classe responsável por gerenciar temas visuais e preferências de claro/escuro da interface.
  * @class
@@ -11,7 +13,7 @@ export class ThemeManager {
    * Cria uma instância do ThemeManager.
    * @constructor
    */
-  constructor() {}
+  constructor() { }
 
   /**
    * Inicializa o gerenciador de temas, recuperando o tema salvo e configurando os ouvintes de evento.
@@ -19,16 +21,22 @@ export class ThemeManager {
   init() {
     const savedTheme = localStorage.getItem('theme');
     const isDark = savedTheme === 'dark';
-
+    this.theme = savedTheme;
+    
     this.applyTheme(isDark);
 
-    const themeToggle = document.getElementById('theme-toggle');
-    if (themeToggle) {
-      themeToggle.checked = isDark;
-      themeToggle.addEventListener('change', (e) => {
-        this.toggleTheme(e.target.checked);
-      });
-    }
+    this.setupListeners();
+  }
+
+  /**
+   * Configura os ouvintes de eventos.
+   */
+  setupListeners() {
+    // Evento de troca de tema
+    uiBus.on('theme:toggle', (context) => {
+      // console.log(context.value);
+      this.toggleTheme(context.value);
+    });
   }
 
   /**
@@ -37,8 +45,13 @@ export class ThemeManager {
    * @param {boolean} isDark - Define se o tema deve ser escuro (true) ou claro (false).
    */
   toggleTheme(isDark) {
+
+    const theme =  isDark ? 'dark' : 'light';
+    this.theme = theme;
+
     this.applyTheme(isDark);
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    
+    localStorage.setItem('theme', theme);
   }
 
   /**
@@ -69,5 +82,7 @@ export class ThemeManager {
     // if (window.electronAPI && window.electronAPI.setNativeTheme) {
     //   window.electronAPI.setNativeTheme(isDark);
     // }
+    
+    uiBus.emit('theme:changed', {theme:this.theme});
   }
 }

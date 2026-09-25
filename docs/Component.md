@@ -66,7 +66,7 @@ Quando usar: Para registrar escutadores de eventos de clique, teclado ou formulÃ
 Exemplo:
 ```JavaScript
     setupListeners() {
-      const btn = this.containerElement.querySelector('#send-btn');
+      const btn = this.element.querySelector('#send-btn');
       btn.addEventListener('click', () => this.handleSend());
     }
 ```

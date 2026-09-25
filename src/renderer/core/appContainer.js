@@ -8,6 +8,8 @@ import { ThemeManager } from './themeManager.js';
 import { ServiceManager } from '../services/serviceManager.js';
 import { UiController } from '../controllers/uiController.js';
 import { DomainController } from '../controllers/domainController.js';
+import { uiBus } from '../events/uiBus.js';
+import { domainBus } from '../events/domainBus.js';
 
 // FIXME: Importar Componentes operantes
 import { SidebarComponent } from '../components/sidebar/sidebarComponent.js';
@@ -15,9 +17,9 @@ import { ToolbarComponent } from '../components/toolbar/toolbarComponent.js';
 import { EditorComponent } from '../components/editor/editorComponent.js';
 import { ChatComponent } from '../components/chat/chatComponent.js';
 import { ExplorerComponent } from '../components/explorer/explorerComponent.js';
+import { SettingsComponent } from '../components/settings/settingsComponent.js';
 // import { EditorOverlayComponent } from '../components/editor-overlay/editorOverlayComponent.js';
 // import { ModalComponent } from '../components/modal/modalComponent.js';
-// import { SettingsComponent } from '../components/settings/settingsComponent.js';
 // import { ToastComponent } from '../components/toast/toastComponent.js';
 
 
@@ -46,18 +48,24 @@ export class AppContainer {
         this.domainController = new DomainController(this.services);
 
         // 4. Agrupamos os componentes de UI em um array/objeto central
+        const context = {
+            uiBus: uiBus,
+            domainBus: domainBus,
+            state: this.state
+        };
         this.components = {};
 
-        this.components.sidebar = new SidebarComponent('#sidebar-container');
+        this.components.sidebar = new SidebarComponent('#sidebar-container', context);
         if (this.components.sidebar) {
-            this.components.chat     = new ChatComponent('#chat-container', this.components.sidebar);
-            this.components.explorer = new ExplorerComponent('#explorer-container', this.components.sidebar);
+            this.components.chat = new ChatComponent('#chat-container', context, this.components.sidebar);
+            this.components.explorer = new ExplorerComponent('#explorer-container', context, this.components.sidebar);
         }
-        this.components.editor = new EditorComponent('#editor-container');
+        this.components.editor = new EditorComponent('#editor-container', context);
         if (this.components.editor) {
-            // this.components.editorOverlay = new EditorOverlayComponent('#editor-overlay-container', this.components.editor);
+            // this.components.editorOverlay = new EditorOverlayComponent('#editor-overlay-container', context, this.components.editor);
         }
-        this.components.toolbar = new ToolbarComponent('#toolbar-container');
+        this.components.toolbar = new ToolbarComponent('#toolbar-container', context);
+        this.components.settings = new SettingsComponent('#settings-container', context);
 
     }
 
@@ -66,8 +74,6 @@ export class AppContainer {
    * @returns {Promise<void>}
    */
     async init() {
-
-        this.themeManager.init();
 
         // Percorre os valores do objeto de componentes de forma segura
         // for (const component of Object.values(this.components)) {
@@ -79,7 +85,12 @@ export class AppContainer {
         this.components.sidebar.init();
         this.components.toolbar.init();
         this.components.editor.init();
+        this.components.settings.init();
 
+        // Inicia o tema depois que todos os elementos UI estão renderizados
+        this.themeManager.init();
+
+        // Define eventos globais
         this.setupGlobalEvents();
 
         // FIXME: Implementar métodos de UI iniciais
@@ -93,6 +104,7 @@ export class AppContainer {
     * @private
     */
     setupGlobalEvents() {
+        
         // Previne comportamento padrão de arrastar elementos na janela
         document.addEventListener('dragstart', (e) => {
             e.preventDefault();

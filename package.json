@@ -13,7 +13,8 @@
     "lint": "echo \"No linting configured\"",
     "docs:web": "jsdoc -c jsdoc.json",
     "map": "node scripts/project-map.js > docs/project-map.txt",
-    "code-map": "node scripts/code-map.js > docs/code-map.txt"
+    "code-map": "node scripts/code-map.js > docs/code-map.txt", 
+    "docs": "npm run map && npm run code-map && npm run docs:web"
   },
   "keywords": [],
   "author": {
