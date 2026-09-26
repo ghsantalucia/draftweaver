@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DraftWeaver</title>
+</head>
+
+<body>
+
+  <header id="window-header">
+    <!-- <div id="icon"><img src="public/icon.png"/></div> -->
+  </header>
+
+  <!--========== [ APP CONTAINER ] ==========-->
+  <div id="app-container">
+
+    <!-- Painel Lateral Esquerdo -->
+    <aside id="sidebar-container"></aside>
+
+    <!-- Ferramentas do framework -->
+    <div id="toolbar-container"></div>
+
+    <!-- Área Principal do Editor -->
+    <main id="editor-container"></main>
+
+    <!-- Menu de Configurações Lateral (Drawer) -->
+    <div id="settings-container"></div>
+
+    <!-- Modal Global -->
+    <div id="modal-container" class="hidden"></div>
+
+    <!-- Notificações Toast -->
+    <div id="toast-container" class="hidden"></div>
+
+  </div>
+  <!--========== [ FIM APP CONTAINER ] ==========-->
+
+  <!-- Ponto de entrada do Vite para carregar CSS e Scripts JS -->
+  <script type="module" src="./renderer.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,112 @@
+==================================================
+ MAPA DE ARQUITETURA DE EVENTOS DO DRAFTWEAVER
+==================================================
+
+[uiBus] - Eventos da Interface Gráfica
+--------------------------------------------------
+⚙️ [*]
+    * Emissores:
+      └── ---
+    * Escutadores:
+      └── initDeclarativeEvents (src\renderer\events\uiBus.js)
+
+⚙️ [ai-chat:toggle]
+    * Emissores:
+      └── div#ai-assistant-header (src\renderer\components\chat\template.html)
+    * Escutadores:
+      └── setupListeners (src\renderer\components\chat\chatComponent.js)
+
+⚙️ [book:changed]
+    * Emissores:
+      └── onBookSelect (src\renderer\controllers\handlers\bookHandler.js)
+    * Escutadores:
+      └── setupListeners (src\renderer\components\sidebar\sidebarComponent.js)
+
+⚙️ [book:selected]
+    * Emissores:
+      ├── select#select-book (src\renderer\components\sidebar\template.html)
+      └── onFetchBooks (src\renderer\controllers\handlers\bookHandler.js)
+    * Escutadores:
+      └── registerEvents (src\renderer\controllers\uiController.js)
+
+⚙️ [books:fetch-list]
+    * Emissores:
+      └── onInit (src\renderer\components\sidebar\sidebarComponent.js)
+    * Escutadores:
+      └── registerEvents (src\renderer\controllers\uiController.js)
+
+⚙️ [books:list-loaded]
+    * Emissores:
+      └── onFetchBooks (src\renderer\controllers\handlers\bookHandler.js)
+    * Escutadores:
+      └── setupListeners (src\renderer\components\sidebar\sidebarComponent.js)
+
+⚙️ [modal:open]
+    * Emissores:
+      └── onSyncOpenModal (src\renderer\controllers\handlers\fileHandler.js)
+    * Escutadores:
+      └── setupListeners (src\renderer\components\modal\modalManager.js)
+
+⚙️ [settings:close]
+    * Emissores:
+      └── button#btn-close-menu (src\renderer\components\settings\template.html)
+    * Escutadores:
+      └── setupListeners (src\renderer\components\settings\settingsComponent.js)
+
+⚙️ [settings:open]
+    * Emissores:
+      └── button#btn-open-menu (src\renderer\components\sidebar\template.html)
+    * Escutadores:
+      └── setupListeners (src\renderer\components\settings\settingsComponent.js)
+
+⚙️ [sync:open-modal]
+    * Emissores:
+      └── button#btn-save (src\renderer\components\toolbar\template.html)
+    * Escutadores:
+      └── registerEvents (src\renderer\controllers\uiController.js)
+
+⚙️ [temp-file:saved]
+    * Emissores:
+      └── saveTempFile (src\renderer\services\fileService.js)
+    * Escutadores:
+      └── ---
+
+⚙️ [theme:changed]
+    * Emissores:
+      └── applyTheme (src\renderer\core\themeManager.js)
+    * Escutadores:
+      └── setupListeners (src\renderer\components\settings\settingsComponent.js)
+
+⚙️ [theme:toggle]
+    * Emissores:
+      └── input#theme-toggle (src\renderer\components\settings\template.html)
+    * Escutadores:
+      └── setupListeners (src\renderer\core\themeManager.js)
+
+
+[domainBus] - Eventos de Domínio e Negócio
+--------------------------------------------------
+⚙️ [ai-lock:changed]
+    * Emissores:
+      └── checkAILock (src\renderer\services\bookService.js)
+    * Escutadores:
+      └── registerEvents (src\renderer\controllers\domainController.js)
+
+⚙️ [book:selected]
+    * Emissores:
+      └── selectBook (src\renderer\services\bookService.js)
+    * Escutadores:
+      └── registerEvents (src\renderer\controllers\domainController.js)
+
+⚙️ [file:changed]
+    * Emissores:
+      └── ---
+    * Escutadores:
+      └── registerEvents (src\renderer\controllers\domainController.js)
+
+⚙️ [fs:${eventType}]
+    * Emissores:
+      └── escopo global (src\renderer\renderer.js)
+    * Escutadores:
+      └── ---
+

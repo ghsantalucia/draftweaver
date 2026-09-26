@@ -1,0 +1,330 @@
+/* ==========================================================================
+   COMPONENTES DE MODAIS E JANELAS (Modal.js)
+   ========================================================================== */
+
+   
+/* 2. Overlay Global Tela Cheia (Drawer e Modais) */
+#modal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(19, 19, 19, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 200;
+  opacity: 1;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+#modal-container.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+
+/* Card Container da Janela do Modal */
+.app-modal-window {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
+  
+  /* Adapta à largura do conteúdo mantendo limites elegantes */
+  width: fit-content;
+  min-width: 480px;
+  max-width: min(800px, 90vw);
+  
+  height: auto;
+  max-height: calc(100vh - 40px);
+  background: var(--bg-sidebar, #1e1e2e);
+  border: 1px solid var(--border-app, rgba(255, 255, 255, 0.1));
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modal-appear 0.2s ease-out forwards;
+}
+
+@keyframes modal-appear {
+  to {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Header */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-app, rgba(255, 255, 255, 0.08));
+  background: rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-editor, #cdd6f4);
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #a6adc8);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+  transition: color 0.2s ease;
+}
+
+.modal-close-btn:hover {
+  color: #f38ba8;
+}
+
+/* Body com Rolagem Sutil */
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex-grow: 1;
+  color: var(--text-editor, #cdd6f4);
+  font-size: 0.95rem;
+  /* Compatibilidade com Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+/* Estilização Sutil da Scrollbar (WebKit / Chrome / Edge / Electron) */
+.modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Footer com Alinhamento à Direita */
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border-app, rgba(255, 255, 255, 0.08));
+  background: rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
+/* Botões Padrão de Modal sem Esticamento */
+.btn-modal {
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  width: auto;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-modal:hover {
+  opacity: 0.9;
+}
+
+.btn-modal.btn-primary {
+  background-color: var(--accent-color, #89b4fa);
+  color: #11111b;
+}
+
+.btn-modal.btn-secondary {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-editor, #cdd6f4);
+}
+
+.btn-modal.btn-danger {
+  background-color: #f38ba8;
+  color: #11111b;
+}
+
+/* ==========================================================================
+   COMPONENTES DE CONTEÚDO DE MODAL (Listas, Checkboxes e Links)
+   ========================================================================== */
+
+.sync-modal-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sync-modal-desc {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-muted, #a6adc8);
+  line-height: 1.4;
+}
+
+.sync-select-all-wrapper {
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-app, rgba(255, 255, 255, 0.08));
+}
+
+.sync-file-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 280px;
+}
+
+/* Item da Lista com Distribuição Flex */
+.sync-file-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
+}
+
+.sync-file-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Container do título isolado (Impede que a linha inteira fique clicável) */
+.sync-file-title {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.sync-file-link {
+  color: var(--text-editor, #cdd6f4);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  transition: color 0.15s ease;
+}
+
+.sync-file-link:hover {
+  color: var(--accent-color, #89b4fa);
+  text-decoration: underline;
+}
+
+/* Botão de Lixeira (Descartar) */
+.btn-discard-temp {
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #a6adc8);
+  padding: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.btn-discard-temp:hover {
+  color: #f38ba8;
+  background: rgba(243, 139, 168, 0.15);
+}
+
+/* Fix do "Pulo/Pulo de 4px" do Checkbox */
+.custom-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+}
+
+.custom-checkbox-label input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkbox-mark {
+  height: 18px;
+  width: 18px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-app, rgba(255, 255, 255, 0.2));
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.custom-checkbox-label:hover input ~ .checkbox-mark {
+  border-color: var(--accent-color, #89b4fa);
+}
+
+.custom-checkbox-label input:checked ~ .checkbox-mark {
+  background-color: var(--accent-color, #89b4fa);
+  border-color: var(--accent-color, #89b4fa);
+}
+
+/* Pseudo-elemento do Check mantido fixo no layout sem causar despencamentos */
+.checkbox-mark::after {
+  content: "";
+  width: 4px;
+  height: 8px;
+  border: solid #11111b;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) scale(0.8);
+  opacity: 0;
+  transition: opacity 0.1s ease;
+  margin-bottom: 2px;
+  box-sizing: border-box;
+}
+
+.custom-checkbox-label input:checked ~ .checkbox-mark::after {
+  opacity: 1;
+}
+
+.checkbox-text {
+  font-size: 0.88rem;
+  color: var(--text-editor, #cdd6f4);
+}
+
+.text-danger-subtle {
+  color: #f38ba8;
+  margin-top: 8px;
+  margin-bottom: 0;
+}

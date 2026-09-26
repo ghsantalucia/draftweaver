@@ -1,0 +1,7 @@
+humanRead: true
+humanWrite: true
+aiRead: true
+aiWrite: true
+advanced: false
+title: "Personagens"
+description: "Contém informações sobre os personagens do livro."

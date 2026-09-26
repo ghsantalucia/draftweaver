@@ -1,0 +1,180 @@
+Estrutura do Projeto com Descrições:
+.
+├── .gitignore
+├── [.vite]
+├── [books]
+├── [docs]
+│   ├── [.personal]
+│   │   ├── architeture.md
+│   │   ├── fluxo-events-controllers.md
+│   │   ├── metadata-spec.md
+│   │   ├── project-map.md
+│   │   ├── project.md
+│   │   ├── roadmap.md
+│   │   ├── system.md
+│   │   └── ui-controls.md
+│   ├── code-map.txt
+│   ├── Component.md
+│   ├── Event UI.md
+│   ├── event-map.txt
+│   └── project-map.txt
+├── forge.config.js
+├── jsdoc.json
+├── LICENCE
+├── package-lock.json
+├── package.json
+├── [public]
+│   ├── icon.ico
+│   └── icon.png
+├── README.md
+├── [scripts]
+│   ├── code-map.js — scripts/code-map.js
+│   ├── event-map.js
+│   └── project-map.js — ou @description no início do arquivo
+├── [src]
+│   ├── [main]
+│   │   ├── file-watcher.js — Monitora o sistema de arquivos utilizando a biblioteca Chokidar na pasta /books, disparando eventos via IPC para o processo de renderização sempre que houver alterações em arquivos de configuração, markdowns ou pastas de livros.
+│   │   ├── ipc-handlers.js — Gerencia todos os canais de comunicação IPC (Inter-Process Communication) entre o processo de renderização e o processo principal do Electron (sistema de arquivos, diálogos e temas).
+│   │   └── main.js — Ponto de entrada do Electron, gerencia a janela principal e manipuladores IPC do sistema de arquivos.
+│   ├── [preload]
+│   │   └── preload.js — Expõe a API segura via IPC para comunicação entre o processo de renderização e o Node.js.
+│   └── [renderer]
+│       ├── [ai]
+│       │   ├── aiGateway.js — Gerencia as conexões e o roteamento de requisições para os gateways de Inteligência Artificial.
+│       │   ├── aiTools.js — Define as ferramentas, funções auxiliares e utilitários integrados para uso dos modelos de Inteligência Artificial.
+│       │   └── [providers]
+│       ├── app.js — Ponto de entrada do frontend (Renderer), responsável por inicializar o container principal da aplicação.
+│       ├── [assets]
+│       │   └── [css]
+│       │       ├── [base]
+│       │       │   ├── global.css
+│       │       │   ├── layout.css
+│       │       │   ├── reset.css
+│       │       │   └── variables.css
+│       │       ├── [components]
+│       │       │   ├── buttons.css
+│       │       │   └── switch.css
+│       │       └── main.css
+│       ├── [components]
+│       │   ├── [chat]
+│       │   │   ├── chatAnimations.js — Gerencia as animações da interface do chat de IA
+│       │   │   ├── chatComponent.js — Componente responsável pela renderização estrutural do chat do assistente de IA
+│       │   │   ├── chatPipeline.js — Controlador da pipeline do assistente de IA, gerenciando o fluxo entre o envio do usuário e a resposta da IA.
+│       │   │   ├── chatStorage.js — Módulo de armazenamento do chat, responsável por gerenciar o histórico de mensagens e a persistência dos dados do chat.
+│       │   │   ├── chatUi.js — Responsável pelos eventos e comportamentos da interface do Chat com a IA (auto-resize do input, envio com tecla Enter, renderização e estado do chat).
+│       │   │   ├── index.js — Barrel do módulo Chat, exportando funções e componentes essenciais para a interface e controle da IA.
+│       │   │   ├── styles.css
+│       │   │   └── template.html
+│       │   ├── Component.js
+│       │   ├── [editor]
+│       │   │   ├── editor.js — Controla a inicialização do ToastUI Editor, leitura e salvamento de arquivos Markdown e aplicação de regras de permissão de escrita na UI.
+│       │   │   ├── editorComponent.js — Componente responsável pela renderização estrutural do editor markdown
+│       │   │   ├── index.js — Barrel do módulo Editor, exportando funções e componentes essenciais para a construção do editor de texto e interação com o usuário.
+│       │   │   ├── styles.css
+│       │   │   └── template.html
+│       │   ├── [editor-overlay]
+│       │   │   ├── editorOverlayComponent.js — Componente responsável pela renderização estrutural do editor overlay
+│       │   │   ├── editorOverlays.js — Funções utilitárias para controlar overlays na interface.
+│       │   │   ├── styles.css
+│       │   │   └── template.html
+│       │   ├── [explorer]
+│       │   │   ├── explorerComponent.js — Componente responsável pela renderização estrutural do explorer de arquivos.
+│       │   │   ├── explorerUi.js — Funções da UI do explorador de arquivos (File Explorer), incluindo a renderização da árvore de arquivos, eventos de interação e manipulação de elementos DOM relacionados.
+│       │   │   ├── index.js — Barrel do módulo Explorer, exportando funções e componentes essenciais para a construção da árvore de arquivos e interação com o usuário.
+│       │   │   ├── styles.css
+│       │   │   ├── template.html
+│       │   │   └── tree.js — Constrói e gerencia a interface da árvore de arquivos e pastas no painel lateral com suporte a filtros YAML e permissões de exibição.
+│       │   ├── [modal]
+│       │   │   ├── modalComponent.js — Classe gerenciadora de modais em pilha (Stack).
+│       │   │   ├── modalManager.js — Classe gerenciadora da pilha de modais dinâmicos da aplicação.
+│       │   │   ├── styles.css
+│       │   │   └── template.html
+│       │   ├── [settings]
+│       │   │   ├── index.js — Barrel do módulo Settings, exportando funções e componentes essenciais para a configuração das preferências do usuário.
+│       │   │   ├── settingsComponent.js — Componente responsável pela renderização estrutural da drawer de configurações
+│       │   │   ├── settingsUi.js — Responsável pelos eventos e comportamentos da interface do Menu de Configurações (Settings Drawer).
+│       │   │   ├── styles.css
+│       │   │   └── template.html
+│       │   ├── [sidebar]
+│       │   │   ├── sidebarComponent.js — Componente responsável pela renderização estrutural da barra lateral (Sidebar).
+│       │   │   ├── styles.css
+│       │   │   └── template.html
+│       │   ├── [toast]
+│       │   │   ├── styles.css
+│       │   │   ├── template.html
+│       │   │   ├── toast.js — Funções utilitárias para exibir notificações do tipo Toast na interface.
+│       │   │   └── toastComponent.js — Componente responsável pela renderização estrutural do toast.
+│       │   └── [toolbar]
+│       │       ├── animations.js — Gerencia as animações da interface do usuário
+│       │       ├── styles.css
+│       │       ├── template.html
+│       │       ├── toolbar.js — Barra de Ferramentas do framework acima do editor
+│       │       └── toolbarComponent.js — Componente responsável pela renderização estrutural da Toolbar.
+│       ├── [controllers]
+│       │   ├── domainController.js — Gerencia e despacha os eventos de negócio e domínio vindos do domainBus para os handlers específicos.
+│       │   ├── [handlers]
+│       │   │   ├── bookHandler.js — Handler dos eventos relacionados ao livro/projeto
+│       │   │   ├── chapterHandler.js
+│       │   │   ├── characterHandler.js
+│       │   │   └── fileHandler.js — Handler dos eventos relacionados a arquivos .md e .temp
+│       │   └── uiController.js — Gerencia e despacha os eventos de interface (UI) vindos do uiBus para os handlers visuais.
+│       ├── [core]
+│       │   ├── appContainer.js — Contém a classe AppContainer, responsável por inicializar, instanciar e gerenciar
+│       │   ├── state.js — Gerencia o estado global compartilhado e define os valores padrão para os metadados e permissões dos arquivos.
+│       │   └── themeManager.js — Gerencia a alternância e a persistência dos temas claro/escuro na aplicação e no editor de texto.
+│       ├── [events]
+│       │   ├── domainBus.js — Barramento de eventos (Pub-Sub) dedicado à camada de negócio da aplicação, processando atualizações de dados vindas do sistema de arquivos e regras do fluxo literário.
+│       │   ├── uiBus.js — scripts/renderer/events/eventUi.js
+│       │   └── uiDeclarativeEvents.js
+│       ├── index.html
+│       ├── renderer.js
+│       ├── [services]
+│       │   ├── bookService.js — Serviço responsável por gerenciar a lista de livros, dados de configuração por projeto e verificação de travas da IA.
+│       │   ├── fileService.js — Serviço responsável por centralizar as operações de CRUD de arquivos (leitura, escrita, restauração e resolução de caminhos), servindo como ponte entre o Editor e o Sistema de Arquivos.
+│       │   └── serviceManager.js — Agregador central de serviços (Facade). Instancia e gerencia o acesso
+│       └── [utils]
+│           ├── helpers.js — Funções auxiliares genéricas para apoio à interface do usuário, controle de menus e normalizações.
+│           └── markdown.js — Utilitário para conversão, parsing e serialização de conteúdos Markdown e metadados Frontmatter YAML.
+├── [templates]
+│   └── [book]
+│       ├── [.system]
+│       │   ├── [changelog]
+│       │   │   └── .gitkeep
+│       │   └── [chatlog]
+│       │       └── .gitkeep
+│       ├── [assets]
+│       │   ├── [characters]
+│       │   │   ├── folder.yml
+│       │   │   ├── index.md
+│       │   │   └── protagonista_x.md
+│       │   ├── [elements]
+│       │   │   ├── folder.yml
+│       │   │   ├── index.md
+│       │   │   └── magia.md
+│       │   ├── folder.yml
+│       │   ├── [places]
+│       │   │   ├── folder.yml
+│       │   │   ├── index.md
+│       │   │   └── reino_Y.md
+│       │   └── timeline.md
+│       ├── config.json
+│       ├── [content]
+│       │   ├── [cap_001]
+│       │   │   ├── 1_script.md
+│       │   │   ├── 2_draft.md
+│       │   │   ├── 3_metadata.md
+│       │   │   ├── [backlog]
+│       │   │   │   ├── 1_analysis.md
+│       │   │   │   ├── 2_foreshadowing.md
+│       │   │   │   ├── 3_roadmap.md
+│       │   │   │   └── folder.yml
+│       │   │   └── folder.yml
+│       │   ├── folder.yml
+│       │   ├── index.md
+│       │   └── plot.md
+│       ├── index.md
+│       └── [notes]
+│           └── folder.yml
+├── vite.main.config.mjs
+├── vite.preload.config.mjs
+└── vite.renderer.config.mjs
