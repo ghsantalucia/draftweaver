@@ -18,9 +18,9 @@ import { EditorComponent } from '../components/editor/editorComponent.js';
 import { ChatComponent } from '../components/chat/chatComponent.js';
 import { ExplorerComponent } from '../components/explorer/explorerComponent.js';
 import { SettingsComponent } from '../components/settings/settingsComponent.js';
-// import { EditorOverlayComponent } from '../components/editor-overlay/editorOverlayComponent.js';
-// import { ModalComponent } from '../components/modal/modalComponent.js';
-// import { ToastComponent } from '../components/toast/toastComponent.js';
+import { EditorOverlayComponent } from '../components/editor-overlay/editorOverlayComponent.js';
+import { ModalManager } from '../components/modal/modalManager.js';
+import { ToastComponent } from '../components/toast/toastComponent.js';
 
 
 /**
@@ -38,34 +38,34 @@ export class AppContainer {
 
         // 1. Core e Serviços
         this.state = new State();
-        this.themeManager = new ThemeManager();
-
-        // 2. Centraliza os serviços em um único lugar
-        this.services = new ServiceManager(this.state);
-
-        // 3. Controllers
-        this.uiController = new UiController(this.services);
-        this.domainController = new DomainController(this.services);
-
-        // 4. Agrupamos os componentes de UI em um array/objeto central
         const context = {
             uiBus: uiBus,
             domainBus: domainBus,
             state: this.state
         };
+        this.themeManager = new ThemeManager();
+        this.modalManager = new ModalManager('#modal-container', context);
+
+        // 2. Centraliza os serviços em um único lugar
+        this.services = new ServiceManager(this.state);
+
+        // 3. Controllers
+        this.uiController = new UiController(this.services, this.state);
+        this.domainController = new DomainController(this.services, this.state);
+
+        // 4. Agrupamos os componentes de UI em um array/objeto central
         this.components = {};
 
         this.components.sidebar = new SidebarComponent('#sidebar-container', context);
-        if (this.components.sidebar) {
-            this.components.chat = new ChatComponent('#chat-container', context, this.components.sidebar);
-            this.components.explorer = new ExplorerComponent('#explorer-container', context, this.components.sidebar);
-        }
+        this.components.chat = this.components.sidebar.newChild(ChatComponent, '#chat-container', context);
+        this.components.explorer = this.components.sidebar.newChild(ExplorerComponent, '#explorer-container', context);
+
         this.components.editor = new EditorComponent('#editor-container', context);
-        if (this.components.editor) {
-            // this.components.editorOverlay = new EditorOverlayComponent('#editor-overlay-container', context, this.components.editor);
-        }
+        this.components.editorOverlay = this.components.editor.newChild(EditorOverlayComponent, '#editor-overlay-container', context);
+
         this.components.toolbar = new ToolbarComponent('#toolbar-container', context);
         this.components.settings = new SettingsComponent('#settings-container', context);
+        this.components.toast = new ToastComponent('#toast-container', context);
 
     }
 
@@ -76,16 +76,11 @@ export class AppContainer {
     async init() {
 
         // Percorre os valores do objeto de componentes de forma segura
-        // for (const component of Object.values(this.components)) {
-        //     if (component && typeof component.init === 'function') {
-        //         component.init();
-        //     }
-        // }
-
-        this.components.sidebar.init();
-        this.components.toolbar.init();
-        this.components.editor.init();
-        this.components.settings.init();
+        for (const component of Object.values(this.components)) {
+            if (component && typeof component.init === 'function') {
+                component.init();
+            }
+        }
 
         // Inicia o tema depois que todos os elementos UI estão renderizados
         this.themeManager.init();
@@ -104,7 +99,7 @@ export class AppContainer {
     * @private
     */
     setupGlobalEvents() {
-        
+
         // Previne comportamento padrão de arrastar elementos na janela
         document.addEventListener('dragstart', (e) => {
             e.preventDefault();

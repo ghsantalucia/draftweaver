@@ -4,6 +4,12 @@
 
 import { uiBus } from '../events/uiBus.js';
 
+import * as book from './handlers/bookHandler.js';
+import * as file from './handlers/fileHandler.js';
+// import * as chapter from './handlers/chapterHandler.js';
+// import * as character from './handlers/characterHandler.js';
+
+
 /**
  * Controller responsável pelas reações visuais da interface.
  * @class
@@ -11,10 +17,11 @@ import { uiBus } from '../events/uiBus.js';
 export class UiController {
   /**
    * Cria uma instância do UiController e registra os ouvintes de eventos da UI.
-   * @param {import('../services/serviceManager.js').ServiceManager} services - Instância centralizada dos serviços.
+   * @param {ServiceManager} services - Instância centralizada dos serviços.
    */
-  constructor(services) {
+  constructor(services, state) {
     this.services = services;
+    this.state = state;
     this.registerEvents();
   }
 
@@ -23,13 +30,26 @@ export class UiController {
    * @private
    */
   registerEvents() {
-    
-    // Escuta quando um arquivo temporário (.temp) é salvo
-    uiBus.on('temp-file:saved', (payload) => {
-      this.handleTempFileSaved(payload);
+
+    // Evento que chama para tela de sincronização de arquivos .temp
+    uiBus.on('sync:open-modal', () => {
+      file.onSyncOpenModal();
+      file.onSyncOpenModal();
     });
 
-    // Adicione novos ouvintes de UI aqui no futuro...
+    // Lida com seleção de livro/projeto
+    uiBus.on('book:selected', (e) => {
+      if (e.nativeEvent) {
+        book.onBookSelect(this.state, e.value);
+      } else {
+        book.onBookSelect(this.state, e);
+      }
+    });
+
+    // Solicita lista de livros do backend
+    uiBus.on('books:fetch-list', () => {
+      book.onFetchBooks(this.services.book);
+    });
   }
 
   /**

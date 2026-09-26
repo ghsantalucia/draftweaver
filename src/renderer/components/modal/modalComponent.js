@@ -3,149 +3,102 @@
  */
 
 import './styles.css';
+import templateHtml from './template.html?raw';
+import { Component } from '../Component.js';
 
 
-export class Modal {
-  // Pilha estática que rastreia as instâncias ativas no app
-  static activeModals = [];
+/**
+ * Componente de Modal em Pilha (Stack), herdando da classe base Component.
+ * @class
+ * @extends {Component}
+ */
+export class ModalComponent extends Component {
 
   /**
-   * @param {Object} options
-   * @param {string} [options.id] ID opcional do modal
-   * @param {string} options.title Título impresso no cabeçalho
-   * @param {string} options.content HTML interno do corpo do modal
-   * @param {Array<{text: string, class?: string, onClick?: Function}>} [options.buttons] Botões do rodapé
-   * @param {Function} [options.onClose] Callback disparado ao fechar
+   * Cria uma instância do ModalComponent.
+   * @param {string} selector - Seletor CSS do container onde o modal será inserido (ex: '#modal-container').
+   * @param {Object} context - Objeto de contexto e infraestrutura (state, uiBus, domainBus).
+   * @param {Object|null} [params=null] - Configurações do modal (id, title, content, buttons, onClose).
+   * @param {Component|null} [parent=null] - Componente pai opcional.
    */
-  constructor({ id, title = '', content = '', buttons = [], onClose = null }) {
-    // Garante um ID único se nenhum for passado ou para evitar colisões
-    this.id = id || `modal-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
-    this.title = title;
-    this.content = content;
-    this.buttons = buttons;
-    this.onClose = onClose;
-    this.element = null;
+  constructor(selector, context, params = null, parent = null) {
+
+    super(selector, context, templateHtml, params, parent);
+
+    // Configurações extraídas de params (com valores padrão seguros)
+    this.modalConfig = params || {};
+    this.id = this.modalConfig.id || `modal-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
+    this.title = this.modalConfig.title || '';
+    this.content = this.modalConfig.content || '';
+    this.buttons = this.modalConfig.buttons || [];
+    this.onCloseCallback = this.modalConfig.onClose || null;
   }
 
   /**
-     * Controla o estado de exibição do overlay global (fundo escuro/desfocado).
-     * @param {boolean|'show'|'hide'|'toggle'} [action='toggle'] Ação a ser executada
-     * @static
-     * @private
-     */
-  static toggleAppOverlay(action = 'toggle') {
-    const overlay = document.getElementById('app-modal-overlay');
-    if (!overlay) return;
-
-    if (action === 'show' || action === true) {
-      overlay.classList.remove('hidden');
-    } else if (action === 'hide' || action === false) {
-      overlay.classList.add('hidden');
-    } else {
-      overlay.classList.toggle('hidden');
-    }
+   * Fornece o contexto de dados para a compilação do template Handlebars.
+   * @returns {Object} Objeto contendo id, title, content e indicador de botões.
+   */
+  getContext() {
+    return {
+      id: this.id,
+      title: this.title,
+      content: this.content,
+      hasButtons: this.buttons.length > 0
+    };
   }
 
   /**
-   * Renderiza a janela e a exibe no topo da pilha
+   * Gancho do ciclo de vida executado logo após a renderização inicial do HTML.
    */
-  show() {
-    const overlay = document.getElementById('app-modal-overlay');
-    if (!overlay) return;
-
-    // 1. Se já existir outro modal visível, esconde o anterior temporariamente para não encavalar
-    if (Modal.activeModals.length > 0) {
-      const topModal = Modal.activeModals[Modal.activeModals.length - 1];
-      if (topModal.element) {
-        topModal.element.style.display = 'none';
-      }
-    } else {
-      // Se é o primeiro modal da pilha, exibe o overlay de fundo
-      Modal.toggleAppOverlay('show');
-    }
-
-    // 2. Cria o elemento DOM da janela
-    this.element = document.createElement('div');
-    this.element.id = this.id;
-    this.element.className = 'app-modal-window';
-
-    // BLINDAGEM DE CLIQUE: Impede que cliques dentro da janela fechem o modal ou propaguem para o fundo
-    this.element.addEventListener('click', (e) => {
-      e.stopPropagation();
-    });
-
-    // 3. Monta o HTML interno
-    this.element.innerHTML = `
-      <div class="modal-header">
-        <h3 class="modal-title">${this.title}</h3>
-        <button class="modal-close-btn" title="Fechar">&times;</button>
-      </div>
-      <div class="modal-body">
-        ${this.content}
-      </div>
-      ${this.buttons.length > 0 ? `<div class="modal-footer"></div>` : ''}
-    `;
-
-    // 4. Renderiza botões do rodapé se existirem
+  onInit() {
+    // Renderiza botões dinamicamente no rodapé, se houver
     if (this.buttons.length > 0) {
       const footer = this.element.querySelector('.modal-footer');
-      this.buttons.forEach(btnConfig => {
-        const btn = document.createElement('button');
-        btn.className = `btn-modal ${btnConfig.class || 'btn-secondary'}`;
-        btn.textContent = btnConfig.text;
-
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          if (btnConfig.onClick) {
-            btnConfig.onClick(this);
-          } else {
-            this.close();
-          }
+      if (footer) {
+        this.buttons.forEach(btnConfig => {
+          const btn = document.createElement('button');
+          btn.className = `btn-modal ${btnConfig.class || 'btn-secondary'}`;
+          btn.textContent = btnConfig.text;
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (btnConfig.onClick) btnConfig.onClick(this);
+            else this.close();
+          });
+          footer.appendChild(btn);
         });
-
-        footer.appendChild(btn);
-      });
+      }
     }
+  }
 
-    // 5. Evento de fechar EXCLUSIVO no botão 'X'
+  /**
+   * Configura os ouvintes de eventos (blindagem de cliques internos e botão de fechar).
+   * @private
+   */
+  setupListeners() {
+    if (!this.element) return;
+    this.element.addEventListener('click', (e) => e.stopPropagation());
+
     const closeBtn = this.element.querySelector('.modal-close-btn');
     closeBtn?.addEventListener('click', (e) => {
       e.stopPropagation();
       this.close();
     });
-
-    // Injeta a janela no DOM e salva na pilha
-    overlay.appendChild(this.element);
-    Modal.activeModals.push(this);
   }
 
   /**
-   * Fecha o modal atual e restaura o modal anterior da pilha (se houver)
+   * Fecha o modal atual, executa o callback opcional e limpa o elemento do DOM.
    */
   close() {
-    if (!this.element) return;
-
-    // Executa callback customizado
-    if (typeof this.onClose === 'function') {
-      this.onClose();
+    if (typeof this.onCloseCallback === 'function') {
+      this.onCloseCallback();
     }
-
-    // Remove elemento do DOM
-    this.element.remove();
+    // Remove apenas a janela individual do modal, mantendo o #modal-container seguro
+    if (this.element && this.element.classList.contains('app-modal-window')) {
+      this.element.remove();
+    } else if (this.element) {
+      // Caso o element seja o próprio container (fallback de segurança)
+      this.element.innerHTML = '';
+    }
     this.element = null;
-
-    // Remove da pilha estática
-    Modal.activeModals = Modal.activeModals.filter(m => m !== this);
-
-    // Se ainda restarem modais na pilha, reexibe o modal que ficou no topo
-    if (Modal.activeModals.length > 0) {
-      const previousModal = Modal.activeModals[Modal.activeModals.length - 1];
-      if (previousModal.element) {
-        previousModal.element.style.display = 'flex';
-      }
-    } else {
-      // Se não sobrou nenhum modal, oculta o overlay global escuro
-      Modal.toggleAppOverlay('hide');
-    }
   }
 }

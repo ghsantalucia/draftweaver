@@ -16,10 +16,11 @@ export class ChatComponent extends Component {
    * Cria uma instância da classe
    * @param {string} selector - Seletor CSS do elemento do DOM onde será injetada.
    * @param {Object} context - Objeto de contexto e infraestrutura (state, uiBus, domainBus)
-   * @param {Component} [parent=null] - Componente pai (ex: SidebarComponent).
+   * @param {Object|Array|null} [params=null] - Parâmetros opcionais dinâmicos para a exigência do componente.
+   * @param {Component} [parent=null]
    */
-  constructor(selector, context, parent = null) {
-    super(selector, context, templateHtml, parent);
+  constructor(selector, context, params, parent = null) {
+    super(selector, context, templateHtml, params, parent);
   }
 
   /**
@@ -62,12 +63,16 @@ export class ChatComponent extends Component {
 
       const textarea = document.getElementById('ai-chat-input');
       if (textarea) textarea.focus();
-      scrollToBottom();
+      this.scrollToBottom();
     } else if (canvas) {
       gsap.to(canvas, {
         opacity: 0,
         duration: 0.2,
       });
     }
+  }
+
+  scrollToBottom() {
+    this.element.scrollTop = this.element.scrollHeight;
   }
 }

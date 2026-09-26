@@ -12,13 +12,14 @@ import { Component } from '../Component.js';
  */
 export class ExplorerComponent extends Component {
   /**
-   * Cria uma instância do SidebarComponent.
+   * Cria uma instância da classe
    * @param {string} selector - Seletor CSS do elemento do DOM onde será injetada.
    * @param {Object} context - Objeto de contexto e infraestrutura (state, uiBus, domainBus)
+   * @param {Object|Array|null} [params=null] - Parâmetros opcionais dinâmicos para a exigência do componente.
    * @param {Component} [parent=null]
    */
-  constructor(selector, context, parent = null) {
-    super(selector, context, templateHtml, parent);
+  constructor(selector, context, params, parent = null) {
+    super(selector, context, templateHtml, params, parent);
   }
 
   /**

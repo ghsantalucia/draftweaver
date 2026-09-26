@@ -1,5 +1,5 @@
 /**
- * @file Componente responsável pela renderização estrutural da Toolbar.
+ * @file Componente responsável pela renderização estrutural do editor overlay
  */
 
 import './styles.css';
@@ -7,10 +7,10 @@ import templateHtml from './template.html?raw';
 import { Component } from '../Component.js';
 
 /**
- * Representa a Toolbar da aplicação.
+ * Representa o overlay do editor.
  * @class
  */
-export class ToolbarComponent extends Component {
+export class EditorOverlayComponent extends Component {
   /**
    * Cria uma instância da classe
    * @param {string} selector - Seletor CSS do elemento do DOM onde será injetada.

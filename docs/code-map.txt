@@ -18,9 +18,10 @@
      ├── [components]
      │   ├── Component.js
      │   │   └── 📦 class Component — Classe base abstrata para todos os componentes do DraftWeaver. Gerencia ciclo de vida, herança pai-filho (Composite) e renderização via Handlebars.
-     │   │       ├── ⚙️ constructor(selector, templateHtml, parent = null) — Cria uma instância do componente.
-     │   │       ├── ⚙️ setChildren(child) — Adiciona um componente filho à lista de gerenciamento.
-     │   │       ├── ⚙️ init() — Ciclo de vida principal padronizado.
+     │   │       ├── ⚙️ constructor(selector, context, templateHtml, params = null, parent = null) — Cria uma instância do componente.
+     │   │       ├── ⚙️ newChild(ComponentClass, selector, context, params = null) — Fábrica interna para instanciar e registrar um componente filho de forma limpa pelo pai.
+     │   │       ├── ⚙️ setChild(child) — Adiciona um componente filho à lista de gerenciamento.
+     │   │       ├── ⚙️ init(isParent = false) — Ciclo de vida principal padronizado.
      │   │       ├── ⚙️ render() — Motor de renderização centralizado usando Handlebars.
      │   │       └── ⚙️ setupListeners() — Método padrão vazio (Hook). As filhas fazem override se precisarem de eventos.
      │   ├── [chat]
@@ -35,8 +36,12 @@
      │   │   │   └── ⚙️ drawShootingStar(ctx, shootingStar) — Renderiza o efeito de estrela cadente com rastro em gradiente no canvas.
      │   │   ├── chatComponent.js — [Componente responsável pela renderização estrutural do chat do assistente de IA]
      │   │   │   └── 📦 class ChatComponent — Representa o chat do assistente de IA.
-     │   │   │       ├── ⚙️ constructor(selector, parent = null) — Cria uma instância da classe
-     │   │   │       └── ⚙️ setupListeners() — Configura os ouvintes de eventos específicos do chat.
+     │   │   │       ├── ⚙️ constructor(selector, context, params, parent = null) — Cria uma instância da classe
+     │   │   │       ├── ⚙️ setupListeners() — Configura os ouvintes de eventos específicos do chat.
+     │   │   │       ├── ⚙️ toggleAiDrawer() — Alterna o estado da gaveta (Drawer) com fade-in no canvas.
+     │   │   │       ├── ⚙️ setTimeout(window.resetStarsPosition, 50)
+     │   │   │       ├── ⚙️ setTimeout(window.resetStarsPosition, 350)
+     │   │   │       └── ⚙️ scrollToBottom()
      │   │   ├── chatPipeline.js — [Controlador da pipeline do assistente de IA, gerenciando o fluxo entre o envio do usuário e a resposta da IA.]
      │   │   │   ├── ⚙️ getRandomMockResponse() — Retorna uma resposta aleatória da simulação de IA.
      │   │   │   ├── ⚙️ injectMessageIntoChat({ role, content }, renderCallback) — Injeta diretamente uma mensagem no chat (usada por gatilhos do sistema ou pela IA) e persiste no log.
@@ -70,18 +75,22 @@
      │   │   │   └── ⚙️ resetEditorState() — Reseta a interface do editor para o estado inicial sem arquivo aberto.
      │   │   ├── editorComponent.js — [Componente responsável pela renderização estrutural do editor markdown]
      │   │   │   └── 📦 class EditorComponent — Representa o Editor Markdown da aplicação.
-     │   │   │       ├── ⚙️ constructor(selector, parent = null) — Cria uma instância da classe
+     │   │   │       ├── ⚙️ constructor(selector, context, params, parent = null) — Cria uma instância da classe
      │   │   │       ├── ⚙️ onInit()
      │   │   │       ├── ⚙️ setupListeners() — Configura os ouvintes de eventos da interface.
      │   │   │       └── ⚙️ initMarkdownEditor() — Inicializa a biblioteca ToastUI Editor no elemento DOM recém-criado.
      │   │   └── index.js — [Barrel do módulo Editor, exportando funções e componentes essenciais para a construção do editor de texto e interação com o usuário.]
      │   ├── [editor-overlay]
+     │   │   ├── editorOverlayComponent.js — [Componente responsável pela renderização estrutural do editor overlay]
+     │   │   │   └── 📦 class EditorOverlayComponent — Representa o overlay do editor.
+     │   │   │       ├── ⚙️ constructor(selector, context, params, parent = null) — Cria uma instância da classe
+     │   │   │       └── ⚙️ setupListeners() — Configura os ouvintes de eventos da interface.
      │   │   └── editorOverlays.js — [Funções utilitárias para controlar overlays na interface.]
      │   │        └── ⚙️ toggleEditorOverlay(show, key, message = '', showSpinner = true) — Controla o estado do overlay interno do editor usando uma pilha por chaves.
      │   ├── [explorer]
      │   │   ├── explorerComponent.js — [Componente responsável pela renderização estrutural do explorer de arquivos.]
      │   │   │   └── 📦 class ExplorerComponent — Representa o explorer de arquivos.
-     │   │   │       ├── ⚙️ constructor(selector, parent = null) — Cria uma instância do SidebarComponent.
+     │   │   │       ├── ⚙️ constructor(selector, context, params, parent = null) — Cria uma instância da classe
      │   │   │       └── ⚙️ setupListeners() — Configura os ouvintes de eventos.
      │   │   ├── explorerUi.js — [Funções da UI do explorador de arquivos (File Explorer), incluindo a renderização da árvore de arquivos, eventos de interação e manipulação de elementos DOM relacionados.]
      │   │   │   ├── ⚙️ initExplorerEvents() — Inicializa todos os ouvintes de eventos e comportamentos do explorador de arquivos.
@@ -96,13 +105,30 @@
      │   │        ├── ⚙️ createFileNode(entry, relativePath, parentMeta = null) — Lê o arquivo Markdown, avalia permissões no Frontmatter e cria o nó de arquivo (`<li>`).
      │   │        └── ⚙️ syncTreeSelection(relativePath) — Sincroniza a árvore de arquivos e as abas visuais ao abrir um arquivo.
      │   ├── [modal]
-     │   │   └── modalComponent.js — [Classe gerenciadora de modais em pilha (Stack).]
-     │   │        └── 📦 class Modal
-     │   │            ├── ⚙️ constructor({ id, title = '', content = '', buttons = [], onClose = null }) — Método Construtor
-     │   │            ├── ⚙️ show() — Renderiza a janela e a exibe no topo da pilha
-     │   │            └── ⚙️ close() — Fecha o modal atual e restaura o modal anterior da pilha (se houver)
+     │   │   ├── modalComponent.js — [Classe gerenciadora de modais em pilha (Stack).]
+     │   │   │   └── 📦 class ModalComponent — Componente de Modal em Pilha (Stack), herdando da classe base Component.
+     │   │   │       ├── ⚙️ constructor(selector, context, params = null, parent = null) — Cria uma instância do ModalComponent.
+     │   │   │       ├── ⚙️ getContext() — Fornece o contexto de dados para a compilação do template Handlebars.
+     │   │   │       ├── ⚙️ onInit() — Gancho do ciclo de vida executado logo após a renderização inicial do HTML.
+     │   │   │       ├── ⚙️ setupListeners() — Configura os ouvintes de eventos (blindagem de cliques internos e botão de fechar).
+     │   │   │       └── ⚙️ close() — Fecha o modal atual, executa o callback opcional e limpa o elemento do DOM.
+     │   │   └── modalManager.js — [Classe gerenciadora da pilha de modais dinâmicos da aplicação.]
+     │   │        └── 📦 class ModalManager — Gerenciador responsável por controlar a pilha de modais, overlay escuro e âncoras globais da aplicação.
+     │   │            ├── ⚙️ constructor(selector, context) — Cria uma instância do ModalManager.
+     │   │            ├── ⚙️ open(options) — Abre um novo modal empilhando-o sobre os anteriores.
+     │   │            ├── ⚙️ originalClose()
+     │   │            ├── ⚙️ handleModalClose() — Gerencia o comportamento visual da pilha ao fechar um modal (restaura o anterior ou esconde o overlay).
+     │   │            ├── ⚙️ toggleOverlay(show) — Alterna a visibilidade do overlay global escuro de fundo.
+     │   │            └── ⚙️ setupListeners() — Configura os ouvintes de eventos globais no barramento uiBus.
      │   ├── [settings]
      │   │   ├── index.js — [Barrel do módulo Settings, exportando funções e componentes essenciais para a configuração das preferências do usuário.]
+     │   │   ├── settingsComponent.js — [Componente responsável pela renderização estrutural da drawer de configurações]
+     │   │   │   └── 📦 class SettingsComponent — Representa a drawer de configurações.
+     │   │   │       ├── ⚙️ constructor(selector, context, params, parent = null) — Cria uma instância da classe
+     │   │   │       ├── ⚙️ setupListeners() — Configura os ouvintes de eventos.
+     │   │   │       ├── ⚙️ open() — Abre a gaveta de configurações.
+     │   │   │       ├── ⚙️ close() — Fecha a gaveta de configurações.
+     │   │   │       └── ⚙️ toggleThemeSwitch(theme) — Altera o estado do switch de alteração do theme
      │   │   └── settingsUi.js — [Responsável pelos eventos e comportamentos da interface do Menu de Configurações (Settings Drawer).]
      │   │        ├── ⚙️ openSettingsDrawer() — Abre a gaveta de configurações.
      │   │        ├── ⚙️ closeSettingsDrawer() — Fecha a gaveta de configurações.
@@ -110,11 +136,16 @@
      │   ├── [sidebar]
      │   │   └── sidebarComponent.js — [Componente responsável pela renderização estrutural da barra lateral (Sidebar).]
      │   │        └── 📦 class SidebarComponent — Representa o painel lateral esquerdo da aplicação.
-     │   │            ├── ⚙️ constructor(selector, parent = null) — Cria uma instância do SidebarComponent.
+     │   │            ├── ⚙️ constructor(selector, context, params, parent = null) — Cria uma instância da classe
+     │   │            ├── ⚙️ onInit()
      │   │            └── ⚙️ setupListeners() — Configura os ouvintes de eventos da interface da sidebar.
      │   ├── [toast]
-     │   │   └── toast.js — [Funções utilitárias para exibir notificações do tipo Toast na interface.]
-     │   │        └── ⚙️ showToast(message, type = 'success') — Exibe notificações do tipo Toast na interface.
+     │   │   ├── toast.js — [Funções utilitárias para exibir notificações do tipo Toast na interface.]
+     │   │   │   └── ⚙️ showToast(message, type = 'success') — Exibe notificações do tipo Toast na interface.
+     │   │   └── toastComponent.js — [Componente responsável pela renderização estrutural do toast.]
+     │   │        └── 📦 class ToastComponent — Representa o toast da aplicação.
+     │   │            ├── ⚙️ constructor(selector, context, params, parent = null) — Cria uma instância da classe
+     │   │            └── ⚙️ setupListeners() — Configura os ouvintes de eventos da interface.
      │   └── [toolbar]
      │        ├── animations.js — [Gerencia as animações da interface do usuário]
      │        │   └── ⚙️ initSaveButtonAnimation()
@@ -128,7 +159,7 @@
      │        │   └── ⚙️ refreshSaveButtonState() — Centraliza a regra de ativação/desativação do botão Salvar/Sincronizar
      │        └── toolbarComponent.js — [Componente responsável pela renderização estrutural da Toolbar.]
      │             └── 📦 class ToolbarComponent — Representa a Toolbar da aplicação.
-     │                 ├── ⚙️ constructor(selector, parent = null) — Cria uma instância da classe
+     │                 ├── ⚙️ constructor(selector, context, params, parent = null) — Cria uma instância da classe
      │                 └── ⚙️ setupListeners() — Configura os ouvintes de eventos da interface.
      ├── [controllers]
      │   ├── domainController.js — [Gerencia e despacha os eventos de negócio e domínio vindos do domainBus para os handlers específicos.]
@@ -139,11 +170,16 @@
      │   │       ├── ⚙️ handleBookSelected(payload) — Handler para quando um livro é selecionado.
      │   │       └── ⚙️ handleAiLockStateChanged(payload) — Handler para mudança de estado da trava de IA.
      │   ├── [handlers]
+     │   │   ├── bookHandler.js — [Handler dos eventos relacionados ao livro/projeto]
+     │   │   │   ├── ⚙️ onBookSelect(state, bookPath) — Handler de troca de livro.
+     │   │   │   └── ⚙️ onFetchBooks(bookService) — Solicita lista de livros do backend e também confere qual o último livro selecionado. @async
      │   │   ├── chapterHandler.js
-     │   │   └── characterHandler.js
+     │   │   ├── characterHandler.js
+     │   │   └── fileHandler.js — [Handler dos eventos relacionados a arquivos .md e .temp]
+     │   │        └── ⚙️ onSyncOpenModal() — Handler que abre modal e exibe todos os arquivos .temp do projeto para serem sincronizados
      │   └── uiController.js — [Gerencia e despacha os eventos de interface (UI) vindos do uiBus para os handlers visuais.]
      │        └── 📦 class UiController — Controller responsável pelas reações visuais da interface.
-     │            ├── ⚙️ constructor(services) — Cria uma instância do UiController e registra os ouvintes de eventos da UI.
+     │            ├── ⚙️ constructor(services, state) — Cria uma instância do UiController e registra os ouvintes de eventos da UI.
      │            ├── ⚙️ registerEvents() — Registra todos os escutadores do barramento de UI.
      │            └── ⚙️ handleTempFileSaved(payload) — Handler para quando um arquivo temporário é salvo (.temp). Atualiza o explorer (adicionando o asterisco) e libera a sincronização.
      ├── [core]
@@ -158,11 +194,14 @@
      │        └── 📦 class ThemeManager — Classe responsável por gerenciar temas visuais e preferências de claro/escuro da interface.
      │            ├── ⚙️ constructor() — Cria uma instância do ThemeManager. @constructor
      │            ├── ⚙️ init() — Inicializa o gerenciador de temas, recuperando o tema salvo e configurando os ouvintes de evento.
+     │            ├── ⚙️ setupListeners() — Configura os ouvintes de eventos.
      │            ├── ⚙️ toggleTheme(isDark) — Alterna o tema atual e o persiste no armazenamento local.
      │            └── ⚙️ applyTheme(isDark) — Aplica as classes visuais do tema no corpo da página, no editor e opcionalmente na janela nativa.
      ├── [events]
      │   ├── domainBus.js — [Barramento de eventos (Pub-Sub) dedicado à camada de negócio da aplicação, processando atualizações de dados vindas do sistema de arquivos e regras do fluxo literário.]
-     │   └── uiBus.js — [Barramento de eventos (Pub-Sub) dedicado exclusivamente para a interface do usuário (UI), gerenciando interações visuais, abertura de drawers, toasts e modais.]
+     │   ├── uiBus.js — [scripts/renderer/events/eventUi.js]
+     │   └── uiDeclarativeEvents.js
+     │        └── ⚙️ initDeclarativeEvents(uiBus) — Inicializa o escutador global de eventos no documento.
      ├── renderer.js
      ├── [services]
      │   ├── bookService.js — [Serviço responsável por gerenciar a lista de livros, dados de configuração por projeto e verificação de travas da IA.]

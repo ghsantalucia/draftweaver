@@ -8,17 +8,21 @@ A classe Component serve como a base abstrata para todos os elementos de interfa
 
 Estes métodos já vêm prontos na classe Component e não precisam (nem devem) ser reescritos nas classes filhas, pois controlam a infraestrutura e a ordem de execução.
 
-**`constructor(selector, parent, templateHtml)`** \[Método Construtor]
+### `constructor(selector, context, templateHtml, params = null, parent = null)` \[Método Construtor]
 
-Inicializa o seletor CSS, guarda o template HTML, define elementos de DOM como null, cria o array de children e executa o auto-registro no pai, caso ele seja fornecido.
+Inicializa o seletor CSS, guarda o template HTML, define elementos de DOM como null, cria o array de children e executa o auto-registro no pai, caso ele seja fornecido. Possui parâmetros opcionais que são agrupados em um objeto, e o parâmetro `parent`não deve ser usado por padrão, o caminho padrão para adicionar um componente filho é o método `newChild()`do componente pai.
 
-### `setChildren(child)` \[Utilitário]
+### `newChild(ComponentClass, selector, context, params)` [Fábrica / Composite]
+
+O método padrão de criação de filhos: instancia o componente filho fornecido repassando automaticamente o contexto, os parâmetros dinâmicos (opcionais) e a instância atual (`this`) como pai, registrando-o na árvore e retornando a instância criada.
+
+### `setChild(child)` \[Utilitário]
 
 Adiciona um componente filho à lista interna this.children do componente atual (usado pelo padrão Composite).
 
-### `init()` \[Ciclo de Vida]
+### `init(isParent)` \[Ciclo de Vida]
 
-O Orquestrador: Localiza o elemento no DOM, executa render(), dispara o gancho onInit(), configura os ouvintes via setupListeners() e inicia em cascata todos os filhos armazenados.
+O Orquestrador: Localiza o elemento no DOM, executa `render()`, dispara o gancho `onInit()`, configura os ouvintes via `setupListeners()` e inicia em cascata todos os filhos armazenados. Caso o objeto seja filho, confere se o pai está inicializando, caso contrário impede a inicialização.
 
 ### `render()` \[Renderização]
 
@@ -77,8 +81,9 @@ Exemplo:
 
 Quando o AppContainer ou um componente pai chama `.init()` em um componente:
 
-1. Ele busca o elemento no `DOM` usando o selector.
-2. Compila o template HTML injetando o contexto obtido em `getContext()`.
-3. Executa o método `onInit()` (se a filha o possuir).
-4. Configura todos os eventos definidos em `setupListeners()`.
-5. Percorre a lista de filhos (`this.children`) e chama o `init()` de cada um deles automaticamente.
+1. Valida se o componente é filho e impede inicializações soltas fora de ordem.
+2. Ele busca o elemento no `DOM` usando o selector.
+3. Compila o template HTML injetando o contexto obtido em `getContext()`.
+4. Executa o método `onInit()` (se a filha o possuir).
+5. Configura todos os eventos definidos em `setupListeners()`.
+6. Percorre a lista de filhos (`this.children`) e chama o `init()` de cada um deles automaticamente.
