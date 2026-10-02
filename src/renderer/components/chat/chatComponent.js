@@ -2,10 +2,10 @@
  * @file Componente responsável pela renderização estrutural do chat do assistente de IA
  */
 
-import './styles.css';
-import templateHtml from './template.html?raw';
-import { Component } from '../Component.js';
-import { gsap } from 'gsap';
+import "./styles.css";
+import templateHtml from "./template.html?raw";
+import { Component } from "../Component.js";
+import { gsap } from "gsap";
 
 /**
  * Representa o chat do assistente de IA.
@@ -27,7 +27,7 @@ export class ChatComponent extends Component {
    * Configura os ouvintes de eventos específicos do chat.
    */
   setupListeners() {
-    this.uiBus.on('ai-chat:toggle', () => {
+    this.uiBus.on("ai-chat:toggle", () => {
       this.toggleAiDrawer();
     });
   }
@@ -36,18 +36,17 @@ export class ChatComponent extends Component {
    * Alterna o estado da gaveta (Drawer) com fade-in no canvas.
    */
   toggleAiDrawer() {
-
-    const aiDrawer = document.getElementById('chat-container');
-    const canvas = document.getElementById('ai-bg-canvas');
+    const aiDrawer = document.getElementById("chat-container");
+    const canvas = document.getElementById("ai-bg-canvas");
     if (!aiDrawer) return;
 
-    const isOpening = !aiDrawer.classList.contains('expanded');
-    aiDrawer.classList.toggle('expanded');
+    const isOpening = !aiDrawer.classList.contains("expanded");
+    aiDrawer.classList.toggle("expanded");
 
     if (isOpening) {
       if (canvas) gsap.set(canvas, { opacity: 0 });
 
-      if (typeof window.resetStarsPosition === 'function') {
+      if (typeof window.resetStarsPosition === "function") {
         setTimeout(window.resetStarsPosition, 50);
         setTimeout(window.resetStarsPosition, 350);
       }
@@ -56,12 +55,12 @@ export class ChatComponent extends Component {
         gsap.to(canvas, {
           opacity: 1,
           duration: 0.5,
-          ease: 'power2.out',
+          ease: "power2.out",
           delay: 0.1,
         });
       }
 
-      const textarea = document.getElementById('ai-chat-input');
+      const textarea = document.getElementById("ai-chat-input");
       if (textarea) textarea.focus();
       this.scrollToBottom();
     } else if (canvas) {

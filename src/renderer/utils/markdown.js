@@ -9,19 +9,19 @@
  * @returns {{ metadata: Object, body: string }}
  */
 export function parseMarkdown(fileContent, isYmlOnly = false) {
-  let yamlText = '';
-  let body = '';
+  let yamlText = "";
+  let body = "";
 
   if (isYmlOnly) {
     yamlText = fileContent;
-    body = '';
+    body = "";
   } else {
     const frontmatterRegex = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?/;
     const match = fileContent.match(frontmatterRegex);
 
     if (match) {
       yamlText = match[1];
-      body = fileContent.replace(frontmatterRegex, '');
+      body = fileContent.replace(frontmatterRegex, "");
     } else {
       return { metadata: {}, body: fileContent };
     }
@@ -29,14 +29,17 @@ export function parseMarkdown(fileContent, isYmlOnly = false) {
 
   const metadata = {};
 
-  yamlText.split('\n').forEach(line => {
-    const [key, ...valueParts] = line.split(':');
+  yamlText.split("\n").forEach((line) => {
+    const [key, ...valueParts] = line.split(":");
     if (key && valueParts.length > 0) {
       const cleanKey = key.trim();
-      let val = valueParts.join(':').trim().replace(/^["']|["']$/g, '');
+      let val = valueParts
+        .join(":")
+        .trim()
+        .replace(/^["']|["']$/g, "");
 
-      if (val === 'true') val = true;
-      else if (val === 'false') val = false;
+      if (val === "true") val = true;
+      else if (val === "false") val = false;
 
       metadata[cleanKey] = val;
     }
@@ -54,11 +57,11 @@ export function parseMarkdown(fileContent, isYmlOnly = false) {
 export function stringifyFrontmatter(metadata, body) {
   if (!metadata || Object.keys(metadata).length === 0) return body;
 
-  let yaml = '---\n';
+  let yaml = "---\n";
   for (const [key, value] of Object.entries(metadata)) {
     yaml += `${key}: ${value}\n`;
   }
-  yaml += '---\n\n';
+  yaml += "---\n\n";
 
   return yaml + body.trimStart();
 }

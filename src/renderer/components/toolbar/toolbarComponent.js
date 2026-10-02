@@ -2,9 +2,9 @@
  * @file Componente responsável pela renderização estrutural da Toolbar.
  */
 
-import './styles.css';
-import templateHtml from './template.html?raw';
-import { Component } from '../Component.js';
+import "./styles.css";
+import templateHtml from "./template.html?raw";
+import { Component } from "../Component.js";
 
 /**
  * Representa a Toolbar da aplicação.

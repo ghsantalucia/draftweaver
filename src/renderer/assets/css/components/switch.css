@@ -53,13 +53,13 @@
 }
 
 /* Estado Ativo (Checked) */
-input:checked+.slider {
+input:checked + .slider {
   background-color: rgba(137, 180, 250, 0.2);
   /* Fundo azul suave idêntico ao hover do menu */
   border-color: #89b4fa;
 }
 
-input:checked+.slider::before {
+input:checked + .slider::before {
   transform: translateX(16px);
   background-color: #89b4fa;
 }

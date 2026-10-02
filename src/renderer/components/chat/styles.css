@@ -52,7 +52,6 @@
 }
 
 @keyframes pulse-sparkle {
-
   0%,
   100% {
     opacity: 0.6;
@@ -75,10 +74,12 @@
   background: transparent;
   border: none;
   color: var(--text-muted);
-  font-size: 0.60rem;
+  font-size: 0.6rem;
   opacity: 0.8;
   cursor: pointer;
-  transition: transform 0.3s ease, color 0.2s ease;
+  transition:
+    transform 0.3s ease,
+    color 0.2s ease;
 }
 
 #chat-container.expanded .ai-toggle-btn {
@@ -94,7 +95,7 @@
   padding: 12px;
   padding-top: 0px;
   min-height: 0;
-  background: linear-gradient(0deg, #0e0f17 0%, #030305 100%)
+  background: linear-gradient(0deg, #0e0f17 0%, #030305 100%);
 }
 
 #ai-bg-canvas {
@@ -259,7 +260,9 @@
   border-radius: 16px;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   padding: 10px 10px 8px 12px;
   width: 100%;
 }
@@ -314,7 +317,9 @@
   justify-content: center;
   cursor: pointer;
   padding: 0;
-  transition: transform 0.15s ease, background-color 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    background-color 0.15s ease;
 }
 
 /* Regra para garantir a visibilidade e o tamanho do ícone SVG */
@@ -342,4 +347,3 @@
   background: rgba(255, 255, 255, 0.15);
   border-radius: 4px;
 }
-

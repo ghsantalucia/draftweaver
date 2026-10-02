@@ -2,7 +2,7 @@
  * @file Funções utilitárias para controlar overlays na interface.
  */
 
-import './styles.css';
+import "./styles.css";
 
 // Pilha em memória para armazenar os overlays ativos
 // Estrutura do item: { key, message, showSpinner }
@@ -15,16 +15,21 @@ const overlayStack = [];
  * @param {string} [message=''] Mensagem a ser exibida no card
  * @param {boolean} [showSpinner=true] Exibe ou oculta o spinner
  */
-export function toggleEditorOverlay(show, key, message = '', showSpinner = true) {
-  const overlay = document.getElementById('editor-overlay');
-  const messageEl = document.getElementById('editor-overlay-message');
-  const spinnerEl = document.getElementById('editor-overlay-spinner');
+export function toggleEditorOverlay(
+  show,
+  key,
+  message = "",
+  showSpinner = true,
+) {
+  const overlay = document.getElementById("editor-overlay");
+  const messageEl = document.getElementById("editor-overlay-message");
+  const spinnerEl = document.getElementById("editor-overlay-spinner");
 
   if (!overlay) return;
 
   if (show) {
     // 1. Se a chave já existir na pilha, atualiza os dados; caso contrário, insere no topo
-    const index = overlayStack.findIndex(item => item.key === key);
+    const index = overlayStack.findIndex((item) => item.key === key);
     if (index !== -1) {
       overlayStack[index] = { key, message, showSpinner };
     } else {
@@ -32,7 +37,7 @@ export function toggleEditorOverlay(show, key, message = '', showSpinner = true)
     }
   } else {
     // 2. Se for para ocultar, remove a chave informada da pilha
-    const index = overlayStack.findIndex(item => item.key === key);
+    const index = overlayStack.findIndex((item) => item.key === key);
     if (index !== -1) {
       overlayStack.splice(index, 1);
     }
@@ -44,11 +49,12 @@ export function toggleEditorOverlay(show, key, message = '', showSpinner = true)
     const currentOverlay = overlayStack[overlayStack.length - 1];
 
     if (messageEl) messageEl.textContent = currentOverlay.message;
-    if (spinnerEl) spinnerEl.style.display = currentOverlay.showSpinner ? 'block' : 'none';
+    if (spinnerEl)
+      spinnerEl.style.display = currentOverlay.showSpinner ? "block" : "none";
 
-    overlay.classList.remove('hidden');
+    overlay.classList.remove("hidden");
   } else {
     // Se a pilha estiver vazia, oculta o overlay visualmente
-    overlay.classList.add('hidden');
+    overlay.classList.add("hidden");
   }
 }

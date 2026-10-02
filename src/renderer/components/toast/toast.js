@@ -2,17 +2,16 @@
  * @file Funções utilitárias para exibir notificações do tipo Toast na interface.
  */
 
-
-import './styles.css';
+import "./styles.css";
 
 /**
  * Exibe notificações do tipo Toast na interface.
  * @param {string} message Mensagem a ser exibida
  * @param {'success'|'error'} type Tipo da notificação
  */
-export function showToast(message, type = 'success') {
-  const toast = document.getElementById('toast');
-  const toastMessage = document.getElementById('toast-message');
+export function showToast(message, type = "success") {
+  const toast = document.getElementById("toast");
+  const toastMessage = document.getElementById("toast-message");
 
   if (!toast || !toastMessage) return;
 
@@ -20,6 +19,6 @@ export function showToast(message, type = 'success') {
   toast.className = `toast ${type}`;
 
   setTimeout(() => {
-    toast.classList.add('hidden');
+    toast.classList.add("hidden");
   }, 3000);
 }

@@ -2,9 +2,9 @@
  * @file Componente responsável pela renderização estrutural do toast.
  */
 
-import './styles.css';
-import templateHtml from './template.html?raw';
-import { Component } from '../Component.js';
+import "./styles.css";
+import templateHtml from "./template.html?raw";
+import { Component } from "../Component.js";
 
 /**
  * Representa o toast da aplicação.

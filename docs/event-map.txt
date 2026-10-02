@@ -4,12 +4,6 @@
 
 [uiBus] - Eventos da Interface Gráfica
 --------------------------------------------------
-⚙️ [*]
-    * Emissores:
-      └── ---
-    * Escutadores:
-      └── initDeclarativeEvents (src\renderer\events\uiBus.js)
-
 ⚙️ [ai-chat:toggle]
     * Emissores:
       └── div#ai-assistant-header (src\renderer\components\chat\template.html)
@@ -24,22 +18,79 @@
 
 ⚙️ [book:selected]
     * Emissores:
-      ├── select#select-book (src\renderer\components\sidebar\template.html)
-      └── onFetchBooks (src\renderer\controllers\handlers\bookHandler.js)
+      ├── selectLastBook (src\renderer\components\sidebar\sidebarComponent.js)
+      └── select#select-book (src\renderer\components\sidebar\template.html)
+    * Escutadores:
+      ├── setupListeners (src\renderer\components\explorer\explorerComponent.js)
+      └── registerEvents (src\renderer\controllers\uiController.js)
+
+⚙️ [book:title-changed]
+    * Emissores:
+      └── onConfigChanged (src\renderer\controllers\handlers\configHandler.js)
+    * Escutadores:
+      └── ---
+
+⚙️ [books:refresh-list]
+    * Emissores:
+      └── onConfigChanged (src\renderer\controllers\handlers\configHandler.js)
+    * Escutadores:
+      └── ---
+
+⚙️ [editor:open-file]
+    * Emissores:
+      ├── setupInternalLinkHandler (src\renderer\components\editor\editorComponent.js)
+      └── onclick (src\renderer\components\explorer\explorerComponent.js)
+    * Escutadores:
+      └── setupListeners (src\renderer\components\editor\editorComponent.js)
+
+⚙️ [editor:reset]
+    * Emissores:
+      └── resetEditorState (src\renderer\components\editor\editorComponent.js)
+    * Escutadores:
+      └── ---
+
+⚙️ [editor:saved-success]
+    * Emissores:
+      └── triggerAutoSave (src\renderer\components\editor\editorComponent.js)
+    * Escutadores:
+      └── ---
+
+⚙️ [file:current-changed]
+    * Emissores:
+      └── onFileGet (src\renderer\controllers\handlers\fileHandler.js)
+    * Escutadores:
+      ├── setupListeners (src\renderer\components\editor\editorComponent.js)
+      └── setupListeners (src\renderer\components\explorer\explorerComponent.js)
+
+⚙️ [file:get]
+    * Emissores:
+      └── setupListeners (src\renderer\components\editor\editorComponent.js)
     * Escutadores:
       └── registerEvents (src\renderer\controllers\uiController.js)
 
-⚙️ [books:fetch-list]
+⚙️ [file:save-temp]
     * Emissores:
-      └── onInit (src\renderer\components\sidebar\sidebarComponent.js)
+      └── triggerAutoSave (src\renderer\components\editor\editorComponent.js)
     * Escutadores:
       └── registerEvents (src\renderer\controllers\uiController.js)
 
-⚙️ [books:list-loaded]
+⚙️ [file:save-temp-error]
     * Emissores:
-      └── onFetchBooks (src\renderer\controllers\handlers\bookHandler.js)
+      └── onSaveTemp (src\renderer\controllers\handlers\fileHandler.js)
     * Escutadores:
-      └── setupListeners (src\renderer\components\sidebar\sidebarComponent.js)
+      └── ---
+
+⚙️ [file:save-temp-success]
+    * Emissores:
+      └── onSaveTemp (src\renderer\controllers\handlers\fileHandler.js)
+    * Escutadores:
+      └── ---
+
+⚙️ [file:sync-selection]
+    * Emissores:
+      └── ---
+    * Escutadores:
+      └── setupListeners (src\renderer\components\explorer\explorerComponent.js)
 
 ⚙️ [modal:open]
     * Emissores:
@@ -86,6 +137,12 @@
 
 [domainBus] - Eventos de Domínio e Negócio
 --------------------------------------------------
+⚙️ [*]
+    * Emissores:
+      └── ---
+    * Escutadores:
+      └── escopo global (src\renderer\events\domainBus.js)
+
 ⚙️ [ai-lock:changed]
     * Emissores:
       └── checkAILock (src\renderer\services\bookService.js)
@@ -97,6 +154,12 @@
       └── selectBook (src\renderer\services\bookService.js)
     * Escutadores:
       └── registerEvents (src\renderer\controllers\domainController.js)
+
+⚙️ [book:title-changed]
+    * Emissores:
+      └── onConfigChanged (src\renderer\controllers\handlers\configHandler.js)
+    * Escutadores:
+      └── ---
 
 ⚙️ [file:changed]
     * Emissores:

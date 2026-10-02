@@ -3,4 +3,9 @@
  * Este arquivo serve como ponto de entrada para a interface do editor, facilitando a importação e organização do código.
  */
 
-export { initEditor, resetEditorState, openFileEditor, setEditorReadOnly } from './editor.js';
+export {
+  initEditor,
+  resetEditorState,
+  openFileEditor,
+  setEditorReadOnly,
+} from "./editor.js";

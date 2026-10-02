@@ -1,4 +1,4 @@
-import Handlebars from 'handlebars';
+import Handlebars from "handlebars";
 
 /**
  * Classe base abstrata para todos os componentes do DraftWeaver.
@@ -27,7 +27,7 @@ export class Component {
     this.children = [];
 
     // Auto-registro no pai, se fornecido
-    if (this.parent && typeof this.parent.setChild === 'function') {
+    if (this.parent && typeof this.parent.setChild === "function") {
       this.parent.setChild(this);
     }
   }
@@ -42,7 +42,6 @@ export class Component {
    * @returns {Component} A instância do componente filho criada
    */
   newChild(ComponentClass, selector, context, params = null) {
-
     // Instancia o filho passando 'this' como pai e os parâmetros opcionais
     const childInstance = new ComponentClass(selector, context, params, this);
 
@@ -54,7 +53,7 @@ export class Component {
 
   /**
    * Adiciona um componente filho à lista de gerenciamento.
-   * @param {Component} child 
+   * @param {Component} child
    */
   setChild(child) {
     this.children.push(child);
@@ -62,17 +61,18 @@ export class Component {
 
   /**
    * Ciclo de vida principal padronizado.
-   * @param {boolean} verifica se é o pai que está inicializando 
+   * @param {boolean} verifica se é o pai que está inicializando
    */
   init(isParent = false) {
-
     // Se é componente filho e não é o pai que inicia, retorna
     if (this.parent && !isParent) return;
 
     this.element = document.querySelector(this.selector);
 
     if (!this.element) {
-      console.error(`[${this.constructor.name}] Container alvo (${this.selector}) não fornecido para renderização.`);
+      console.error(
+        `[${this.constructor.name}] Container alvo (${this.selector}) não fornecido para renderização.`,
+      );
       return;
     }
 
@@ -80,7 +80,7 @@ export class Component {
     this.render();
 
     // 2. Gancho opcional para lógica pós-renderização na classe filha
-    if (typeof this.onInit === 'function') {
+    if (typeof this.onInit === "function") {
       this.onInit();
     }
 
@@ -89,13 +89,15 @@ export class Component {
 
     // 4. Se houver filhos cadastrados, inicializa todos em cascata
     for (const child of this.children) {
-      if (typeof child.init === 'function') {
+      if (typeof child.init === "function") {
         child.init(true);
       }
     }
 
-    const isChild = (this.parent) ? " (child)" : "";
-    console.log(`[${this.constructor.name}]${isChild} Inicializado com sucesso.`);
+    const isChild = this.parent ? " (child)" : "";
+    console.log(
+      `[${this.constructor.name}]${isChild} Inicializado com sucesso.`,
+    );
   }
 
   /**
@@ -105,7 +107,8 @@ export class Component {
     if (!this.element || !this.templateHtml) return;
 
     // Se a filha tiver o método getContext, usa ele. Se não, usa um objeto vazio {} por padrão.
-    const context = typeof this.getContext === 'function' ? this.getContext() : {};
+    const context =
+      typeof this.getContext === "function" ? this.getContext() : {};
 
     const templateFn = Handlebars.compile(this.templateHtml);
     this.element.innerHTML = templateFn(context);

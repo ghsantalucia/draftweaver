@@ -2,7 +2,7 @@
  * @file Serviço responsável por centralizar as operações de CRUD de arquivos (leitura, escrita, restauração e resolução de caminhos), servindo como ponte entre o Editor e o Sistema de Arquivos.
  */
 
-import { uiBus } from '../events/uiBus.js';
+import { uiBus } from "../events/uiBus.js";
 
 /**
  * Serviço de manipulação e persistência de arquivos locais via IPC do Electron.
@@ -35,7 +35,10 @@ export class FileService {
     try {
       return await window.electronAPI.deleteFile(fullPath);
     } catch (error) {
-      console.error(`[FILE SERVICE] Erro ao deletar arquivo em ${fullPath}:`, error);
+      console.error(
+        `[FILE SERVICE] Erro ao deletar arquivo em ${fullPath}:`,
+        error,
+      );
       return { success: false, error: error.message };
     }
   }
@@ -50,7 +53,7 @@ export class FileService {
       if (!fullPath) return { content: null, isTemp: false };
 
       // Se o caminho já for o arquivo .temp, lê diretamente sem chamar getTempPath
-      if (fullPath.endsWith('.temp')) {
+      if (fullPath.endsWith(".temp")) {
         const rawText = await window.electronAPI.readFile(fullPath);
         return { content: rawText, isTemp: true };
       }
@@ -67,7 +70,10 @@ export class FileService {
 
       return { content: rawText, isTemp };
     } catch (error) {
-      console.error(`[FILE SERVICE] Erro ao ler arquivo em ${fullPath}:`, error);
+      console.error(
+        `[FILE SERVICE] Erro ao ler arquivo em ${fullPath}:`,
+        error,
+      );
       return { content: null, isTemp: false };
     }
   }
@@ -79,15 +85,15 @@ export class FileService {
    * @returns {Promise<Object>} Resultado da operação de salvamento.
    */
   async saveTempFile(fullPath, content) {
-    if (!fullPath) return { success: false, error: 'Caminho inválido.' };
+    if (!fullPath) return { success: false, error: "Caminho inválido." };
     const tempPath = this.getTempPath(fullPath);
-   const result = await window.electronAPI.saveFile(tempPath, content);
-    
+    const result = await window.electronAPI.saveFile(tempPath, content);
+
     if (result.success) {
       // Emite o evento real passando o arquivo original e o temp
-      uiBus.emit('temp-file:saved', { originalPath: fullPath, tempPath });
+      uiBus.emit("temp-file:saved", { originalPath: fullPath, tempPath });
     }
-    
+
     return result;
   }
 
@@ -99,23 +105,29 @@ export class FileService {
    */
   async saveFile(fullPath, content) {
     if (!fullPath) {
-      return { success: false, error: 'Caminho de arquivo inválido.' };
+      return { success: false, error: "Caminho de arquivo inválido." };
     }
 
     try {
       // 1. Grava no arquivo oficial
       const res = await window.electronAPI.saveFile(fullPath, content);
-      
+
       if (res.success) {
         // 2. Remove o arquivo .temp
         const tempPath = this.getTempPath(fullPath);
         await this.deleteFile(tempPath);
       }
-      
+
       return res;
     } catch (error) {
-      console.error(`[FILE SERVICE] Erro ao salvar arquivo em ${fullPath}:`, error);
-      return { success: false, error: error.message || 'Erro desconhecido ao salvar.' };
+      console.error(
+        `[FILE SERVICE] Erro ao salvar arquivo em ${fullPath}:`,
+        error,
+      );
+      return {
+        success: false,
+        error: error.message || "Erro desconhecido ao salvar.",
+      };
     }
   }
 
@@ -124,58 +136,69 @@ export class FileService {
    * @param {string} targetPath - Caminho do arquivo a ser aberto.
    */
   autoOpenFileByPath(targetPath) {
-    console.log('[DEBUG autoOpenFileByPath] Entrada targetPath:', targetPath);
+    console.log("[DEBUG autoOpenFileByPath] Entrada targetPath:", targetPath);
     if (!targetPath) return;
 
     let decodedPath = targetPath;
     try {
       decodedPath = decodeURIComponent(targetPath);
     } catch (e) {
-      console.error('[DEBUG] Erro ao decodificar targetPath:', e);
+      console.error("[DEBUG] Erro ao decodificar targetPath:", e);
     }
 
     const cleanTargetPath = decodedPath
-      .replace(/\\/g, '/')
-      .replace(/^\/+/, '')
-      .replace(/^content\//, '')
-      .replace(/^\.\.\/books\//, '');
+      .replace(/\\/g, "/")
+      .replace(/^\/+/, "")
+      .replace(/^content\//, "")
+      .replace(/^\.\.\/books\//, "");
 
-    console.log('[DEBUG autoOpenFileByPath] cleanTargetPath:', cleanTargetPath);
+    console.log("[DEBUG autoOpenFileByPath] cleanTargetPath:", cleanTargetPath);
 
-    const fileSpans = document.querySelectorAll('.file-name');
-    console.log('[DEBUG autoOpenFileByPath] Spans .file-name encontrados:', fileSpans.length);
+    const fileSpans = document.querySelectorAll(".file-name");
+    console.log(
+      "[DEBUG autoOpenFileByPath] Spans .file-name encontrados:",
+      fileSpans.length,
+    );
 
     if (fileSpans.length === 0) return;
 
     let found = false;
 
     for (const span of fileSpans) {
-      const parentLi = span.closest('li');
-      const rawAttrPath = span.getAttribute('data-path') || parentLi?.getAttribute('data-path') || '';
-      const attrPath = rawAttrPath.replace(/\\/g, '/').replace(/^\/+/, '');
+      const parentLi = span.closest("li");
+      const rawAttrPath =
+        span.getAttribute("data-path") ||
+        parentLi?.getAttribute("data-path") ||
+        "";
+      const attrPath = rawAttrPath.replace(/\\/g, "/").replace(/^\/+/, "");
 
       const isMatch =
         attrPath === cleanTargetPath ||
         attrPath.endsWith(cleanTargetPath) ||
         cleanTargetPath.endsWith(attrPath);
 
-      console.log(`[DEBUG Comparação] attrPath: "${attrPath}" vs cleanTarget: "${cleanTargetPath}" => Match: ${isMatch}`);
+      console.log(
+        `[DEBUG Comparação] attrPath: "${attrPath}" vs cleanTarget: "${cleanTargetPath}" => Match: ${isMatch}`,
+      );
 
       if (isMatch) {
         found = true;
-        console.log('[DEBUG autoOpenFileByPath] MATCH ENCONTRADO! Clicando no span...', span);
+        console.log(
+          "[DEBUG autoOpenFileByPath] MATCH ENCONTRADO! Clicando no span...",
+          span,
+        );
 
-        let folderLi = span.closest('li.folder');
+        let folderLi = span.closest("li.folder");
         while (folderLi) {
-          folderLi.classList.remove('collapsed');
-          folderLi = folderLi.parentElement.closest('li.folder');
+          folderLi.classList.remove("collapsed");
+          folderLi = folderLi.parentElement.closest("li.folder");
         }
 
-        if (parentLi && parentLi.classList.contains('advanced-item')) {
-          const modeToggle = document.getElementById('mode-toggle');
-          const container = document.getElementById('file-tree');
+        if (parentLi && parentLi.classList.contains("advanced-item")) {
+          const modeToggle = document.getElementById("mode-toggle");
+          const container = document.getElementById("file-tree");
           if (modeToggle) modeToggle.checked = true;
-          if (container) container.classList.add('show-advanced');
+          if (container) container.classList.add("show-advanced");
         }
 
         span.click();
@@ -184,7 +207,10 @@ export class FileService {
     }
 
     if (!found) {
-      console.warn('[DEBUG autoOpenFileByPath] NENHUM MATCH ENCONTRADO para:', cleanTargetPath);
+      console.warn(
+        "[DEBUG autoOpenFileByPath] NENHUM MATCH ENCONTRADO para:",
+        cleanTargetPath,
+      );
     }
   }
 
@@ -192,11 +218,11 @@ export class FileService {
    * Tenta reabrir o último arquivo salvo no localStorage (Executar SOMENTE na inicialização).
    */
   restoreLastOpenedFile() {
-    const lastFile = localStorage.getItem('last_open_file');
-    console.log('[RESTORE] Tentando restaurar arquivo salvo:', lastFile);
+    const lastFile = localStorage.getItem("last_open_file");
+    console.log("[RESTORE] Tentando restaurar arquivo salvo:", lastFile);
 
     if (!lastFile) {
-      console.log('[RESTORE] Nenhum arquivo salvo no localStorage.');
+      console.log("[RESTORE] Nenhum arquivo salvo no localStorage.");
       return;
     }
 

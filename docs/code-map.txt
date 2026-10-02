@@ -73,12 +73,18 @@
      │   │   │   ├── ⚙️ setEditorReadOnly(isReadOnly) — Define o estado de leitura/escrita do editor de texto e dos controles associados na UI.
      │   │   │   ├── ⚙️ openFileEditor(fullPath, relativePath) — Lê o conteúdo do arquivo usando o FileService e renderiza no editor.
      │   │   │   └── ⚙️ resetEditorState() — Reseta a interface do editor para o estado inicial sem arquivo aberto.
-     │   │   ├── editorComponent.js — [Componente responsável pela renderização estrutural do editor markdown]
-     │   │   │   └── 📦 class EditorComponent — Representa o Editor Markdown da aplicação.
-     │   │   │       ├── ⚙️ constructor(selector, context, params, parent = null) — Cria uma instância da classe
-     │   │   │       ├── ⚙️ onInit()
-     │   │   │       ├── ⚙️ setupListeners() — Configura os ouvintes de eventos da interface.
-     │   │   │       └── ⚙️ initMarkdownEditor() — Inicializa a biblioteca ToastUI Editor no elemento DOM recém-criado.
+     │   │   ├── editorComponent.js — [Componente responsável pela renderização estrutural do editor markdown e manipulação de eventos via uiBus.]
+     │   │   │   └── 📦 class EditorComponent — Representa o Editor Markdown da aplicação baseado em eventos.
+     │   │   │       ├── ⚙️ constructor(selector, context, params, parent = null) — Cria uma instância da classe EditorComponent. @constructor
+     │   │   │       ├── ⚙️ onInit() — Executado logo após a renderização inicial do componente.
+     │   │   │       ├── ⚙️ setupListeners() — Configura os ouvintes de eventos da interface exclusivamente via uiBus.
+     │   │   │       ├── ⚙️ initMarkdownEditor() — Inicializa a biblioteca ToastUI Editor no elemento DOM recém-criado.
+     │   │   │       ├── ⚙️ setupInternalLinkHandler() — Escuta cliques dentro do container do editor para capturar navegações por links internos.
+     │   │   │       ├── ⚙️ handleEditorChange() — Monitora digitação e aguarda 1s sem digitação para disparar autosave.
+     │   │   │       ├── ⚙️ setSaveStatus(status) — Atualiza o ícone visual de status de salvamento na UI.
+     │   │   │       ├── ⚙️ setEditorReadOnly(isReadOnly) — Define o estado de leitura/escrita do editor de texto.
+     │   │   │       ├── ⚙️ renderFileContent(fullPath, relativePath, rawText) — Renderiza o conteúdo do arquivo no editor e atualiza a interface.
+     │   │   │       └── ⚙️ resetEditorState() — Reseta a interface do editor para o estado inicial sem arquivo aberto.
      │   │   └── index.js — [Barrel do módulo Editor, exportando funções e componentes essenciais para a construção do editor de texto e interação com o usuário.]
      │   ├── [editor-overlay]
      │   │   ├── editorOverlayComponent.js — [Componente responsável pela renderização estrutural do editor overlay]
@@ -86,12 +92,17 @@
      │   │   │       ├── ⚙️ constructor(selector, context, params, parent = null) — Cria uma instância da classe
      │   │   │       └── ⚙️ setupListeners() — Configura os ouvintes de eventos da interface.
      │   │   └── editorOverlays.js — [Funções utilitárias para controlar overlays na interface.]
-     │   │        └── ⚙️ toggleEditorOverlay(show, key, message = '', showSpinner = true) — Controla o estado do overlay interno do editor usando uma pilha por chaves.
      │   ├── [explorer]
-     │   │   ├── explorerComponent.js — [Componente responsável pela renderização estrutural do explorer de arquivos.]
+     │   │   ├── explorerComponent.js — [Componente responsável pela renderização estrutural e lógica do explorer de arquivos.]
      │   │   │   └── 📦 class ExplorerComponent — Representa o explorer de arquivos.
      │   │   │       ├── ⚙️ constructor(selector, context, params, parent = null) — Cria uma instância da classe
-     │   │   │       └── ⚙️ setupListeners() — Configura os ouvintes de eventos.
+     │   │   │       ├── ⚙️ onInit() — Executado logo após a renderização inicial do componente.
+     │   │   │       ├── ⚙️ setupListeners() — Configura os ouvintes de eventos da UI e de domínio.
+     │   │   │       ├── ⚙️ initExplorerEvents() — Inicializa todos os ouvintes de eventos e comportamentos visuais do explorador.
+     │   │   │       ├── ⚙️ toggleAdvancedExplorerView() — Controla e alterna a visibilidade dos elementos avançados no explorador.
+     │   │   │       ├── ⚙️ updateAdvancedVisibility()
+     │   │   │       ├── ⚙️ tabSelectionEvents() — Gerencia a seleção de abas de navegação do explorador.
+     │   │   │       └── ⚙️ syncTreeSelection(relativePath) — Sincroniza a seleção na árvore com base no caminho relativo informado.
      │   │   ├── explorerUi.js — [Funções da UI do explorador de arquivos (File Explorer), incluindo a renderização da árvore de arquivos, eventos de interação e manipulação de elementos DOM relacionados.]
      │   │   │   ├── ⚙️ initExplorerEvents() — Inicializa todos os ouvintes de eventos e comportamentos do explorador de arquivos.
      │   │   │   ├── ⚙️ toggleAdvancedExplorerView() — Controla e alterna a visibilidade dos elementos avançados no explorador de arquivos com base no estado do interruptor.
@@ -137,11 +148,11 @@
      │   │   └── sidebarComponent.js — [Componente responsável pela renderização estrutural da barra lateral (Sidebar).]
      │   │        └── 📦 class SidebarComponent — Representa o painel lateral esquerdo da aplicação.
      │   │            ├── ⚙️ constructor(selector, context, params, parent = null) — Cria uma instância da classe
-     │   │            ├── ⚙️ onInit()
-     │   │            └── ⚙️ setupListeners() — Configura os ouvintes de eventos da interface da sidebar.
+     │   │            ├── ⚙️ setupListeners() — Configura os ouvintes de eventos da interface da sidebar.
+     │   │            └── ⚙️ selectLastBook()
      │   ├── [toast]
      │   │   ├── toast.js — [Funções utilitárias para exibir notificações do tipo Toast na interface.]
-     │   │   │   └── ⚙️ showToast(message, type = 'success') — Exibe notificações do tipo Toast na interface.
+     │   │   │   └── ⚙️ showToast(message, type = "success") — Exibe notificações do tipo Toast na interface.
      │   │   └── toastComponent.js — [Componente responsável pela renderização estrutural do toast.]
      │   │        └── 📦 class ToastComponent — Representa o toast da aplicação.
      │   │            ├── ⚙️ constructor(selector, context, params, parent = null) — Cria uma instância da classe
@@ -154,7 +165,6 @@
      │        │   ├── ⚙️ syncMultipleFiles(filePaths) — Sincroniza uma lista de caminhos de arquivos em lote.
      │        │   ├── ⚙️ openSyncModal() — Abre o modal de gerenciamento de alterações temporárias pendentes.
      │        │   ├── ⚙️ renderSyncModalContent(tempFiles) — Gera o HTML dinâmico contendo a lista de arquivos temporários para exibição no modal de sincronização.
-     │        │   ├── ⚙️ handleDiscardTemp(path, name, targetLi, syncModal, updateListState) — Manipula o processo de descarte e exclusão de um arquivo temporário (.temp) do disco e da interface.
      │        │   ├── ⚙️ attachSyncModalEvents(syncModal) — Gerencia os ouvintes de eventos e interações dentro do modal de sincronização (cliques em links, seleção de checkboxes e exclusão de itens).
      │        │   └── ⚙️ refreshSaveButtonState() — Centraliza a regra de ativação/desativação do botão Salvar/Sincronizar
      │        └── toolbarComponent.js — [Componente responsável pela renderização estrutural da Toolbar.]
@@ -172,11 +182,15 @@
      │   ├── [handlers]
      │   │   ├── bookHandler.js — [Handler dos eventos relacionados ao livro/projeto]
      │   │   │   ├── ⚙️ onBookSelect(state, bookPath) — Handler de troca de livro.
-     │   │   │   └── ⚙️ onFetchBooks(bookService) — Solicita lista de livros do backend e também confere qual o último livro selecionado. @async
+     │   │   │   └── ⚙️ onFetchBooks(req, state, bookService) — Solicita lista de livros do backend e também confere qual o último livro selecionado. @async
      │   │   ├── chapterHandler.js
      │   │   ├── characterHandler.js
+     │   │   ├── configHandler.js — [Handler para gerenciar alterações no arquivo config.json dos projetos.]
      │   │   └── fileHandler.js — [Handler dos eventos relacionados a arquivos .md e .temp]
-     │   │        └── ⚙️ onSyncOpenModal() — Handler que abre modal e exibe todos os arquivos .temp do projeto para serem sincronizados
+     │   │        ├── ⚙️ onSyncOpenModal() — Handler que abre modal e exibe todos os arquivos .temp do projeto para serem sincronizados
+     │   │        ├── ⚙️ onFileGet(fullPath, relativePath, state) — Realiza a consulta do arquivo no disco (com prioridade .temp), atualiza o state e notifica globalmente.
+     │   │        ├── ⚙️ onSaveTemp(path, content)
+     │   │        └── ⚙️ resolveFileWithTemp(fullPath) — Verifica se existe uma versão .temp do arquivo e retorna o caminho ajustado se existir.
      │   └── uiController.js — [Gerencia e despacha os eventos de interface (UI) vindos do uiBus para os handlers visuais.]
      │        └── 📦 class UiController — Controller responsável pelas reações visuais da interface.
      │            ├── ⚙️ constructor(services, state) — Cria uma instância do UiController e registra os ouvintes de eventos da UI.
@@ -200,6 +214,18 @@
      ├── [events]
      │   ├── domainBus.js — [Barramento de eventos (Pub-Sub) dedicado à camada de negócio da aplicação, processando atualizações de dados vindas do sistema de arquivos e regras do fluxo literário.]
      │   ├── uiBus.js — [scripts/renderer/events/eventUi.js]
+     │   │   └── 📦 class UiEventBus
+     │   │       ├── ⚙️ constructor() — @constructor
+     │   │       ├── ⚙️ initDeclarativeEvents(this.bus)
+     │   │       ├── ⚙️ emit(event, payload) — @method emit
+     │   │       ├── ⚙️ on(event, callback) — @method on
+     │   │       ├── ⚙️ callback(reqContext)
+     │   │       ├── ⚙️ onReq(event, callback) — @method onReq
+     │   │       ├── ⚙️ off(event, callback) — @method off
+     │   │       ├── ⚙️ req(eventBase, payload = {}) — @method req
+     │   │       ├── ⚙️ clearTimeout(timeout)
+     │   │       ├── ⚙️ reject(new Error(response.error)
+     │   │       └── ⚙️ resolve(response.data)
      │   └── uiDeclarativeEvents.js
      │        └── ⚙️ initDeclarativeEvents(uiBus) — Inicializa o escutador global de eventos no documento.
      ├── renderer.js
@@ -218,7 +244,7 @@
      │            └── ⚙️ constructor(state) — Inicializa e agrupa todos os serviços da aplicação. @constructor
      └── [utils]
           ├── helpers.js — [Funções auxiliares genéricas para apoio à interface do usuário, controle de menus e normalizações.]
-          │   ├── ⚙️ normalizeItemMetadata(rawMetadata, fallbackTitle = '') — Garante que todas as chaves obrigatórias do objeto de metadados existam com valores padrão (fallbacks).
+          │   ├── ⚙️ normalizeItemMetadata(rawMetadata, fallbackTitle = "") — Garante que todas as chaves obrigatórias do objeto de metadados existam com valores padrão (fallbacks).
           │   └── ⚙️ normalizePath(p) — Normaliza caminhos de arquivo para evitar quebras em seletores CSS ou chamadas do Node/IPC.
           └── markdown.js — [Utilitário para conversão, parsing e serialização de conteúdos Markdown e metadados Frontmatter YAML.]
                ├── ⚙️ parseMarkdown(fileContent, isYmlOnly = false) — Converte Frontmatter YAML em Objeto JS e retorna o corpo do Markdown separadamente.

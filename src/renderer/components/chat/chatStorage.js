@@ -2,7 +2,7 @@
  * @file Módulo de armazenamento do chat, responsável por gerenciar o histórico de mensagens e a persistência dos dados do chat.
  */
 
-import { state } from '../../core/state.js';
+import { state } from "../../core/state.js";
 
 const MAX_MESSAGES_PER_FILE = 50;
 
@@ -13,8 +13,8 @@ const MAX_MESSAGES_PER_FILE = 50;
 function getTodaySessionDate() {
   const now = new Date();
   const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
 
@@ -26,7 +26,7 @@ function getTodaySessionDate() {
 function getCurrentChatLogFilePath(sessionIndex = 1) {
   if (!state.currentBookPath) return null;
   const dateStr = getTodaySessionDate();
-  const indexStr = String(sessionIndex).padStart(3, '0');
+  const indexStr = String(sessionIndex).padStart(3, "0");
   return `${state.currentBookPath}/.system/chatlog/session_${dateStr}_${indexStr}.json`;
 }
 
@@ -95,7 +95,10 @@ export async function saveChatMessage(message) {
 
   messages.push(logEntry);
 
-  const saveResult = await window.electronAPI.saveFile(filePath, JSON.stringify(messages, null, 2));
+  const saveResult = await window.electronAPI.saveFile(
+    filePath,
+    JSON.stringify(messages, null, 2),
+  );
   return saveResult && saveResult.success;
 }
 
@@ -104,30 +107,36 @@ export async function saveChatMessage(message) {
  * @returns {Promise<Array<{role: string, content: string, timestamp: string}>>} Lista com o histórico de mensagens.
  */
 export async function loadChatHistory() {
-  console.log('[CHAT] Início de loadChatHistory()...');
+  console.log("[CHAT] Início de loadChatHistory()...");
 
   if (!state.currentBookPath) {
-    console.log('[CHAT] Nulo: state.currentBookPath inválido.');
+    console.log("[CHAT] Nulo: state.currentBookPath inválido.");
     return [];
   }
 
   // Normaliza as barras do caminho para evitar falhas no Node.js/Windows
-  const normalizedPath = state.currentBookPath.replace(/\\/g, '/');
+  const normalizedPath = state.currentBookPath.replace(/\\/g, "/");
   const chatlogFolder = `${normalizedPath}/.system/chatlog`;
 
   try {
-    console.log('[CHAT] Solicitando getTree para:', chatlogFolder);
+    console.log("[CHAT] Solicitando getTree para:", chatlogFolder);
     const folderTree = await window.electronAPI.getTree(chatlogFolder);
-    console.log('[CHAT] Retorno de getTree recebido:', folderTree);
+    console.log("[CHAT] Retorno de getTree recebido:", folderTree);
 
-    if (!folderTree || !folderTree.children) { 
-      console.log(`[CHAT LOG] Nenhum histórico encontrado em: ${chatlogFolder}`);
+    if (!folderTree || !folderTree.children) {
+      console.log(
+        `[CHAT LOG] Nenhum histórico encontrado em: ${chatlogFolder}`,
+      );
       return [];
     }
 
     // Filtra considerando tanto `type === 'file'` quanto `!isDirectory`
     const jsonFiles = folderTree.children
-      .filter((item) => (item.type === 'file' || item.isDirectory === false) && item.name.endsWith('.json'))
+      .filter(
+        (item) =>
+          (item.type === "file" || item.isDirectory === false) &&
+          item.name.endsWith(".json"),
+      )
       .sort((a, b) => a.name.localeCompare(b.name));
 
     const fullHistory = [];
@@ -148,7 +157,7 @@ export async function loadChatHistory() {
 
     return fullHistory;
   } catch (err) {
-    console.error('[CHAT LOG] Erro crítico ao carregar histórico:', err);
+    console.error("[CHAT LOG] Erro crítico ao carregar histórico:", err);
     return [];
   }
 }

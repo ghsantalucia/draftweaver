@@ -2,16 +2,15 @@
  * @file Ponto de entrada do frontend (Renderer), responsável por inicializar o container principal da aplicação.
  */
 
-import { AppContainer } from './core/appContainer.js';
+import { AppContainer } from "./core/appContainer.js";
 
 // Inicialização principal quando o DOM estiver carregado utilizando o Container IoC
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const appContainer = new AppContainer();
   await appContainer.init();
 });
 
 console.log("[APP.JS]");
-
 
 // import { state } from './core/config.js';
 // import { initTheme } from './core/theme.js';
@@ -31,7 +30,6 @@ console.log("[APP.JS]");
 // import { initSaveButtonAnimation } from './components/toolbar/animations.js';
 // import { initStarryBackground } from './components/chat/chatAnimations.js';
 // import './components/sidebar/sidebar.js';
-
 
 // // Inicialização principal quando o DOM estiver carregado
 // document.addEventListener('DOMContentLoaded', async () => {

@@ -52,13 +52,13 @@
 }
 
 /* Faz a sub-UL da pasta raiz ativa ficar sempre visível e sem recuo extra */
-.file-tree li.folder-root>ul {
+.file-tree li.folder-root > ul {
   display: block !important;
   padding-left: 0 !important;
 }
 
 /* Oculta a linha da própria pasta raiz (seta/nome) para parecer que o conteúdo já é a aba */
-.file-tree li.folder-root>.folder-name {
+.file-tree li.folder-root > .folder-name {
   display: none !important;
 }
 
@@ -74,7 +74,9 @@
   border-radius: 5px;
   font-size: 0.82rem;
   color: #cdd6f4;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
 /* Hover e Seleção Ativa */
@@ -108,11 +110,13 @@
   color: #767676;
   width: 12px;
   display: inline-block;
-  transition: transform 0.2s ease, color 0.15s ease;
+  transition:
+    transform 0.2s ease,
+    color 0.15s ease;
 }
 
 /* Rotação da seta quando a pasta está aberta */
-.folder:not(.collapsed)>.folder-name>.tree-arrow {
+.folder:not(.collapsed) > .folder-name > .tree-arrow {
   transform: rotate(90deg);
   color: #767676;
 }
@@ -163,7 +167,7 @@
 }
 
 /* Arquivo Avançado */
-li.advanced-item>.file-name>.icon-file {
+li.advanced-item > .file-name > .icon-file {
   color: #d98cdf;
   /* Cor lilás dos itens avançados */
 }
@@ -177,7 +181,7 @@ li.advanced-item>.file-name>.icon-file {
   background-color: #1e2335;
 }
 
-.collapsed>ul {
+.collapsed > ul {
   display: none;
 }
 

@@ -2,7 +2,6 @@
    COMPONENTES DE MODAIS E JANELAS (Modal.js)
    ========================================================================== */
 
-   
 /* 2. Overlay Global Tela Cheia (Drawer e Modais) */
 #modal-container {
   position: fixed;
@@ -15,7 +14,9 @@
   -webkit-backdrop-filter: blur(4px);
   z-index: 200;
   opacity: 1;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease;
 }
 
 #modal-container.hidden {
@@ -24,19 +25,18 @@
   pointer-events: none;
 }
 
-
 /* Card Container da Janela do Modal */
 .app-modal-window {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) scale(0.95);
-  
+
   /* Adapta à largura do conteúdo mantendo limites elegantes */
   width: fit-content;
   min-width: 480px;
   max-width: min(800px, 90vw);
-  
+
   height: auto;
   max-height: calc(100vh - 40px);
   background: var(--bg-sidebar, #1e1e2e);
@@ -143,7 +143,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.2s ease, background-color 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .btn-modal:hover {
@@ -286,7 +288,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
   flex-shrink: 0;
   box-sizing: border-box;
 }

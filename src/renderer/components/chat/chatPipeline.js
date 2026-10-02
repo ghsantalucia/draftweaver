@@ -2,18 +2,17 @@
  * @file Controlador da pipeline do assistente de IA, gerenciando o fluxo entre o envio do usuário e a resposta da IA.
  */
 
-import { saveChatMessage } from './chatStorage.js';
-
+import { saveChatMessage } from "./chatStorage.js";
 
 // =====================[MOCK]========================== //
 /**
  * Respostas pré-definidas para simulação da IA.
  */
 const MOCK_AI_RESPONSES = [
-  'Anotei sua ideia! Posso estruturar um resumo detalhado ou ajustar este trecho do capítulo se você desejar.',
-  'Analisando a estrutura da sua narrativa, este desenvolvimento traz um bom ritmo para a trama.',
-  'Excelente direcionamento. Gostaria que eu sugerisse alguns diálogos ou desdobramentos de cena para apoiar este ponto?',
-  'Com base nos personagens cadastrados no seu projeto, essa decisão gera um conflito interno interessante para o protagonista.',
+  "Anotei sua ideia! Posso estruturar um resumo detalhado ou ajustar este trecho do capítulo se você desejar.",
+  "Analisando a estrutura da sua narrativa, este desenvolvimento traz um bom ritmo para a trama.",
+  "Excelente direcionamento. Gostaria que eu sugerisse alguns diálogos ou desdobramentos de cena para apoiar este ponto?",
+  "Com base nos personagens cadastrados no seu projeto, essa decisão gera um conflito interno interessante para o protagonista.",
 ];
 
 /**
@@ -26,7 +25,6 @@ function getRandomMockResponse() {
 }
 // ===================================================== //
 
-
 /**
  * Injeta diretamente uma mensagem no chat (usada por gatilhos do sistema ou pela IA) e persiste no log.
  * @param {Object} params
@@ -36,7 +34,6 @@ function getRandomMockResponse() {
  * @returns {Promise<void>}
  */
 export async function injectMessageIntoChat({ role, content }, renderCallback) {
-  
   const messageData = {
     role,
     content,
@@ -47,7 +44,7 @@ export async function injectMessageIntoChat({ role, content }, renderCallback) {
   await saveChatMessage(messageData);
 
   // Executa callback de renderização na interface
-  if (typeof renderCallback === 'function') {
+  if (typeof renderCallback === "function") {
     renderCallback(messageData);
   }
 }
@@ -61,22 +58,22 @@ export async function injectMessageIntoChat({ role, content }, renderCallback) {
  * @param {Function} callbacks.setLoadingState - Callback para habilitar/desabilitar inputs.
  */
 export async function handleUserPrompt(userPrompt, callbacks) {
-  
   const trimmed = userPrompt.trim();
   if (!trimmed) return;
 
-  const { onUserMessageRender, onAssistantMessageRender, setLoadingState } = callbacks;
+  const { onUserMessageRender, onAssistantMessageRender, setLoadingState } =
+    callbacks;
 
   // 1. Notifica a UI e salva a mensagem do usuário
-  if (typeof setLoadingState === 'function') setLoadingState(true);
+  if (typeof setLoadingState === "function") setLoadingState(true);
 
   const userMessage = {
-    role: 'user',
+    role: "user",
     content: trimmed,
     timestamp: new Date().toISOString(),
   };
 
-  if (typeof onUserMessageRender === 'function') {
+  if (typeof onUserMessageRender === "function") {
     onUserMessageRender(userMessage);
   }
   await saveChatMessage(userMessage);
@@ -87,13 +84,12 @@ export async function handleUserPrompt(userPrompt, callbacks) {
 
     await injectMessageIntoChat(
       {
-        role: 'assistant',
+        role: "assistant",
         content: mockReply,
       },
-      onAssistantMessageRender
+      onAssistantMessageRender,
     );
 
-    if (typeof setLoadingState === 'function') setLoadingState(false);
+    if (typeof setLoadingState === "function") setLoadingState(false);
   }, 1200);
-  
 }

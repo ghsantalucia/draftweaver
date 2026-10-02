@@ -2,13 +2,12 @@
  * @file Gerencia e despacha os eventos de interface (UI) vindos do uiBus para os handlers visuais.
  */
 
-import { uiBus } from '../events/uiBus.js';
+import { uiBus } from "../events/uiBus.js";
 
-import * as book from './handlers/bookHandler.js';
-import * as file from './handlers/fileHandler.js';
+import * as book from "./handlers/bookHandler.js";
+import * as file from "./handlers/fileHandler.js";
 // import * as chapter from './handlers/chapterHandler.js';
 // import * as character from './handlers/characterHandler.js';
-
 
 /**
  * Controller responsável pelas reações visuais da interface.
@@ -30,15 +29,32 @@ export class UiController {
    * @private
    */
   registerEvents() {
+    //==========================================//
+    //         Requisições de UI (uiBus)        //
+    //==========================================//
+
+    // Solicita lista de livros do backend
+    uiBus.onReq("books:fetch-list", (req) => {
+      book.onFetchBooks(req, this.state, this.services.book);
+    });
+
+    // Intercepta o evento file:get e delega para o fileHandler passando os dados e o state
+    uiBus.onReq("file:get", (req) => {
+      file.onFileGet(req, this.state, this.services.file);
+    });
+
+    //==========================================//
+    //             Eventos  de  UI              //
+    //==========================================//
 
     // Evento que chama para tela de sincronização de arquivos .temp
-    uiBus.on('sync:open-modal', () => {
+    uiBus.on("sync:open-modal", () => {
       file.onSyncOpenModal();
       file.onSyncOpenModal();
     });
 
     // Lida com seleção de livro/projeto
-    uiBus.on('book:selected', (e) => {
+    uiBus.on("book:selected", (e) => {
       if (e.nativeEvent) {
         book.onBookSelect(this.state, e.value);
       } else {
@@ -46,20 +62,14 @@ export class UiController {
       }
     });
 
-    // Solicita lista de livros do backend
-    uiBus.on('books:fetch-list', () => {
-      book.onFetchBooks(this.services.book);
+    // Solicita o salvamento de um arquivo temporário (.temp) via IPC
+    uiBus.on("file:save-temp", async ({ path, content }) => {
+      file.onSaveTemp(path, content);
     });
-  }
 
-  /**
-   * Handler para quando um arquivo temporário é salvo (.temp).
-   * Atualiza o explorer (adicionando o asterisco) e libera a sincronização.
-   * @private
-   * @param {{ originalPath: string, tempPath: string }} payload - Dados do evento
-   */
-  handleTempFileSaved(payload) {
-    console.log('[UiController] Evento recebido: temp-file:saved', payload);
-    // TODO: Chamar métodos visuais para atualizar o explorer e a toolbar
+    // Evento disparado quando um arquivo é aberto com sucesso
+    uiBus.on("file:opened", (data) => {
+      file.onFileOpened(this.state, data);
+    });
   }
 }

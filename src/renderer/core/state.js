@@ -3,7 +3,7 @@
  */
 
 /**
- * Objeto de configuração contendo os valores padrão para metadados de arquivos, 
+ * Objeto de configuração contendo os valores padrão para metadados de arquivos,
  * caso não estejam presentes no arquivo .md.
  * @type {Object}
  */
@@ -14,7 +14,7 @@ export const DEFAULT_TREE_METADATA = {
   aiWrite: false,
   advanced: false,
   title: null, // Será tratado no merge se precisar do nome do arquivo
-  description: null
+  description: null,
 };
 
 /**
@@ -27,40 +27,46 @@ export class State {
    * @constructor
    */
   constructor() {
-    /** 
+    /**
      * Instância do editor de texto ativo.
-     * @type {Object|null} 
+     * @type {Object|null}
      */
     this.editor = null;
 
-    /** 
+    /**
      * Caminho absoluto do livro atualmente selecionado.
-     * @type {string|null} 
+     * @type {string|null}
      */
     this.currentBookPath = null;
 
-    /** 
+    /**
      * Caminho absoluto do arquivo atualmente aberto.
-     * @type {string|null} 
+     * @type {string|null}
      */
     this.currentFilePath = null;
 
-    /** 
+    /**
      * Metadados do arquivo atual.
-     * @type {Object} 
+     * @type {Object}
      */
     this.currentFileMetadata = {};
 
-    /** 
+    /**
      * Mapa de metadados de todos os arquivos rastreados.
-     * @type {Object} 
+     * @type {Object}
      */
     this.fileMetadataMap = {};
 
-    /** 
+    /**
      * Estado de trava de segurança da IA.
-     * @type {boolean} 
+     * @type {boolean}
      */
     this.aiLockState = false;
+
+    /**
+     * Lista de todos os livros/projetos
+     * @type {Array[Object]}
+     */
+    this.bookList = [];
   }
 }

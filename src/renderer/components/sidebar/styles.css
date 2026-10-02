@@ -54,7 +54,7 @@ select#select-book:hover {
 #select-book option {
   background-color: var(--bg-header);
   /* Fundo escuro igual à sidebar */
-  color: var(--bg-editor)fff;
+  color: var(--bg-editor) fff;
   /* Texto branco visível */
   padding: 10px;
   font-size: 0.8rem;
@@ -87,7 +87,9 @@ select#select-book:hover {
   padding: 4px;
   border-radius: 4px;
   opacity: 0.7;
-  transition: opacity 0.2s ease, transform 0.3s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.3s ease;
 }
 
 /* Efeito hover discreto */

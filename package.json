@@ -13,9 +13,10 @@
     "lint": "echo \"No linting configured\"",
     "docs:web": "jsdoc -c jsdoc.json",
     "file-map": "node scripts/project-map.js > docs/project-map.txt",
-    "code-map": "node scripts/code-map.js > docs/code-map.txt", 
-    "event-map": "node scripts/event-map.js > docs/event-map.txt", 
-    "docs": "npm run file-map && npm run code-map && npm run event-map && npm run docs:web"
+    "code-map": "node scripts/code-map.js > docs/code-map.txt",
+    "event-map": "node scripts/event-map.js > docs/event-map.txt",
+    "docs": "npm run file-map && npm run code-map && npm run event-map && npm run docs:web",
+    "format": "prettier --write \"src/**/*.{js,ts,json,css,md}\""
   },
   "keywords": [],
   "author": {
@@ -35,6 +36,7 @@
     "@electron/fuses": "^1.8.0",
     "electron": "44.2.0",
     "jsdoc": "^4.0.5",
+    "prettier": "^3.9.9",
     "vite": "^5.4.21"
   },
   "dependencies": {

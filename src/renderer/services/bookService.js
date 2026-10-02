@@ -2,8 +2,8 @@
  * @file Serviço responsável por gerenciar a lista de livros, dados de configuração por projeto e verificação de travas da IA.
  */
 
-import { domainBus } from '../events/domainBus.js';
-import { uiBus } from '../events/uiBus.js';
+import { domainBus } from "../events/domainBus.js";
+import { uiBus } from "../events/uiBus.js";
 
 export class BookService {
   /**
@@ -21,15 +21,15 @@ export class BookService {
    * @param {string} bookPath - Caminho completo do livro.
    * @param {string} [bookTitle=''] - Título opcional do livro.
    */
-  async selectBook(bookPath, bookTitle = '') {
+  async selectBook(bookPath, bookTitle = "") {
     if (!bookPath) return;
 
     // 1. Atualiza estado e persistência
     this.state.currentBookPath = bookPath;
-    localStorage.setItem('last_selected_book', bookPath);
+    localStorage.setItem("last_selected_book", bookPath);
 
     // 2. Emite evento de domínio notificando que o livro foi alterado
-    domainBus.emit('book:selected', { bookPath, bookTitle });
+    domainBus.emit("book:selected", { bookPath, bookTitle });
 
     // 3. Executa checagens e processos dependentes do livro atual
     await this.checkAILock();
@@ -44,7 +44,7 @@ export class BookService {
       const books = await window.electronAPI.getBooksList();
       return books || [];
     } catch (error) {
-      console.error('[BOOK SERVICE] Erro ao buscar lista de livros:', error);
+      console.error("[BOOK SERVICE] Erro ao buscar lista de livros:", error);
       return [];
     }
   }
@@ -56,10 +56,13 @@ export class BookService {
   async restoreLastSelectedBook(books = []) {
     if (!books || books.length === 0) return;
 
-    const lastSelectedBook = localStorage.getItem('last_selected_book');
-    const bookToLoad = books.find((b) => b.fullPath === lastSelectedBook) || books[0];
+    const lastSelectedBook = localStorage.getItem("last_selected_book");
+    const bookToLoad =
+      books.find((b) => b.fullPath === lastSelectedBook) || books[0];
 
-    console.log(`[BOOK SERVICE] Carregando livro: ${bookToLoad.title} (${bookToLoad.fullPath})`);
+    console.log(
+      `[BOOK SERVICE] Carregando livro: ${bookToLoad.title} (${bookToLoad.fullPath})`,
+    );
     await this.selectBook(bookToLoad.fullPath, bookToLoad.title);
   }
 
@@ -83,11 +86,10 @@ export class BookService {
       this.state.aiLockState = isLocked;
 
       // Emite evento para que os controllers/UI reajam ao bloqueio/desbloqueio da IA
-      domainBus.emit('ai-lock:changed', { 
-        isLocked, 
-        currentFileMetadata: this.state.currentFileMetadata 
+      domainBus.emit("ai-lock:changed", {
+        isLocked,
+        currentFileMetadata: this.state.currentFileMetadata,
       });
-
     } catch (err) {
       console.warn(`[BOOK SERVICE] Falha ao ler config.json: ${err.message}`);
     }

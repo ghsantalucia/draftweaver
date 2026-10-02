@@ -9,15 +9,17 @@ Estrutura do Projeto com Descrições:
 │   │   ├── fluxo-events-controllers.md
 │   │   ├── metadata-spec.md
 │   │   ├── project-map.md
-│   │   ├── project.md
 │   │   ├── roadmap.md
 │   │   ├── system.md
 │   │   └── ui-controls.md
+│   ├── Checklist.md
 │   ├── code-map.txt
 │   ├── Component.md
 │   ├── Event UI.md
 │   ├── event-map.txt
-│   └── project-map.txt
+│   ├── Padrão de Eventos.md
+│   ├── project-map.txt
+│   └── project.md
 ├── forge.config.js
 ├── jsdoc.json
 ├── LICENCE
@@ -68,7 +70,7 @@ Estrutura do Projeto com Descrições:
 │       │   ├── Component.js
 │       │   ├── [editor]
 │       │   │   ├── editor.js — Controla a inicialização do ToastUI Editor, leitura e salvamento de arquivos Markdown e aplicação de regras de permissão de escrita na UI.
-│       │   │   ├── editorComponent.js — Componente responsável pela renderização estrutural do editor markdown
+│       │   │   ├── editorComponent.js — Componente responsável pela renderização estrutural do editor markdown e manipulação de eventos via uiBus.
 │       │   │   ├── index.js — Barrel do módulo Editor, exportando funções e componentes essenciais para a construção do editor de texto e interação com o usuário.
 │       │   │   ├── styles.css
 │       │   │   └── template.html
@@ -78,9 +80,10 @@ Estrutura do Projeto com Descrições:
 │       │   │   ├── styles.css
 │       │   │   └── template.html
 │       │   ├── [explorer]
-│       │   │   ├── explorerComponent.js — Componente responsável pela renderização estrutural do explorer de arquivos.
+│       │   │   ├── explorerComponent.js — Componente responsável pela renderização estrutural e lógica do explorer de arquivos.
 │       │   │   ├── explorerUi.js — Funções da UI do explorador de arquivos (File Explorer), incluindo a renderização da árvore de arquivos, eventos de interação e manipulação de elementos DOM relacionados.
 │       │   │   ├── index.js — Barrel do módulo Explorer, exportando funções e componentes essenciais para a construção da árvore de arquivos e interação com o usuário.
+│       │   │   ├── nodeTemplate.html
 │       │   │   ├── styles.css
 │       │   │   ├── template.html
 │       │   │   └── tree.js — Constrói e gerencia a interface da árvore de arquivos e pastas no painel lateral com suporte a filtros YAML e permissões de exibição.
@@ -116,6 +119,7 @@ Estrutura do Projeto com Descrições:
 │       │   │   ├── bookHandler.js — Handler dos eventos relacionados ao livro/projeto
 │       │   │   ├── chapterHandler.js
 │       │   │   ├── characterHandler.js
+│       │   │   ├── configHandler.js — Handler para gerenciar alterações no arquivo config.json dos projetos.
 │       │   │   └── fileHandler.js — Handler dos eventos relacionados a arquivos .md e .temp
 │       │   └── uiController.js — Gerencia e despacha os eventos de interface (UI) vindos do uiBus para os handlers visuais.
 │       ├── [core]
