@@ -37,7 +37,6 @@ export class EditorComponent extends Component {
    */
   onInit() {
     this.initMarkdownEditor();
-    this.openLastFile();
   }
 
   /**
@@ -52,7 +51,7 @@ export class EditorComponent extends Component {
       });
 
       // Reseta e bloqueia o editor sempre que um novo livro/projeto for selecionado
-      this.uiBus.on("book:selected", () => {
+      this.uiBus.on("book:changed", () => {
         this.resetEditorState();
       });
     }
@@ -88,20 +87,6 @@ export class EditorComponent extends Component {
     }
 
     this.setupInternalLinkHandler();
-  }
-
-  /**
-   * Abre o último arquivo acessado, se disponível no estado global.
-   * @returns {void}
-   */
-  openLastFile() {
-    console.log(
-      "[[[[[[[[[[[[[[[[[[[[[[",
-      localStorage.getItem("last_opened_file"),
-    );
-    if (this.state && this.state.currentFilePath) {
-      this.openFile(this.state.currentFilePath);
-    }
   }
 
   /**
@@ -368,14 +353,7 @@ export class EditorComponent extends Component {
    * @returns {void}
    */
   resetEditorState() {
-    if (this.state) {
-      this.state.currentFilePath = null;
-      this.state.currentFileMetadata = "";
-      if (this.state.editor) {
-        this.state.editor.setMarkdown("");
-      }
-    }
-
+    this.state.editor.setMarkdown("");
     const pageTitle = document.getElementById("page-title");
     if (pageTitle) pageTitle.innerText = "Selecione um arquivo";
 

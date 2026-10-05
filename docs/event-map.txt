@@ -21,6 +21,7 @@
       ├── selectLastBook (src\renderer\components\sidebar\sidebarComponent.js)
       └── select#select-book (src\renderer\components\sidebar\template.html)
     * Escutadores:
+      ├── setupListeners (src\renderer\components\editor\editorComponent.js)
       ├── setupListeners (src\renderer\components\explorer\explorerComponent.js)
       └── registerEvents (src\renderer\controllers\uiController.js)
 
@@ -36,6 +37,24 @@
     * Escutadores:
       └── ---
 
+⚙️ [editor-overlay:close]
+    * Emissores:
+      └── renderFileContent (src\renderer\components\editor\editorComponent.js)
+    * Escutadores:
+      └── setupListeners (src\renderer\components\editor-overlay\editorOverlayComponent.js)
+
+⚙️ [editor-overlay:open]
+    * Emissores:
+      └── resetEditorState (src\renderer\components\editor\editorComponent.js)
+    * Escutadores:
+      └── setupListeners (src\renderer\components\editor-overlay\editorOverlayComponent.js)
+
+⚙️ [editor:locked]
+    * Emissores:
+      └── readOnlyKeyHandler (src\renderer\components\editor\editorComponent.js)
+    * Escutadores:
+      └── ---
+
 ⚙️ [editor:open-file]
     * Emissores:
       ├── setupInternalLinkHandler (src\renderer\components\editor\editorComponent.js)
@@ -43,7 +62,7 @@
     * Escutadores:
       └── setupListeners (src\renderer\components\editor\editorComponent.js)
 
-⚙️ [editor:reset]
+⚙️ [editor:reseted]
     * Emissores:
       └── resetEditorState (src\renderer\components\editor\editorComponent.js)
     * Escutadores:
@@ -55,17 +74,17 @@
     * Escutadores:
       └── ---
 
-⚙️ [file:current-changed]
+⚙️ [editor:unlocked]
     * Emissores:
-      └── onFileGet (src\renderer\controllers\handlers\fileHandler.js)
+      └── readOnlyKeyHandler (src\renderer\components\editor\editorComponent.js)
     * Escutadores:
-      ├── setupListeners (src\renderer\components\editor\editorComponent.js)
-      └── setupListeners (src\renderer\components\explorer\explorerComponent.js)
+      └── ---
 
-⚙️ [file:get]
+⚙️ [file:opened]
     * Emissores:
-      └── setupListeners (src\renderer\components\editor\editorComponent.js)
+      └── renderFileContent (src\renderer\components\editor\editorComponent.js)
     * Escutadores:
+      ├── setupListeners (src\renderer\components\explorer\explorerComponent.js)
       └── registerEvents (src\renderer\controllers\uiController.js)
 
 ⚙️ [file:save-temp]

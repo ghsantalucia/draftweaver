@@ -29,13 +29,29 @@ export class UiController {
    * @private
    */
   registerEvents() {
+    // Evento de inicialização do app
+    uiBus.on("app:ready", async () => {
+      // Recupera lista de livros cadastrados
+      const bookList = await book.fetchBooks(this.state, this.services.book);
+      // Envia para preparar o frontend
+      uiBus.emit("books:updated", bookList);
+      // Restaura o último livro aberto caso exista
+      uiBus.emit("book:selected", this.state.currentBookPath);
+      // Restaura o último arquivo aberto caso exista
+      if (this.state.currentFilePath) {
+        uiBus.emit("editor:open-file", { path: this.state.currentFilePath });
+      } else {
+        uiBus.emit("editor:reseted");
+      }
+    });
+
     //==========================================//
     //         Requisições de UI (uiBus)        //
     //==========================================//
 
     // Solicita lista de livros do backend
     uiBus.onReq("books:fetch-list", (req) => {
-      book.onFetchBooks(req, this.state, this.services.book);
+      book.onFetchBooksList(req, this.services.book);
     });
 
     // Intercepta o evento file:get e delega para o fileHandler passando os dados e o state
@@ -60,6 +76,11 @@ export class UiController {
       } else {
         book.onBookSelect(this.state, e);
       }
+    });
+
+    // Lida com editor resetado (nenhum arquivo aberto)
+    uiBus.on("editor:reseted", () => {
+      file.onEditorReset(this.state);
     });
 
     // Solicita o salvamento de um arquivo temporário (.temp) via IPC

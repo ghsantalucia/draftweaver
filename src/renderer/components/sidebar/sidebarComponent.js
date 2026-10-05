@@ -24,12 +24,14 @@ export class SidebarComponent extends Component {
 
   async onInit() {
     // Solicita que o controller/handler busque e popule o select de livros
-    await this.updateBookList();
-    this.selectLastBook();
+    // await this.updateBookList();
+    // this.selectLastBook();
   }
 
   /**
    * Configura os ouvintes de eventos da interface da sidebar.
+   * @private
+   * @returns {void}
    */
   setupListeners() {
     // Sincroniza o <select> com o livro atualmente selecionado
@@ -43,36 +45,36 @@ export class SidebarComponent extends Component {
         selectEl.value = bookPath;
       }
     });
+    // Solicita atualização da lista de livros quando o backend notifica mudança
+    this.uiBus.on("books:updated", (bookList) => {
+      this.updateBookList(bookList);
+    });
   }
 
-  async updateBookList() {
-    try {
-      const response = await this.uiBus.req("books:fetch-list");
-      const books = response?.books || [];
+  /**
+   * Atualiza select de livros
+   * @param {Array[Object]} books
+   * @returns {void}
+   * @private
+   */
+  async updateBookList(books) {
+    const selectBookEl = this.element.querySelector("#select-book");
+    if (!selectBookEl) return;
 
-      // Atualiza o state local ou global
-      this.state.bookList = books;
+    selectBookEl.innerHTML = "";
 
-      const selectBookEl = this.element.querySelector("#select-book");
-      if (!selectBookEl) return;
-
-      selectBookEl.innerHTML = "";
-
-      if (books.length === 0) {
-        selectBookEl.innerHTML =
-          '<option value="">Nenhum livro encontrado</option>';
-        return;
-      }
-
-      books.forEach((book) => {
-        const option = document.createElement("option");
-        option.value = book.fullPath;
-        option.innerText = book.title;
-        selectBookEl.appendChild(option);
-      });
-    } catch (error) {
-      console.error("[Sidebar] Erro ao atualizar lista de livros:", error);
+    if (books.length === 0) {
+      selectBookEl.innerHTML =
+        '<option value="">Nenhum livro encontrado</option>';
+      return;
     }
+
+    books.forEach((book) => {
+      const option = document.createElement("option");
+      option.value = book.fullPath;
+      option.innerText = book.title;
+      selectBookEl.appendChild(option);
+    });
   }
 
   selectLastBook() {

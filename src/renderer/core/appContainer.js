@@ -105,10 +105,9 @@ export class AppContainer {
     // Define eventos globais
     this.setupGlobalEvents();
 
-    // TODO: Implementar métodos de UI iniciais
-    // const books = await this.services.book.popularSelectDeLivros();
-    // await this.services.book.restoreLastSelectedBook(books);
-    // this.services.file.restoreLastOpenedFile();
+    // Emite eventos globais de que a aplicação está pronta para interações
+    uiBus.emit("app:ready");
+    domainBus.emit("app:ready");
   }
 
   /**
@@ -120,6 +119,7 @@ export class AppContainer {
       localStorage.getItem("last_selected_book") || null;
     this.state.currentFilePath =
       localStorage.getItem("last_opened_file") || null;
+    console.log(this.state.currentFilePath); // FIXME: Remover este log após depuração
   }
 
   /**

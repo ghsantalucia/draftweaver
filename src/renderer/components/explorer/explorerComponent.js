@@ -49,7 +49,7 @@ export class ExplorerComponent extends Component {
 
       // Ouve quando o arquivo atual muda para sincronizar a seleção visual na árvore
       this.uiBus.on("file:opened", (payload) => {
-        this.syncTreeSelection(payload.relativePath);
+        this.autoOpenFileByPath(payload.relativePath);
       });
     }
 
@@ -351,41 +351,106 @@ export class ExplorerComponent extends Component {
   }
 
   /**
-   * Sincroniza a seleção na árvore com base no caminho relativo informado.
-   * @param {string} relativePath - Caminho relativo do arquivo a ser selecionado e focado.
+   * Abre/seleciona o arquivo na árvore de forma completa (abas, switch avançado, pastas e seleção),
+   * aguardando de forma resiliente caso a árvore ainda esteja sendo renderizada.
+   * @param {string} targetPath - Caminho relativo do arquivo.
    * @returns {void}
    */
-  syncTreeSelection(relativePath) {
-    if (!relativePath) return;
+  async autoOpenFileByPath(targetPath) {
+    if (!targetPath) return;
 
-    const normalizedPath = relativePath.replace(/\\/g, "/");
-    let fileSpan = this.element.querySelector(
-      `.file-name[data-path="${CSS.escape(normalizedPath)}"]`,
-    );
+    let decodedPath = targetPath;
+    try {
+      decodedPath = decodeURIComponent(targetPath);
+    } catch (e) {
+      console.error("[ExplorerComponent] Erro ao decodificar targetPath:", e);
+    }
 
-    if (!fileSpan) {
-      const allFiles = this.element.querySelectorAll(".file-name");
-      for (const span of allFiles) {
-        const spanPath = span.getAttribute("data-path")?.replace(/\\/g, "/");
-        if (spanPath === normalizedPath) {
-          fileSpan = span;
-          break;
+    const cleanTargetPath = decodedPath
+      .replace(/\\/g, "/")
+      .replace(/^\/+/, "")
+      .replace(/^content\//, "")
+      .replace(/^\.\.\/books\//, "");
+
+    // 1. Identifica a raiz (notes, content, assets) para selecionar a aba correta
+    const pathSegments = cleanTargetPath.split("/");
+    const rootFolder = pathSegments[1]; // ex: "content", "notes", "assets"
+
+    if (rootFolder) {
+      const tabBtn = this.element.querySelector(
+        `.tab-btn[folder="${rootFolder}"]`,
+      );
+      if (tabBtn) {
+        this.element
+          .querySelectorAll(".tab-btn")
+          .forEach((b) => b.classList.remove("active"));
+        tabBtn.classList.add("active");
+
+        const fileTreeContainer = this.element.querySelector("#file-tree");
+        if (fileTreeContainer) {
+          fileTreeContainer.classList.remove(
+            "active-tab-notes",
+            "active-tab-content",
+            "active-tab-assets",
+          );
+          fileTreeContainer.classList.add(`active-tab-${rootFolder}`);
         }
       }
     }
 
-    if (!fileSpan) return;
+    // Função interna para tentar localizar e marcar o elemento na árvore
+    const attemptSelection = () => {
+      const fileSpan = this.element.querySelector(
+        `.file-name[data-path$="${CSS.escape(cleanTargetPath)}"]`,
+      );
 
-    this.element
-      .querySelectorAll(".file-name")
-      .forEach((el) => el.classList.remove("active"));
-    fileSpan.classList.add("active");
+      if (!fileSpan) return false;
 
-    // Expande os pais colapsados
-    let parentFolder = fileSpan.closest(".folder");
-    while (parentFolder) {
-      parentFolder.classList.remove("collapsed");
-      parentFolder = parentFolder.parentElement?.closest(".folder");
+      const parentLi = fileSpan.closest("li");
+
+      // 2. Ativa o switch avançado se o arquivo for avançado
+      if (parentLi && parentLi.classList.contains("advanced-item")) {
+        const modeToggle = this.element.querySelector("#mode-toggle");
+        const container = this.element.querySelector("#file-tree");
+        if (modeToggle) {
+          modeToggle.checked = true;
+          modeToggle.dispatchEvent(new Event("change"));
+        }
+        if (container) container.classList.add("show-advanced");
+      }
+
+      // 3. Expande todas as pastas pai recursivamente
+      let currentElement = fileSpan.parentElement;
+      while (currentElement && currentElement !== this.element) {
+        if (
+          currentElement.tagName === "LI" &&
+          currentElement.classList.contains("folder")
+        ) {
+          currentElement.classList.remove("collapsed");
+          const folderIcon = currentElement.querySelector(
+            ".folder-name > .icon-folder",
+          );
+          if (folderIcon) {
+            folderIcon.classList.replace("fa-folder", "fa-folder-open");
+          }
+        }
+        currentElement = currentElement.parentElement;
+      }
+
+      // 4. Seleciona o arquivo visualmente
+      this.element
+        .querySelectorAll(".file-name")
+        .forEach((el) => el.classList.remove("active"));
+      fileSpan.classList.add("active");
+
+      return true;
+    };
+
+    // Tenta executar imediatamente; se a árvore estiver carregando, tenta novamente após um pequeno delay
+    if (!attemptSelection()) {
+      setTimeout(() => {
+        attemptSelection();
+      }, 150);
     }
   }
 }
