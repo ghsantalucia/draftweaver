@@ -58,23 +58,24 @@ Certifique-se de ter o **Node.js** (versão 18 ou superior) instalado na sua má
 ### Instalação (Ambiente de Desenvolvimento)
 
 1. Clone este repositório:
-   ```bash
+```bash
    git clone [https://github.com/ghsantalucia/draftweaver.git](https://github.com/ghsantalucia/draftweaver.git)
+```
 
-    Acesse a pasta do projeto:
-    Bash
-
+Acesse a pasta do projeto:
+```bash
     cd draftweaver
+```
 
-    Instale as dependências:
-    Bash
-
+Instale as dependências:
+```bash
     npm install
+```
 
-    Execute a aplicação em modo de desenvolvimento:
-    Bash
-
+Execute a aplicação em modo de desenvolvimento:
+```bash
     npm start
+```
 
 (Nota: Para usuários finais, executáveis compilados para Windows/Linux/macOS serão disponibilizados na aba de Releases das versões estáveis).
 
