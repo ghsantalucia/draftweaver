@@ -69,24 +69,18 @@ Estrutura do Projeto com Descrições:
 │       │   │   └── template.html
 │       │   ├── Component.js
 │       │   ├── [editor]
-│       │   │   ├── editor.js — Controla a inicialização do ToastUI Editor, leitura e salvamento de arquivos Markdown e aplicação de regras de permissão de escrita na UI.
 │       │   │   ├── editorComponent.js — Componente responsável pela renderização estrutural do editor markdown e manipulação de eventos via uiBus.
-│       │   │   ├── index.js — Barrel do módulo Editor, exportando funções e componentes essenciais para a construção do editor de texto e interação com o usuário.
 │       │   │   ├── styles.css
 │       │   │   └── template.html
 │       │   ├── [editor-overlay]
 │       │   │   ├── editorOverlayComponent.js — Componente responsável pela renderização estrutural do editor overlay
-│       │   │   ├── editorOverlays.js — Funções utilitárias para controlar overlays na interface.
 │       │   │   ├── styles.css
 │       │   │   └── template.html
 │       │   ├── [explorer]
 │       │   │   ├── explorerComponent.js — Componente responsável pela renderização estrutural e lógica do explorer de arquivos.
-│       │   │   ├── explorerUi.js — Funções da UI do explorador de arquivos (File Explorer), incluindo a renderização da árvore de arquivos, eventos de interação e manipulação de elementos DOM relacionados.
-│       │   │   ├── index.js — Barrel do módulo Explorer, exportando funções e componentes essenciais para a construção da árvore de arquivos e interação com o usuário.
 │       │   │   ├── nodeTemplate.html
 │       │   │   ├── styles.css
-│       │   │   ├── template.html
-│       │   │   └── tree.js — Constrói e gerencia a interface da árvore de arquivos e pastas no painel lateral com suporte a filtros YAML e permissões de exibição.
+│       │   │   └── template.html
 │       │   ├── [modal]
 │       │   │   ├── modalComponent.js — Classe gerenciadora de modais em pilha (Stack).
 │       │   │   ├── modalManager.js — Classe gerenciadora da pilha de modais dinâmicos da aplicação.
@@ -103,7 +97,6 @@ Estrutura do Projeto com Descrições:
 │       │   ├── [toast]
 │       │   │   ├── styles.css
 │       │   │   ├── template.html
-│       │   │   ├── toast.js — Funções utilitárias para exibir notificações do tipo Toast na interface.
 │       │   │   └── toastComponent.js — Componente responsável pela renderização estrutural do toast.
 │       │   └── [toolbar]
 │       │       ├── animations.js — Gerencia as animações da interface do usuário

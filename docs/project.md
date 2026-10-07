@@ -79,6 +79,7 @@ Abandonamos chamadas diretas e acopladas entre funções. A comunicação do sis
 
 ## 5. Planejamento Futuro (Roadmap Técnico)
 
+- **TypeScript:** Adoção de tipagem via TypeScript em todo o projeto.
 - **Tailwind CSS:** Adoção gradual de classes utilitárias para modernizar a estilização dos componentes e coexistir de forma segura com o CSS atual.
 - **Testes Automatizados:**
   - _Vitest_ para testes unitários e de integração integrados ao Vite.

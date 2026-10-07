@@ -4,6 +4,12 @@
 
 [uiBus] - Eventos da Interface Gráfica
 --------------------------------------------------
+⚙️ [advanced-mode:toggle]
+    * Emissores:
+      └── input#mode-toggle (src\renderer\components\explorer\template.html)
+    * Escutadores:
+      └── registerEvents (src\renderer\controllers\uiController.js)
+
 ⚙️ [ai-chat:toggle]
     * Emissores:
       └── div#ai-assistant-header (src\renderer\components\chat\template.html)
@@ -20,8 +26,8 @@
     * Emissores:
       └── onBookSelect (src\renderer\controllers\handlers\bookHandler.js)
     * Escutadores:
-      ├── setupListeners (src\renderer\components\editor\editorComponent.js)
-      └── setupListeners (src\renderer\components\sidebar\sidebarComponent.js)
+      ├── setupListeners (src\renderer\components\sidebar\sidebarComponent.js)
+      └── registerEvents (src\renderer\controllers\uiController.js)
 
 ⚙️ [book:selected]
     * Emissores:
@@ -72,7 +78,14 @@
     * Emissores:
       ├── setupInternalLinkHandler (src\renderer\components\editor\editorComponent.js)
       ├── onclick (src\renderer\components\explorer\explorerComponent.js)
+      ├── onBookChange (src\renderer\controllers\handlers\bookHandler.js)
       └── registerEvents (src\renderer\controllers\uiController.js)
+    * Escutadores:
+      └── setupListeners (src\renderer\components\editor\editorComponent.js)
+
+⚙️ [editor:reset]
+    * Emissores:
+      └── onBookChange (src\renderer\controllers\handlers\bookHandler.js)
     * Escutadores:
       └── setupListeners (src\renderer\components\editor\editorComponent.js)
 
@@ -125,6 +138,12 @@
       └── ---
     * Escutadores:
       └── setupListeners (src\renderer\components\explorer\explorerComponent.js)
+
+⚙️ [folder:toggle]
+    * Emissores:
+      └── li.folder (src\renderer\components\explorer\nodeTemplate.html)
+    * Escutadores:
+      └── registerEvents (src\renderer\controllers\uiController.js)
 
 ⚙️ [modal:open]
     * Emissores:

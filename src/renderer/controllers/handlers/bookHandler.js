@@ -145,6 +145,7 @@ export function onBookChange(bookPath, state) {
   // 3. Reseta o editor por segurança, limpando o arquivo anterior
   if (uiBus) {
     uiBus.emit("editor:reset");
+    uiBus.emit("chat:clear");
   }
 
   // 4. Se o livro possui um arquivo salvo anteriormente, restaura-o
