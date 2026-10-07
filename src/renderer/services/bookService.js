@@ -94,4 +94,33 @@ export class BookService {
       console.warn(`[BOOK SERVICE] Falha ao ler config.json: ${err.message}`);
     }
   }
+
+  /**
+   * Serializa e persiste o config.json do livro atualmente selecionado.
+   * @async
+   * @returns {Promise<void>}
+   */
+  async updateConfig() {
+    if (!this.state || !this.state.currentBookPath || !this.state.bookList) {
+      return;
+    }
+
+    const currentBook = this.state.bookList.find(
+      (book) => book.fullPath === this.state.currentBookPath,
+    );
+    if (!currentBook) return;
+
+    // Remove os atributos artificiais adicionados pelo main.js antes de salvar
+    const { folderName, fullPath, ...configData } = currentBook;
+
+    // Monta o caminho absoluto para o config.json do livro
+    const configPath = `${fullPath}/config.json`;
+    const jsonContent = JSON.stringify(configData, null, 2);
+
+    try {
+      await window.electronAPI.saveFile(configPath, jsonContent);
+    } catch (err) {
+      console.error("[BookService] Erro ao salvar config.json do livro:", err);
+    }
+  }
 }

@@ -1,10 +1,15 @@
 {{#if isFolder}}
 <li
-  class="folder collapsed {{#unless parentMeta}}folder-root {{rootClass}}{{/unless}} {{#if meta.advanced}}advanced-item{{/if}}"
+  class="folder {{#unless isOpen}}collapsed{{/unless}} {{#unless parentMeta}}folder-root {{rootClass}}{{/unless}} {{#if meta.advanced}}advanced-item{{/if}}"
+  event-click="folder:toggle"
+  data-path="{{relativePath}}"
+  data-status="{{#if isOpen}}open{{else}}collapsed{{/if}}"
 >
-  <span class="folder-name" data-path="{{relativePath}}">
+  <span class="folder-name">
     <i class="fa-solid fa-chevron-right tree-arrow"></i>
-    <i class="fa-solid fa-folder icon-folder"></i>
+    <i
+      class="fa-solid {{#if isOpen}}fa-folder-open{{else}}fa-folder{{/if}} icon-folder"
+    ></i>
     <span class="folder-title">{{meta.title}}</span>
   </span>
 </li>

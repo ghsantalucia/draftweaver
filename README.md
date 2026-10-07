@@ -46,7 +46,6 @@ O software foi projetado para oferecer versatilidade total na criação, suporta
 * **Linguagens & Estilo:** JavaScript (ES6+ Module), HTML5, CSS3 Custom Properties
 * **Editor Visual:** [Toast UI Editor](https://nhn.github.io/tue.editor/)
 * **Animações & UI:** GSAP (GreenSock)
-* **Live Reloading (Dev):** Nodemon
 
 ---
 

@@ -44,6 +44,7 @@ export class ExplorerComponent extends Component {
     // Ouve alterações no livro atual para re-renderizar a árvore
     if (this.uiBus) {
       this.uiBus.on("book:selected", () => {
+        this.syncAdvancedModeView();
         this.renderTree();
       });
 
@@ -129,6 +130,37 @@ export class ExplorerComponent extends Component {
     const defaultTab = this.element.querySelector('.tab-btn[folder="content"]');
     if (defaultTab) {
       defaultTab.click();
+    }
+  }
+
+  /**
+   * Sincroniza o estado visual do switch e do container de arquivos avançados
+   * com base nas configurações (config.json) do livro atual.
+   * @returns {void}
+   */
+  syncAdvancedModeView() {
+    if (!this.state || !this.state.bookList || !this.state.currentBookPath)
+      return;
+
+    const currentBook = this.state.bookList.find(
+      (b) => b.fullPath === this.state.currentBookPath,
+    );
+
+    const isAdvanced = currentBook?.explorer_state?.advanced_mode || false;
+
+    const modeToggle = this.element.querySelector("#mode-toggle");
+    const fileTreeContainer = this.element.querySelector("#file-tree");
+
+    if (modeToggle) {
+      modeToggle.checked = isAdvanced;
+    }
+
+    if (fileTreeContainer) {
+      if (isAdvanced) {
+        fileTreeContainer.classList.add("show-advanced");
+      } else {
+        fileTreeContainer.classList.remove("show-advanced");
+      }
     }
   }
 
@@ -255,13 +287,33 @@ export class ExplorerComponent extends Component {
       else rootClass = "notes-folder";
     }
 
-    // Renderiza usando o template único com isFolder: true
+    // Verifica se esta pasta está marcada como aberta no config.json do livro atual
+    let isOpen = false;
+    if (this.state && this.state.bookList && this.state.currentBookPath) {
+      const currentBook = this.state.bookList.find(
+        (b) => b.fullPath === this.state.currentBookPath,
+      );
+      if (
+        currentBook &&
+        currentBook.explorer_state &&
+        Array.isArray(currentBook.explorer_state.open_folders)
+      ) {
+        // Normaliza as barras para garantir o match exato com o path salvo
+        const normalizedRelPath = relativePath.replace(/\\/g, "/");
+        isOpen = currentBook.explorer_state.open_folders.some(
+          (p) => p && p.replace(/\\/g, "/") === normalizedRelPath,
+        );
+      }
+    }
+
+    // Renderiza usando o template único com isFolder: true e a flag isOpen
     const htmlString = this.nodeTemplate({
       isFolder: true,
       meta,
       relativePath,
       parentMeta,
       rootClass,
+      isOpen,
     });
     const templateContainer = document.createElement("template");
     templateContainer.innerHTML = htmlString.trim();
@@ -269,15 +321,17 @@ export class ExplorerComponent extends Component {
 
     const span = li.querySelector(".folder-name");
     span.onclick = (e) => {
-      e.stopPropagation();
+      // e.stopPropagation();
       li.classList.toggle("collapsed");
 
       const folderIcon = span.querySelector(".icon-folder");
       if (folderIcon) {
         if (li.classList.contains("collapsed")) {
           folderIcon.classList.replace("fa-folder-open", "fa-folder");
+          li.dataset.status = "collapsed";
         } else {
           folderIcon.classList.replace("fa-folder", "fa-folder-open");
+          li.dataset.status = "open";
         }
       }
     };
@@ -287,7 +341,6 @@ export class ExplorerComponent extends Component {
 
     return li;
   }
-
   /**
    * Cria o nó de arquivo emitindo eventos via uiBus e utilizando o template unificado.
    * @param {Object} entry - Objeto contendo os dados do arquivo (caminho, nome, etc.).
@@ -336,7 +389,7 @@ export class ExplorerComponent extends Component {
 
     const span = li.querySelector(".file-name");
     span.onclick = (e) => {
-      e.stopPropagation();
+      // e.stopPropagation();
       this.element
         .querySelectorAll(".file-name")
         .forEach((el) => el.classList.remove("active"));
@@ -357,6 +410,10 @@ export class ExplorerComponent extends Component {
    * @returns {void}
    */
   async autoOpenFileByPath(targetPath) {
+    console.log(
+      "[ExplorerComponent] Tentando abrir arquivo na árvore:",
+      targetPath,
+    );
     if (!targetPath) return;
 
     let decodedPath = targetPath;

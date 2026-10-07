@@ -148,7 +148,7 @@ export function setupIpcHandlers(mainWindow) {
         if (entry.isDirectory()) {
           const bookPath = path.join(booksDir, entry.name);
           const configPath = path.join(bookPath, "config.json");
-          let title = entry.name;
+          let configData = {};
 
           if (fs.existsSync(configPath)) {
             try {
@@ -156,8 +156,7 @@ export function setupIpcHandlers(mainWindow) {
                 configPath,
                 "utf-8",
               );
-              const config = JSON.parse(configContent);
-              if (config.book_title) title = config.book_title;
+              configData = JSON.parse(configContent);
             } catch (e) {
               console.error(`Erro ao ler config.json em ${entry.name}:`, e);
             }
@@ -165,8 +164,8 @@ export function setupIpcHandlers(mainWindow) {
 
           books.push({
             folderName: entry.name,
-            title: title,
             fullPath: bookPath,
+            ...configData, // Espalha todas as propriedades do config.json (title, ai_lock, explorer_state, etc.)
           });
         }
       }

@@ -51,7 +51,7 @@ export class EditorComponent extends Component {
       });
 
       // Reseta e bloqueia o editor sempre que um novo livro/projeto for selecionado
-      this.uiBus.on("book:changed", () => {
+      this.uiBus.on("editor:reset", () => {
         this.resetEditorState();
       });
     }

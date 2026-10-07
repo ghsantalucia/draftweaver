@@ -63,6 +63,11 @@ export class UiController {
     //             Eventos  de  UI              //
     //==========================================//
 
+    // Atualiza estado da árvore de arquivos quando uma pasta é aberta ou fechada
+    uiBus.on("folder:toggle", (payload) => {
+      book.onFolderToggle(this.state, this.services.book, payload.data);
+    });
+
     // Evento que chama para tela de sincronização de arquivos .temp
     uiBus.on("sync:open-modal", () => {
       file.onSyncOpenModal();
@@ -78,6 +83,11 @@ export class UiController {
       }
     });
 
+    //
+    uiBus.on("book:changed", (bookPath) => {
+      book.onBookChange(bookPath, this.state);
+    });
+
     // Lida com editor resetado (nenhum arquivo aberto)
     uiBus.on("editor:reseted", () => {
       file.onEditorReset(this.state);
@@ -90,7 +100,12 @@ export class UiController {
 
     // Evento disparado quando um arquivo é aberto com sucesso
     uiBus.on("file:opened", (data) => {
-      file.onFileOpened(this.state, data);
+      file.onFileOpened(this.state, this.services.book, data);
+    });
+
+    // Evento disparado quando o modo avançado é alternado
+    uiBus.on("advanced-mode:toggle", (payload) => {
+      book.onAdvancedModeToggle(this.state, this.services.book, payload);
     });
   }
 }

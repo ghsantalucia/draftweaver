@@ -10,18 +10,25 @@
     * Escutadores:
       └── setupListeners (src\renderer\components\chat\chatComponent.js)
 
+⚙️ [app:ready]
+    * Emissores:
+      └── init (src\renderer\core\appContainer.js)
+    * Escutadores:
+      └── registerEvents (src\renderer\controllers\uiController.js)
+
 ⚙️ [book:changed]
     * Emissores:
       └── onBookSelect (src\renderer\controllers\handlers\bookHandler.js)
     * Escutadores:
+      ├── setupListeners (src\renderer\components\editor\editorComponent.js)
       └── setupListeners (src\renderer\components\sidebar\sidebarComponent.js)
 
 ⚙️ [book:selected]
     * Emissores:
       ├── selectLastBook (src\renderer\components\sidebar\sidebarComponent.js)
-      └── select#select-book (src\renderer\components\sidebar\template.html)
+      ├── select#select-book (src\renderer\components\sidebar\template.html)
+      └── registerEvents (src\renderer\controllers\uiController.js)
     * Escutadores:
-      ├── setupListeners (src\renderer\components\editor\editorComponent.js)
       ├── setupListeners (src\renderer\components\explorer\explorerComponent.js)
       └── registerEvents (src\renderer\controllers\uiController.js)
 
@@ -36,6 +43,12 @@
       └── onConfigChanged (src\renderer\controllers\handlers\configHandler.js)
     * Escutadores:
       └── ---
+
+⚙️ [books:updated]
+    * Emissores:
+      └── registerEvents (src\renderer\controllers\uiController.js)
+    * Escutadores:
+      └── setupListeners (src\renderer\components\sidebar\sidebarComponent.js)
 
 ⚙️ [editor-overlay:close]
     * Emissores:
@@ -58,15 +71,17 @@
 ⚙️ [editor:open-file]
     * Emissores:
       ├── setupInternalLinkHandler (src\renderer\components\editor\editorComponent.js)
-      └── onclick (src\renderer\components\explorer\explorerComponent.js)
+      ├── onclick (src\renderer\components\explorer\explorerComponent.js)
+      └── registerEvents (src\renderer\controllers\uiController.js)
     * Escutadores:
       └── setupListeners (src\renderer\components\editor\editorComponent.js)
 
 ⚙️ [editor:reseted]
     * Emissores:
-      └── resetEditorState (src\renderer\components\editor\editorComponent.js)
+      ├── resetEditorState (src\renderer\components\editor\editorComponent.js)
+      └── registerEvents (src\renderer\controllers\uiController.js)
     * Escutadores:
-      └── ---
+      └── registerEvents (src\renderer\controllers\uiController.js)
 
 ⚙️ [editor:saved-success]
     * Emissores:
@@ -167,6 +182,12 @@
       └── checkAILock (src\renderer\services\bookService.js)
     * Escutadores:
       └── registerEvents (src\renderer\controllers\domainController.js)
+
+⚙️ [app:ready]
+    * Emissores:
+      └── init (src\renderer\core\appContainer.js)
+    * Escutadores:
+      └── ---
 
 ⚙️ [book:selected]
     * Emissores:

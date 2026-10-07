@@ -1,4 +1,9 @@
 {
-    "book_title": "Template",
-    "ai_lock": false
+  "book_title": "Template",
+  "ai_lock": false,
+  "explorer_state": {
+    "open_file": null,
+    "open_folders": [],
+    "advanced_mode": true
+  }
 }

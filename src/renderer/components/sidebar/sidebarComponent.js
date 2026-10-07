@@ -22,12 +22,6 @@ export class SidebarComponent extends Component {
     super(selector, context, templateHtml, params, parent);
   }
 
-  async onInit() {
-    // Solicita que o controller/handler busque e popule o select de livros
-    // await this.updateBookList();
-    // this.selectLastBook();
-  }
-
   /**
    * Configura os ouvintes de eventos da interface da sidebar.
    * @private
@@ -45,6 +39,7 @@ export class SidebarComponent extends Component {
         selectEl.value = bookPath;
       }
     });
+
     // Solicita atualização da lista de livros quando o backend notifica mudança
     this.uiBus.on("books:updated", (bookList) => {
       this.updateBookList(bookList);
@@ -72,7 +67,7 @@ export class SidebarComponent extends Component {
     books.forEach((book) => {
       const option = document.createElement("option");
       option.value = book.fullPath;
-      option.innerText = book.title;
+      option.innerText = book.book_title;
       selectBookEl.appendChild(option);
     });
   }

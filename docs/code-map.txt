@@ -14,7 +14,6 @@
      │   ├── aiGateway.js — [Gerencia as conexões e o roteamento de requisições para os gateways de Inteligência Artificial.]
      │   └── aiTools.js — [Define as ferramentas, funções auxiliares e utilitários integrados para uso dos modelos de Inteligência Artificial.]
      ├── app.js — [Ponto de entrada do frontend (Renderer), responsável por inicializar o container principal da aplicação.]
-     │   └── ⚙️ setupUIEvents()
      ├── [components]
      │   ├── Component.js
      │   │   └── 📦 class Component — Classe base abstrata para todos os componentes do DraftWeaver. Gerencia ciclo de vida, herança pai-filho (Composite) e renderização via Handlebars.
@@ -79,7 +78,6 @@
      │   │   │       ├── ⚙️ onInit() — Executado logo após a renderização inicial do componente.
      │   │   │       ├── ⚙️ setupListeners() — Configura os ouvintes de eventos da interface exclusivamente via uiBus.
      │   │   │       ├── ⚙️ initMarkdownEditor() — Inicializa a biblioteca ToastUI Editor no elemento DOM recém-criado.
-     │   │   │       ├── ⚙️ openLastFile() — Abre o último arquivo acessado, se disponível no estado global.
      │   │   │       ├── ⚙️ openFile(path) — Gerencia a abertura de arquivos no editor, requisitando o conteúdo via uiBus e renderizando-o.
      │   │   │       ├── ⚙️ setupInternalLinkHandler() — Escuta cliques dentro do container do editor para capturar navegações por links internos.
      │   │   │       ├── ⚙️ handleEditorChange() — Monitora digitação e aguarda 1s sem digitação para disparar autosave.
@@ -105,7 +103,8 @@
      │   │   │       ├── ⚙️ toggleAdvancedExplorerView() — Controla e alterna a visibilidade dos elementos avançados no explorador.
      │   │   │       ├── ⚙️ updateAdvancedVisibility()
      │   │   │       ├── ⚙️ tabSelectionEvents() — Gerencia a seleção de abas de navegação do explorador.
-     │   │   │       └── ⚙️ syncTreeSelection(relativePath) — Sincroniza a seleção na árvore com base no caminho relativo informado.
+     │   │   │       ├── ⚙️ setTimeout(()
+     │   │   │       └── ⚙️ attemptSelection()
      │   │   ├── explorerUi.js — [Funções da UI do explorador de arquivos (File Explorer), incluindo a renderização da árvore de arquivos, eventos de interação e manipulação de elementos DOM relacionados.]
      │   │   │   ├── ⚙️ initExplorerEvents() — Inicializa todos os ouvintes de eventos e comportamentos do explorador de arquivos.
      │   │   │   ├── ⚙️ toggleAdvancedExplorerView() — Controla e alterna a visibilidade dos elementos avançados no explorador de arquivos com base no estado do interruptor.
@@ -135,18 +134,13 @@
      │   │            ├── ⚙️ toggleOverlay(show) — Alterna a visibilidade do overlay global escuro de fundo.
      │   │            └── ⚙️ setupListeners() — Configura os ouvintes de eventos globais no barramento uiBus.
      │   ├── [settings]
-     │   │   ├── index.js — [Barrel do módulo Settings, exportando funções e componentes essenciais para a configuração das preferências do usuário.]
-     │   │   ├── settingsComponent.js — [Componente responsável pela renderização estrutural da drawer de configurações]
-     │   │   │   └── 📦 class SettingsComponent — Representa a drawer de configurações.
-     │   │   │       ├── ⚙️ constructor(selector, context, params, parent = null) — Cria uma instância da classe
-     │   │   │       ├── ⚙️ setupListeners() — Configura os ouvintes de eventos.
-     │   │   │       ├── ⚙️ open() — Abre a gaveta de configurações.
-     │   │   │       ├── ⚙️ close() — Fecha a gaveta de configurações.
-     │   │   │       └── ⚙️ toggleThemeSwitch(theme) — Altera o estado do switch de alteração do theme
-     │   │   └── settingsUi.js — [Responsável pelos eventos e comportamentos da interface do Menu de Configurações (Settings Drawer).]
-     │   │        ├── ⚙️ openSettingsDrawer() — Abre a gaveta de configurações.
-     │   │        ├── ⚙️ closeSettingsDrawer() — Fecha a gaveta de configurações.
-     │   │        └── ⚙️ initSettingsEvents() — Registra os ouvintes de evento para os botões do menu de configurações.
+     │   │   └── settingsComponent.js — [Componente responsável pela renderização estrutural da drawer de configurações]
+     │   │        └── 📦 class SettingsComponent — Representa a drawer de configurações.
+     │   │            ├── ⚙️ constructor(selector, context, params, parent = null) — Cria uma instância da classe
+     │   │            ├── ⚙️ setupListeners() — Configura os ouvintes de eventos.
+     │   │            ├── ⚙️ open() — Abre a gaveta de configurações.
+     │   │            ├── ⚙️ close() — Fecha a gaveta de configurações.
+     │   │            └── ⚙️ toggleThemeSwitch(theme) — Altera o estado do switch de alteração do theme
      │   ├── [sidebar]
      │   │   └── sidebarComponent.js — [Componente responsável pela renderização estrutural da barra lateral (Sidebar).]
      │   │        └── 📦 class SidebarComponent — Representa o painel lateral esquerdo da aplicação.
@@ -184,8 +178,9 @@
      │   │       └── ⚙️ handleAiLockStateChanged(payload) — Handler para mudança de estado da trava de IA.
      │   ├── [handlers]
      │   │   ├── bookHandler.js — [Handler dos eventos relacionados ao livro/projeto]
+     │   │   │   ├── ⚙️ fetchBooks(state, bookService)
      │   │   │   ├── ⚙️ onBookSelect(state, bookPath) — Handler de troca de livro.
-     │   │   │   └── ⚙️ onFetchBooks(req, state, bookService) — Solicita lista de livros do backend e também confere qual o último livro selecionado. @async
+     │   │   │   └── ⚙️ onFetchBooksList(req, bookService) — Solicita lista de livros do backend e também confere qual o último livro selecionado. @async
      │   │   ├── chapterHandler.js
      │   │   ├── characterHandler.js
      │   │   ├── configHandler.js — [Handler para gerenciar alterações no arquivo config.json dos projetos.]
@@ -193,7 +188,8 @@
      │   │        ├── ⚙️ onSyncOpenModal() — Handler que abre modal e exibe todos os arquivos .temp do projeto para serem sincronizados
      │   │        ├── ⚙️ onFileGet(req, state, fileService) — Realiza a consulta do arquivo no disco (com prioridade .temp), atualiza o state e notifica globalmente.
      │   │        ├── ⚙️ onSaveTemp(path, content)
-     │   │        └── ⚙️ onFileOpened(state, payload) — Trata o evento de arquivo aberto, atualizando o state global e armazenando a referência do último arquivo aberto.
+     │   │        ├── ⚙️ onFileOpened(state, payload) — Trata o evento de arquivo aberto, atualizando o state global e armazenando a referência do último arquivo aberto.
+     │   │        └── ⚙️ onEditorReset(state)
      │   └── uiController.js — [Gerencia e despacha os eventos de interface (UI) vindos do uiBus para os handlers visuais.]
      │        └── 📦 class UiController — Controller responsável pelas reações visuais da interface.
      │            ├── ⚙️ constructor(services, state) — Cria uma instância do UiController e registra os ouvintes de eventos da UI.
@@ -238,9 +234,7 @@
      │   ├── fileService.js — [Serviço responsável por centralizar as operações de CRUD de arquivos (leitura, escrita, restauração e resolução de caminhos), servindo como ponte entre o Editor e o Sistema de Arquivos.]
      │   │   └── 📦 class FileService — Serviço de manipulação e persistência de arquivos locais via IPC do Electron.
      │   │       ├── ⚙️ constructor(state) — Cria uma instância do FileService.
-     │   │       ├── ⚙️ getTempPath(filePath) — Retorna o caminho do arquivo temporário (.temp) correspondente.
-     │   │       ├── ⚙️ autoOpenFileByPath(targetPath) — Abre um arquivo no editor e o seleciona na árvore de arquivos com base no caminho alvo.
-     │   │       └── ⚙️ restoreLastOpenedFile() — Tenta reabrir o último arquivo salvo no localStorage (Executar SOMENTE na inicialização).
+     │   │       └── ⚙️ getTempPath(filePath) — Retorna o caminho do arquivo temporário (.temp) correspondente.
      │   └── serviceManager.js — [Agregador central de serviços (Facade). Instancia e gerencia o acesso]
      │        └── 📦 class ServiceManager — Gerencia todas as classes de serviços.
      │            └── ⚙️ constructor(state) — Inicializa e agrupa todos os serviços da aplicação. @constructor

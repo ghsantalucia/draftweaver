@@ -81,14 +81,37 @@ export async function onSaveTemp(path, content) {
 }
 
 /**
- * Trata o evento de arquivo aberto, atualizando o state global e armazenando a referência do último arquivo aberto.
- * @param {Object} State
- * @param {Object} payload {fullPath, relativePath, fileName, metadata, body,}
+ * Manipula a abertura de um arquivo, atualizando o estado do livro atual e persistindo as configurações.
+ * @param {Object} state - Instância do estado global.
+ * @param {Object} bookService - Instância do serviço de livros.
+ * @param {Object} payload - Dados do arquivo aberto (contém fullPath e metadata).
  */
-export function onFileOpened(state, payload) {
-  state.currentFilePath = payload.fullPath;
-  state.currentFileMetadata = payload.metadata;
-  localStorage.setItem("last_opened_file", payload.fullPath);
+export function onFileOpened(state, bookService, payload) {
+  const filePath = payload.fullPath || payload.path;
+
+  state.currentFilePath = filePath;
+  state.currentFileMetadata = payload.metadata || "";
+
+  if (!state.currentBookPath || !state.bookList) return;
+
+  // Localiza o livro atual na lista
+  const currentBook = state.bookList.find(
+    (book) => book.fullPath === state.currentBookPath,
+  );
+
+  if (!currentBook) return;
+
+  // Cada um cuida do seu: garante apenas a existência do container e atualiza o seu campo
+  currentBook.explorer_state = currentBook.explorer_state || {};
+  currentBook.explorer_state.open_file = filePath;
+
+  // Atualiza o último arquivo aberto no objeto do livro
+  currentBook.explorer_state.open_file = filePath;
+
+  // Persiste as alterações no config.json do livro
+  if (typeof bookService.updateConfig === "function") {
+    bookService.updateConfig();
+  }
 }
 
 export function onEditorReset(state) {

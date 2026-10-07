@@ -93,9 +93,7 @@ Estrutura do Projeto com Descrições:
 │       │   │   ├── styles.css
 │       │   │   └── template.html
 │       │   ├── [settings]
-│       │   │   ├── index.js — Barrel do módulo Settings, exportando funções e componentes essenciais para a configuração das preferências do usuário.
 │       │   │   ├── settingsComponent.js — Componente responsável pela renderização estrutural da drawer de configurações
-│       │   │   ├── settingsUi.js — Responsável pelos eventos e comportamentos da interface do Menu de Configurações (Settings Drawer).
 │       │   │   ├── styles.css
 │       │   │   └── template.html
 │       │   ├── [sidebar]
