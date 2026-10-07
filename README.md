@@ -1,91 +1,104 @@
-# 🖋️ Draftweaver
+# DraftWeaver
 
-> **Assistente Literário e Editor Markdown Inteligente com Arquitetura Orientada à IA**
+<p align="left">
+  <a href="https://nodejs.org"><img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" alt="Node.js"></a>
+  <a href="https://www.electronjs.org"><img src="https://img.shields.io/badge/Electron-47848F?style=flat-square&logo=electron&logoColor=white" alt="Electron"></a>
+  <a href="https://www.typescriptlang.org"><img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript"></a>
+  <a href="https://vitejs.dev"><img src="https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white" alt="Vite"></a>
+  <a href="https://tailwindcss.com"><img src="https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind CSS"></a>
+  <a href="https://vitest.dev"><img src="https://img.shields.io/badge/Vitest-6E9F18?style=flat-square&logo=vitest&logoColor=white" alt="Vitest"></a>
+  <a href="https://playwright.dev"><img src="https://img.shields.io/badge/Playwright-2EAD33?style=flat-square&logo=playwright&logoColor=white" alt="Playwright"></a>
+  <a href="https://git-scm.com"><img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white" alt="Git"></a>
+</p>
 
-O **Draftweaver** é uma plataforma open-source desenvolvida para resolver um dos maiores desafios da escrita de romances longos e universos complexos: a **complexidade exponencial** e o risco de perder a coerência de mundo, a evolução dos personagens e a continuidade do enredo ao longo da linha do tempo.
+> Editor de livros desktop assistido por inteligência artificial, estruturado para manter consistência e integridade em universos narrativos complexos. Desenvolvido com arquitetura moderna e foco em boas práticas de engenharia de software para portfólio.
 
-Diferente de editores tradicionais ou ferramentas engessadas, o Draftweaver oferece um framework flexível que se adapta ao fluxo de trabalho de cada autor. Ele combina a integridade de dados via metadados estruturados com o poder de copilotos de IA, garantindo consistência narrativa automática sem limitar a liberdade criativa.
+## Visão Geral
 
----
+O **DraftWeaver** é uma aplicação desktop nativa desenvolvida para resolver os desafios de gerenciamento de dados e continuidade textual em grandes projetos literários. A ferramenta utiliza uma arquitetura baseada no sistema de arquivos local (*file-driven*), eliminando a necessidade de bancos de dados tradicionais, e implementa um modelo flexível de integração com APIs de IA (*Bring-Your-Key*).
 
-## 🌟 Modos de Operação
+### Modos de Operação
 
-O software foi projetado para oferecer versatilidade total na criação, suportando três fluxos principais:
+* **Auxílio de Escrita:** Redação humana com suporte pontual da IA para revisão de consistência e tom.
+* **Criação Guiada:** Geração estruturada de capítulos com validação e controle de prompts pelo usuário.
+* **Criação Autônoma:** Execução autônoma orientada por diretrizes estratégicas e metadados estruturados.
 
-* **✍️ Assistente de Escrita (Humano-Centrado):** O autor redige todo o conteúdo e a IA atua como revisora de consistência, continuidade e tom.
-* **🤝 Híbrido (Co-piloto):** O autor elabora a ideia ou rascunho bruto, a IA desenvolve a prosa e o humano revisa, ajusta e aprova bloco a bloco.
-* **🤖 Autônomo (Geração Guiada):** O autor define as premissas, a filosofia e os arcos estratégicos, e a IA gera a estrutura e os capítulos sob supervisão de diretrizes.
+## Arquitetura e Decisões de Projeto
 
----
+O projeto foi construído seguindo rigorosos padrões de arquitetura de software para garantir escalabilidade, desacoplamento e segurança:
 
-## ✨ Principais Funcionalidades
+* **Separação de Processos (Electron):** Isolamento estrito entre o Processo Principal (*Main*), a ponte segura de comunicação (*Preload* com *context isolation*) e a camada visual (*Renderer*).
+* **Tipagem Estrita (TypeScript):** Utilização de interfaces e tipos robustos para garantir contratos seguros entre o fluxo de dados do sistema de arquivos e os componentes visuais.
+* **Arquitetura Orientada a Eventos (Pub-Sub):** Utilização da biblioteca `Mitt` dividida em dois barramentos independentes (`domainBus` para regras de negócio e sistema de arquivos, e `uiBus` para intenções de interface e animações).
+* **Padrão de Co-locação de Componentes:** Estruturação modular da interface onde cada componente encapsula sua lógica, templates e estilos isolados, instanciados centralmente via Inversão de Controle (IoC).
+* **Estilização Moderna (Tailwind CSS):** Aplicação de classes utilitárias performáticas para consistência visual e design responsivo.
+* **Monitoramento em Tempo Real:** Integração de alta performance com a biblioteca `Chokidar` no processo principal para observar alterações no sistema de arquivos e propagá-las de forma reativa para o frontend via IPC.
+* **Qualidade e Testes (Vitest & Playwright):** Suporte a testes unitários e de integração rápidos com Vitest, além de testes ponta a ponta (E2E) de interface com Playwright.
 
-### 📝 Editor & Navegação
-* **Editor WYSIWYG Markdown:** Interface visual rica baseada em Toast UI Editor com alternância fluida entre código e visualização final.
-* **Árvore de Arquivos Inteligente:** Navegação dinâmica com suporte a nomes amigáveis via YAML, herança de regras por pasta e filtro estrito para foco no texto.
-* **Modo Escuro Nativo:** Layout escurinho e ajustado para longas sessões de escrita sem cansaço visual.
-* **Controle de Permissões:** Proteção de arquivos críticos do sistema para leitura do usuário e IA sem risco de alterações acidentais na interface.
+## Stack Tecnológica
 
-### 🧠 Arquitetura de Enredo & Consistência
-* **Criação Progressiva de História:** Planejamento estruturado partindo da premissa e filosofia da obra até os pontos de início e fim.
-* **Construção Dinâmica de Capítulos:** Os capítulos imediatos são detalhados enquanto os futuros mantêm esboços flexíveis, atualizando-se conforme a narrativa avança.
-* **Matriz de Foreshadowing:** Gestão de pistas, ganchos e elementos inseridos com antecedência programada para garantir premeditação do enredo e evitar desvios aleatórios.
-* **Sincronização de Lore:** Resolução de conflitos de continuidade em fichas de personagens, locais e regras de mundo quando o texto é alterado.
+### Core & Desktop
+* **Node.js:** Ambiente de execução base.
+* **Electron (v44.2.0) & Electron Forge:** Framework para empacotamento e criação do aplicativo desktop nativo.
+* **TypeScript:** Superset JavaScript com tipagem estática.
+* **Vite:** *Builder* de alta performance para compilação do processo principal e da interface.
 
-### ⚡ Otimização de Tokens & Bring Your Own Key (BYOK)
-* **Arquitetura BYOK:** O software não possui IA embutida nem cobra assinaturas. Você utiliza a sua própria chave de API.
-* **Foco em Gemini & Claude Code:** Utilização nativa de chamadas de funções (*Function Calling*) e *Prompt Caching* para reduzir custos drasticamente.
-* **Índices Estruturados (RAG):** Leitura por metadados e resumos para que a IA consulte apenas os arquivos estritamente necessários, economizando tokens.
-* **Suporte Futuro Ampliado:** Preparado para integração com outras APIs proprietárias e modelos auto-hospedados (como Llama).
+### Interface & Frontend
+* **Tailwind CSS:** Framework utilitário de estilização.
+* **Handlebars:** Motor de templates para renderização modular e dinâmica.
+* **Toast-UI Editor (v3.2.2):** Núcleo visual do editor Markdown.
+* **GSAP (v3.15.0):** Motor de animações para transições fluidas.
+* **FontAwesome:** Biblioteca de ícones vetoriais.
 
----
+### Utilitários, Qualidade & Arquitetura
+* **Chokidar (v5.0.0):** Observador de eventos do sistema de arquivos.
+* **Mitt (v3.0.1):** Barramento leve de eventos Pub-Sub.
+* **Vitest:** Framework de testes unitários.
+* **Playwright:** Automação e testes E2E.
+* **Prettier:** Padronização e consistência de estilo de código.
 
-## 🛠️ Tecnologias Utilizadas
+## Estrutura do Projeto
 
-* **Runtime & Desktop:** [Electron](https://www.electronjs.org/)
-* **Linguagens & Estilo:** JavaScript (ES6+ Module), HTML5, CSS3 Custom Properties
-* **Editor Visual:** [Toast UI Editor](https://nhn.github.io/tue.editor/)
-* **Animações & UI:** GSAP (GreenSock)
+```text
+.
+├── forge.config.js
+├── jsdoc.json
+├── package.json
+├── [src]
+│   ├── [main]          # Processo principal (Electron, Chokidar, IPC Handlers)
+│   ├── [preload]       # Ponte de segurança e isolamento de contexto (IPC)
+│   └── [renderer]      # Camada visual (Components, Controllers, Events, Core, AI)
+├── [books]             # Base de dados dos projetos do usuário
+└── [templates]         # Templates estruturais de livros e metadados por projeto
+```
 
----
-
-## 🚀 Como Executar o Projeto
+## Como Executar o Projeto
 
 ### Pré-requisitos
-Certifique-se de ter o **Node.js** (versão 18 ou superior) instalado na sua máquina.
+Certifique-se de ter o **Node.js** (versão 18 ou superior) instalado em sua máquina.
 
-### Instalação (Ambiente de Desenvolvimento)
+### Instalação e Execução
 
-1. Clone este repositório:
+1. Clone o repositório:
 ```bash
-   git clone [https://github.com/ghsantalucia/draftweaver.git](https://github.com/ghsantalucia/draftweaver.git)
+git clone https://github.com/ghsantalucia/draftweaver.git
 ```
 
-Acesse a pasta do projeto:
+2. Acesse a pasta do projeto:
 ```bash
-    cd draftweaver
+cd draftweaver
 ```
 
-Instale as dependências:
+3. Instale as dependências:
 ```bash
-    npm install
+npm install
 ```
 
-Execute a aplicação em modo de desenvolvimento:
+4. Execute a aplicação em modo de desenvolvimento:
 ```bash
-    npm start
+npm start
 ```
 
-(Nota: Para usuários finais, executáveis compilados para Windows/Linux/macOS serão disponibilizados na aba de Releases das versões estáveis).
+## Licença
 
-## 💖 Manifesto Open-Source
-
-O Draftweaver é um projeto 100% de código aberto e sem fins lucrativos, nascido da paixão por literatura e tecnologia.
-
-O objetivo não é comercializar uma ferramenta, mas construir uma base sólida e livre para a comunidade de escritores, entusiastas de worldbuilding e desenvolvedores. Toda contribuição é bem-vinda — seja enviando sugestões, reportando erros, melhorando a documentação ou submetendo Pull Requests.
-
-Vamos juntos construir a melhor ferramenta de escrita assistida por IA!
-
-## 📄 Licença
-
-Distribuído sob a licença ISC. Veja LICENSE para mais informações.
+Distribuído sob a licença ISC. Consulte o arquivo [LICENCE](LICENCE) para mais detalhes.
