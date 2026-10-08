@@ -55,3 +55,12 @@ export function getRelativePath(fullPath) {
   // Retorna tudo após a pasta 'books'
   return parts.slice(booksIndex + 1).join("/");
 }
+
+/**
+ * Utilitário simples para sanitizar textos HTML.
+ */
+export function escapeHtml(text) {
+  const div = document.createElement("div");
+  div.textContent = text || "";
+  return div.innerHTML;
+}

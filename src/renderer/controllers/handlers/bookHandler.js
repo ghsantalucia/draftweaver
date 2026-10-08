@@ -16,7 +16,6 @@ export async function fetchBooks(state, bookService) {
     state.bookList = booksArray;
     if (!state.currentBookPath) state.currentBookPath = booksArray[0].fullPath;
 
-    console.log("[BookHandler] Lista de livros atualizada:", booksArray);
     return booksArray;
   } catch (error) {
     console.error("[BookHandler] Erro ao buscar livros:", error);

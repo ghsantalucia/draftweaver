@@ -5,6 +5,7 @@
 import "./styles.css";
 import templateHtml from "./template.html?raw";
 import { initStarryBackground } from "./chatAnimations.js";
+import { escapeHtml } from "../../utils/helpers.js";
 import { Component } from "../Component.js";
 import { gsap } from "gsap";
 
@@ -27,35 +28,6 @@ export class ChatComponent extends Component {
   onInit() {
     initStarryBackground();
     this.setupAutoResizeAndInputListeners();
-
-    // FIXME SIMULAÇÃO DE MENSAGENS RECEBIDAS (MOCK)
-    setTimeout(() => {
-      // 1. Simula a chegada de uma mensagem da IA após 1.5s
-      this.uiBus.emit("chat:render-message", {
-        role: "assistant",
-        content: "Olá! Como posso ajudar na estruturação do seu livro hoje?",
-      });
-
-      // 2. Simula o envio de uma resposta do usuário e o estado de carregamento após 3.5s
-      setTimeout(() => {
-        this.uiBus.emit("chat:render-message", {
-          role: "user",
-          content: "Preciso de ajuda para planejar o Capítulo 1.",
-        });
-
-        this.uiBus.emit("chat:set-loading", true);
-
-        // 3. Simula a IA respondendo após processar por 2s
-        setTimeout(() => {
-          this.uiBus.emit("chat:render-message", {
-            role: "assistant",
-            content:
-              "Com certeza! Qual é o objetivo principal do protagonista no início deste capítulo?",
-          });
-          this.uiBus.emit("chat:set-loading", false);
-        }, 2000);
-      }, 2000);
-    }, 1500);
   }
 
   /**
@@ -70,6 +42,18 @@ export class ChatComponent extends Component {
     // Renderiza uma mensagem no chat (chamado pelo chatHandler/uiController)
     this.uiBus.on("chat:render-message", (msgData) => {
       this.renderChatMessage(msgData);
+    });
+
+    // Renderiza histórico inicial do chat
+    this.uiBus.on("chat:render-history", (msgData) => {
+      this.clearChatContainer();
+      this.renderChatHistory(msgData);
+      this.scrollToBottom();
+    });
+
+    // Adiciona histórico mais antigo ao chat
+    this.uiBus.on("chat:append-history", (msgData) => {
+      this.renderChatHistory(msgData);
     });
 
     // Controla o estado de carregamento/bloqueio do input
@@ -131,21 +115,48 @@ export class ChatComponent extends Component {
   }
 
   /**
-   * Renderiza uma mensagem no DOM do chat.
-   * @param {Object} msgData
-   * @param {string} msgData.role - Papel do emissor ('user' | 'assistant' | 'system').
-   * @param {string} msgData.content - Conteúdo em texto.
+   * Cria o elemento DOM de uma mensagem individual usando a mesma estrutura do renderChatMessage.
+   * @param {Object} msg - Objeto com role e content.
+   * @returns {HTMLElement}
    */
-  renderChatMessage({ role, content }) {
+  createMessageElement({ role, content }) {
+    const messageDiv = document.createElement("div");
+    messageDiv.className = `ai-message ${role}`;
+    messageDiv.textContent = content; // Mantém exatamente como o seu renderChatMessage original
+    return messageDiv;
+  }
+
+  /**
+   * Renderiza uma mensagem individual no DOM do chat.
+   * @param {Object} msgData
+   */
+  renderChatMessage(msgData) {
     const chatContainer = document.getElementById("ai-chat-messages");
     if (!chatContainer) return;
 
-    const messageDiv = document.createElement("div");
-    messageDiv.className = `ai-message ${role}`;
-    messageDiv.textContent = content;
-
-    chatContainer.appendChild(messageDiv);
+    const messageElement = this.createMessageElement(msgData);
+    chatContainer.appendChild(messageElement);
     this.scrollToBottom();
+  }
+
+  /**
+   * Renderiza um lote de mensagens do histórico no topo do container.
+   * @param {Array<{role: string, content: string}>} msgData
+   */
+  renderChatHistory(msgData) {
+    if (!Array.isArray(msgData) || msgData.length === 0) return;
+
+    const chatContainer = document.getElementById("ai-chat-messages");
+    if (!chatContainer) return;
+
+    const fragment = document.createDocumentFragment();
+
+    msgData.forEach((msg) => {
+      const messageElement = this.createMessageElement(msg);
+      fragment.appendChild(messageElement);
+    });
+
+    chatContainer.prepend(fragment);
   }
 
   /**

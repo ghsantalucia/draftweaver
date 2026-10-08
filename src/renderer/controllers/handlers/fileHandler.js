@@ -35,9 +35,7 @@ export function onSyncOpenModal() {
  * @returns {Promise<void>}
  */
 export async function onFileGet(req, state, fileService) {
-  console.log(req);
   try {
-    console.log(req.data.path);
     const fullPath = req.data.path;
     const file = await fileService.readFile(fullPath);
 

@@ -6,8 +6,7 @@ import { uiBus } from "../events/uiBus.js";
 
 import * as book from "./handlers/bookHandler.js";
 import * as file from "./handlers/fileHandler.js";
-// import * as chapter from './handlers/chapterHandler.js';
-// import * as character from './handlers/characterHandler.js';
+import * as chat from "./handlers/chatHandler.js";
 
 /**
  * Controller responsável pelas reações visuais da interface.
@@ -83,9 +82,10 @@ export class UiController {
       }
     });
 
-    //
+    // Lida com troca de livro/projeto
     uiBus.on("book:changed", (bookPath) => {
       book.onBookChange(bookPath, this.state);
+      chat.loadHistory(0, this.services.ai);
     });
 
     // Lida com editor resetado (nenhum arquivo aberto)
@@ -106,6 +106,11 @@ export class UiController {
     // Evento disparado quando o modo avançado é alternado
     uiBus.on("advanced-mode:toggle", (payload) => {
       book.onAdvancedModeToggle(this.state, this.services.book, payload);
+    });
+
+    // Envia mensagem para IA
+    uiBus.on("chat:send-message", (data) => {
+      chat.onSendMessage(data, this.services.ai);
     });
   }
 }

@@ -7,5 +7,5 @@ export const domainBus = mitt();
 
 // DEBUG Ouve absolutamente tudo o que passa pelo uiBus
 domainBus.on("*", (eventType, eventContext) => {
-  console.log(`[DOMAIN Debug] Evento disparado: "${eventType}"`, eventContext);
+  console.log(`[DOMAIN Event]: "${eventType}"`, eventContext);
 });

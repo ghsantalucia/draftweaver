@@ -226,6 +226,14 @@
   animation: messageAppear 0.25s ease-out forwards;
 }
 
+.ai-message .message-header {
+  display: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(137, 180, 250, 0.85);
+  margin-bottom: 4px;
+}
+
 /* --------------------------------------------------------------------------
    TEXTAREA AUTO-EXPANSÍVEL E BOTÃO EMBUTIDO (ESTILO GEMINI)
    -------------------------------------------------------------------------- */

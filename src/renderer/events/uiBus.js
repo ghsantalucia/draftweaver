@@ -21,7 +21,7 @@ export class UiEventBus {
 
     // DEBUG Ouve absolutamente tudo o que passa pelo uiBus
     this.bus.on("*", (eventType, eventContext) => {
-      console.log(`[UI Debug] Evento disparado: "${eventType}"`, eventContext);
+      console.log(`[UI Event]: "${eventType}"`, eventContext);
     });
   }
 

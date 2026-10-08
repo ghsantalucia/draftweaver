@@ -410,10 +410,10 @@ export class ExplorerComponent extends Component {
    * @returns {void}
    */
   async autoOpenFileByPath(targetPath) {
-    console.log(
-      "[ExplorerComponent] Tentando abrir arquivo na árvore:",
-      targetPath,
-    );
+    // console.log(
+    //   "[ExplorerComponent] Tentando abrir arquivo na árvore:",
+    //   targetPath,
+    // );
     if (!targetPath) return;
 
     let decodedPath = targetPath;
