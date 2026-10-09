@@ -56,6 +56,42 @@
     * Escutadores:
       └── setupListeners (src\renderer\components\sidebar\sidebarComponent.js)
 
+⚙️ [chat:append-history]
+    * Emissores:
+      └── ---
+    * Escutadores:
+      └── setupListeners (src\renderer\components\chat\chatComponent.js)
+
+⚙️ [chat:clear]
+    * Emissores:
+      └── onBookChange (src\renderer\controllers\handlers\bookHandler.js)
+    * Escutadores:
+      └── setupListeners (src\renderer\components\chat\chatComponent.js)
+
+⚙️ [chat:render-history]
+    * Emissores:
+      └── loadHistory (src\renderer\controllers\handlers\chatHandler.js)
+    * Escutadores:
+      └── setupListeners (src\renderer\components\chat\chatComponent.js)
+
+⚙️ [chat:render-message]
+    * Emissores:
+      └── onSendMessage (src\renderer\controllers\handlers\chatHandler.js)
+    * Escutadores:
+      └── setupListeners (src\renderer\components\chat\chatComponent.js)
+
+⚙️ [chat:send-message]
+    * Emissores:
+      └── triggerSendMessage (src\renderer\components\chat\chatComponent.js)
+    * Escutadores:
+      └── registerEvents (src\renderer\controllers\uiController.js)
+
+⚙️ [chat:set-loading]
+    * Emissores:
+      └── onSendMessage (src\renderer\controllers\handlers\chatHandler.js)
+    * Escutadores:
+      └── setupListeners (src\renderer\components\chat\chatComponent.js)
+
 ⚙️ [editor-overlay:close]
     * Emissores:
       └── renderFileContent (src\renderer\components\editor\editorComponent.js)

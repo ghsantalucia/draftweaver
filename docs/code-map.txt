@@ -11,8 +11,13 @@
 │   └── preload.js — [Expõe a API segura via IPC para comunicação entre o processo de renderização e o Node.js.]
 └── [renderer]
      ├── [ai]
-     │   ├── aiGateway.js — [Gerencia as conexões e o roteamento de requisições para os gateways de Inteligência Artificial.]
-     │   └── aiTools.js — [Define as ferramentas, funções auxiliares e utilitários integrados para uso dos modelos de Inteligência Artificial.]
+     │   ├── aiGateway.js — [Roteador dinâmico de provedores de IA.]
+     │   │   └── ⚙️ processPrompt({ prompt, history = [] }, state) — Processa a instrução enviada direcionando para a pasta do provedor ativo no State.
+     │   ├── aiTools.js — [Define as ferramentas, funções auxiliares e utilitários integrados para uso dos modelos de Inteligência Artificial.]
+     │   └── [providers]
+     │        └── [mock]
+     │             └── index.js — [Módulo do Provedor Simulado (Mock)]
+     │                  └── ⚙️ sendRequest({ prompt }) — Simula a chamada de rede e retorna apenas a string de resposta crua.
      ├── app.js — [Ponto de entrada do frontend (Renderer), responsável por inicializar o container principal da aplicação.]
      ├── [components]
      │   ├── Component.js
@@ -36,11 +41,20 @@
      │   │   ├── chatComponent.js — [Componente responsável pela renderização estrutural do chat do assistente de IA]
      │   │   │   └── 📦 class ChatComponent — Representa o chat do assistente de IA.
      │   │   │       ├── ⚙️ constructor(selector, context, params, parent = null) — Cria uma instância da classe
+     │   │   │       ├── ⚙️ onInit()
+     │   │   │       ├── ⚙️ initStarryBackground()
      │   │   │       ├── ⚙️ setupListeners() — Configura os ouvintes de eventos específicos do chat.
      │   │   │       ├── ⚙️ toggleAiDrawer() — Alterna o estado da gaveta (Drawer) com fade-in no canvas.
      │   │   │       ├── ⚙️ setTimeout(window.resetStarsPosition, 50)
      │   │   │       ├── ⚙️ setTimeout(window.resetStarsPosition, 350)
-     │   │   │       └── ⚙️ scrollToBottom()
+     │   │   │       ├── ⚙️ scrollToBottom()
+     │   │   │       ├── ⚙️ createMessageElement({ role, content }) — Cria o elemento DOM de uma mensagem individual usando a mesma estrutura do renderChatMessage.
+     │   │   │       ├── ⚙️ renderChatMessage(msgData) — Renderiza uma mensagem individual no DOM do chat.
+     │   │   │       ├── ⚙️ renderChatHistory(msgData) — Renderiza um lote de mensagens do histórico no topo do container.
+     │   │   │       ├── ⚙️ clearChatContainer() — Limpa o container de mensagens da interface.
+     │   │   │       ├── ⚙️ setChatLoadingState(isLoading) — Define o estado visual de carregamento do chat (bloqueando ou liberando a digitação).
+     │   │   │       ├── ⚙️ triggerSendMessage() — Captura o texto do input e dispara o evento de envio de mensagem via uiBus.
+     │   │   │       └── ⚙️ setupAutoResizeAndInputListeners() — Configura os ouvintes de redimensionamento automático e atalhos de teclado para o textarea.
      │   │   ├── chatPipeline.js — [Controlador da pipeline do assistente de IA, gerenciando o fluxo entre o envio do usuário e a resposta da IA.]
      │   │   │   ├── ⚙️ getRandomMockResponse() — Retorna uma resposta aleatória da simulação de IA.
      │   │   │   ├── ⚙️ injectMessageIntoChat({ role, content }, renderCallback) — Injeta diretamente uma mensagem no chat (usada por gatilhos do sistema ou pela IA) e persiste no log.
@@ -51,17 +65,16 @@
      │   │   │   ├── ⚙️ resolveTargetLogFile() — Garante a rotação de arquivos caso o arquivo atual exceda o limite de mensagens.
      │   │   │   ├── ⚙️ saveChatMessage(message) — Salva uma nova mensagem no arquivo de log da sessão atual.
      │   │   │   └── ⚙️ loadChatHistory() — Carrega todo o histórico de mensagens de todas as sessões do livro ativo.
-     │   │   ├── chatUi.js — [Responsável pelos eventos e comportamentos da interface do Chat com a IA (auto-resize do input, envio com tecla Enter, renderização e estado do chat).]
-     │   │   │   ├── ⚙️ scrollToBottom() — Garante que a caixa de mensagens role até o final para mostrar o conteúdo mais recente.
-     │   │   │   ├── ⚙️ renderChatMessage({ role, content }) — Renderiza uma mensagem no DOM da caixa de mensagens do Chat.
-     │   │   │   ├── ⚙️ setChatLoadingState(isLoading) — Define o estado de carregamento do chat (bloqueando ou liberando a digitação).
-     │   │   │   ├── ⚙️ clearChatContainer() — Limpa o container de mensagens da interface.
-     │   │   │   ├── ⚙️ reloadChatForCurrentBook() — Recarrega o histórico salvo e exibe as mensagens no chat. Caso o histórico esteja vazio, exibe a mensagem de boas-vindas do sistema.
-     │   │   │   ├── ⚙️ triggerSendMessage() — Dispara o envio da instrução do usuário.
-     │   │   │   ├── ⚙️ setupAutoResizeInput() — Configura o redimensionamento automático e eventos do campo de digitação do chat.
-     │   │   │   ├── ⚙️ toggleAiDrawer() — Alterna o estado da gaveta (Drawer) com fade-in no canvas.
-     │   │   │   └── ⚙️ setupAiDrawerEvents() — Configura os gatilhos de clique na interface para a gaveta do assistente.
-     │   │   └── index.js — [Barrel do módulo Chat, exportando funções e componentes essenciais para a interface e controle da IA.]
+     │   │   └── chatUi.js — [Responsável pelos eventos e comportamentos da interface do Chat com a IA (auto-resize do input, envio com tecla Enter, renderização e estado do chat).]
+     │   │        ├── ⚙️ scrollToBottom() — Garante que a caixa de mensagens role até o final para mostrar o conteúdo mais recente.
+     │   │        ├── ⚙️ renderChatMessage({ role, content }) — Renderiza uma mensagem no DOM da caixa de mensagens do Chat.
+     │   │        ├── ⚙️ setChatLoadingState(isLoading) — Define o estado de carregamento do chat (bloqueando ou liberando a digitação).
+     │   │        ├── ⚙️ clearChatContainer() — Limpa o container de mensagens da interface.
+     │   │        ├── ⚙️ reloadChatForCurrentBook() — Recarrega o histórico salvo e exibe as mensagens no chat. Caso o histórico esteja vazio, exibe a mensagem de boas-vindas do sistema.
+     │   │        ├── ⚙️ triggerSendMessage() — Dispara o envio da instrução do usuário.
+     │   │        ├── ⚙️ setupAutoResizeInput() — Configura o redimensionamento automático e eventos do campo de digitação do chat.
+     │   │        ├── ⚙️ toggleAiDrawer() — Alterna o estado da gaveta (Drawer) com fade-in no canvas.
+     │   │        └── ⚙️ setupAiDrawerEvents() — Configura os gatilhos de clique na interface para a gaveta do assistente.
      │   ├── [editor]
      │   │   └── editorComponent.js — [Componente responsável pela renderização estrutural do editor markdown e manipulação de eventos via uiBus.]
      │   │        └── 📦 class EditorComponent — Representa o Editor Markdown da aplicação baseado em eventos.
@@ -162,6 +175,9 @@
      │   │   │   └── ⚙️ onFetchBooksList(req, bookService) — Solicita lista de livros do backend e também confere qual o último livro selecionado. @async
      │   │   ├── chapterHandler.js
      │   │   ├── characterHandler.js
+     │   │   ├── chatHandler.js — [Handler para orquestração de eventos e mensagens do chat.]
+     │   │   │   ├── ⚙️ onSendMessage({ promptText }, aiService) — Trata o envio de uma mensagem digitada pelo usuário no chat.
+     │   │   │   └── ⚙️ loadHistory(offset, aiService) — Carrega o histórico de mensagens do chat para a sessão atual do livro ativo.
      │   │   ├── configHandler.js — [Handler para gerenciar alterações no arquivo config.json dos projetos.]
      │   │   └── fileHandler.js — [Handler dos eventos relacionados a arquivos .md e .temp]
      │   │        ├── ⚙️ onSyncOpenModal() — Handler que abre modal e exibe todos os arquivos .temp do projeto para serem sincronizados
@@ -207,6 +223,11 @@
      │        └── ⚙️ initDeclarativeEvents(uiBus) — Inicializa o escutador global de eventos no documento.
      ├── renderer.js
      ├── [services]
+     │   ├── aiService.js — [Serviço responsável pela comunicação, intermediação com o gateway de IA e gestão dos logs de chat do projeto.]
+     │   │   ├── ⚙️ getTodaySessionDate() — Obtém a data atual formatada como YYYY-MM-DD para nomear a sessão do chat.
+     │   │   └── 📦 class AiService — Classe de serviço da Inteligência Artificial.
+     │   │       ├── ⚙️ constructor(state) — Cria uma instância do AiService.
+     │   │       └── ⚙️ getCurrentChatLogFilePath(sessionIndex = 1) — Monta o caminho completo do arquivo de log da sessão atual.
      │   ├── bookService.js — [Serviço responsável por gerenciar a lista de livros, dados de configuração por projeto e verificação de travas da IA.]
      │   │   └── 📦 class BookService
      │   │       └── ⚙️ constructor(state, services) — Cria uma instância do BookService.
@@ -221,7 +242,8 @@
           ├── helpers.js — [Funções auxiliares genéricas para apoio à interface do usuário, controle de menus e normalizações.]
           │   ├── ⚙️ normalizeItemMetadata(rawMetadata, fallbackTitle = "") — Garante que todas as chaves obrigatórias do objeto de metadados existam com valores padrão (fallbacks).
           │   ├── ⚙️ normalizePath(p) — Normaliza caminhos de arquivo para evitar quebras em seletores CSS ou chamadas do Node/IPC.
-          │   └── ⚙️ getRelativePath(fullPath) — Transforma um caminho completo em um caminho relativo a partir da pasta 'books', garantindo que a pasta do livro imediatamente abaixo de 'books' comece com 'book_'.
+          │   ├── ⚙️ getRelativePath(fullPath) — Transforma um caminho completo em um caminho relativo a partir da pasta 'books', garantindo que a pasta do livro imediatamente abaixo de 'books' comece com 'book_'.
+          │   └── ⚙️ escapeHtml(text) — Utilitário simples para sanitizar textos HTML.
           └── markdown.js — [Utilitário para conversão, parsing e serialização de conteúdos Markdown e metadados Frontmatter YAML.]
                ├── ⚙️ parseMarkdown(fileContent, isYmlOnly = false) — Converte Frontmatter YAML em Objeto JS e retorna o corpo do Markdown separadamente.
                └── ⚙️ stringifyFrontmatter(metadata, body) — Reconstrói o bloco Frontmatter YAML e anexa ao corpo em Markdown para salvamento.

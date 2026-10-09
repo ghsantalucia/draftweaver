@@ -42,9 +42,11 @@ Estrutura do Projeto com Descrições:
 │   │   └── preload.js — Expõe a API segura via IPC para comunicação entre o processo de renderização e o Node.js.
 │   └── [renderer]
 │       ├── [ai]
-│       │   ├── aiGateway.js — Gerencia as conexões e o roteamento de requisições para os gateways de Inteligência Artificial.
+│       │   ├── aiGateway.js — Roteador dinâmico de provedores de IA.
 │       │   ├── aiTools.js — Define as ferramentas, funções auxiliares e utilitários integrados para uso dos modelos de Inteligência Artificial.
 │       │   └── [providers]
+│       │       └── [mock]
+│       │           └── index.js — Módulo do Provedor Simulado (Mock)
 │       ├── app.js — Ponto de entrada do frontend (Renderer), responsável por inicializar o container principal da aplicação.
 │       ├── [assets]
 │       │   └── [css]
@@ -64,7 +66,6 @@ Estrutura do Projeto com Descrições:
 │       │   │   ├── chatPipeline.js — Controlador da pipeline do assistente de IA, gerenciando o fluxo entre o envio do usuário e a resposta da IA.
 │       │   │   ├── chatStorage.js — Módulo de armazenamento do chat, responsável por gerenciar o histórico de mensagens e a persistência dos dados do chat.
 │       │   │   ├── chatUi.js — Responsável pelos eventos e comportamentos da interface do Chat com a IA (auto-resize do input, envio com tecla Enter, renderização e estado do chat).
-│       │   │   ├── index.js — Barrel do módulo Chat, exportando funções e componentes essenciais para a interface e controle da IA.
 │       │   │   ├── styles.css
 │       │   │   └── template.html
 │       │   ├── Component.js
@@ -110,6 +111,7 @@ Estrutura do Projeto com Descrições:
 │       │   │   ├── bookHandler.js — Handler dos eventos relacionados ao livro/projeto
 │       │   │   ├── chapterHandler.js
 │       │   │   ├── characterHandler.js
+│       │   │   ├── chatHandler.js — Handler para orquestração de eventos e mensagens do chat.
 │       │   │   ├── configHandler.js — Handler para gerenciar alterações no arquivo config.json dos projetos.
 │       │   │   └── fileHandler.js — Handler dos eventos relacionados a arquivos .md e .temp
 │       │   └── uiController.js — Gerencia e despacha os eventos de interface (UI) vindos do uiBus para os handlers visuais.
@@ -124,6 +126,7 @@ Estrutura do Projeto com Descrições:
 │       ├── index.html
 │       ├── renderer.js
 │       ├── [services]
+│       │   ├── aiService.js — Serviço responsável pela comunicação, intermediação com o gateway de IA e gestão dos logs de chat do projeto.
 │       │   ├── bookService.js — Serviço responsável por gerenciar a lista de livros, dados de configuração por projeto e verificação de travas da IA.
 │       │   ├── fileService.js — Serviço responsável por centralizar as operações de CRUD de arquivos (leitura, escrita, restauração e resolução de caminhos), servindo como ponte entre o Editor e o Sistema de Arquivos.
 │       │   └── serviceManager.js — Agregador central de serviços (Facade). Instancia e gerencia o acesso

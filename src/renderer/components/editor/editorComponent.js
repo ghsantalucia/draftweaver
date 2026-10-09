@@ -7,7 +7,7 @@ import "@toast-ui/editor/dist/toastui-editor.css";
 import "@toast-ui/editor/dist/theme/toastui-editor-dark.css";
 
 import "./styles.css";
-import templateHtml from "./template.html?raw";
+import templateHtml from "./templates/main.hbs?raw";
 import { Component } from "../Component.js";
 import { parseMarkdown, stringifyFrontmatter } from "../../utils/markdown.js";
 import { normalizeItemMetadata, getRelativePath } from "../../utils/helpers.js";

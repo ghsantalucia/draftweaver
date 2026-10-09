@@ -112,5 +112,10 @@ export class UiController {
     uiBus.on("chat:send-message", (data) => {
       chat.onSendMessage(data, this.services.ai);
     });
+
+    // Solicita mais histórico de chat
+    uiBus.on("chat:fetch-more-history", ({ offset }) => {
+      chat.fetchMoreHistory(offset, this.services.ai);
+    });
   }
 }

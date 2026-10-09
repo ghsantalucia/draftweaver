@@ -3,7 +3,7 @@
  */
 
 import "./styles.css";
-import templateHtml from "./template.html?raw";
+import templateHtml from "./templates/main.hbs?raw";
 import { Component } from "../Component.js";
 
 /**

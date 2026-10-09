@@ -79,7 +79,9 @@ export async function onSendMessage({ promptText }, aiService) {
 
 /**
  * Carrega o histórico de mensagens do chat para a sessão atual do livro ativo.
- * @param {number} offset - Qual arquivo de log deve ser carregado
+ * Se o lote inicial tiver <= 20 mensagens, busca arquivos anteriores até acumular >= 50 mensagens.
+ *
+ * @param {number} offset - Qual arquivo de log deve ser carregado (normalmente 0 no carregamento inicial).
  * @param {Object} aiService - Instância do AiService.
  */
 export async function loadHistory(offset, aiService) {
@@ -91,19 +93,67 @@ export async function loadHistory(offset, aiService) {
       return;
     }
 
-    // 3. Busca a sessão mais recente (sessionOffset: 0 -> arquivo mais novo)
-    const { messages } = await aiService.loadChatHistoryPaged({
-      sessionOffset: offset,
-    });
+    let accumulatedMessages = [];
+    let currentOffset = offset;
+    let hasMore = true;
 
-    // 4. Se houver mensagens gravadas no histórico do livro, renderiza cada uma
-    if (Array.isArray(messages) && messages.length > 0) {
-      uiBus.emit("chat:render-history", messages);
+    // Loop de acumulação inicial: se <= 20 mensagens, carrega anteriores até totalizar >= 50 ou acabar os arquivos
+    while (hasMore && accumulatedMessages.length <= 20) {
+      const result = await aiService.loadChatHistoryPaged({
+        sessionOffset: currentOffset,
+      });
+
+      if (!result || !Array.isArray(result.messages)) {
+        break;
+      }
+
+      // Como o arquivo mais antigo é retornado nas chamadas com offset maior,
+      // prependemos (ou concatenamos na ordem cronológica anterior) as mensagens novas
+      accumulatedMessages = [...result.messages, ...accumulatedMessages];
+      hasMore = Boolean(result.hasMore);
+
+      // Avança para o próximo arquivo se ainda precisar de mais mensagens
+      if (accumulatedMessages.length < 50 && hasMore) {
+        currentOffset++;
+      } else {
+        break; // Atingiu o mínimo de 50 ou não há mais logs
+      }
+    }
+
+    // Emite o histórico completo acumulado de uma só vez para o componente renderizar
+    if (accumulatedMessages.length > 0 || !hasMore) {
+      uiBus.emit("chat:render-history", {
+        messages: accumulatedMessages,
+        hasMore,
+        offsetUsed: currentOffset, // Repassa o último offset utilizado para sincronizar o ChatComponent
+      });
     }
   } catch (error) {
     console.error(
       "[ChatHandler] Erro ao carregar histórico na troca de livro:",
       error,
     );
+  }
+}
+
+/**
+ * Busca mais histórico antigo quando o usuário rola o chat até o topo (Infinite Scroll).
+ * @param {number} offset - Próximo índice de arquivo a buscar.
+ * @param {Object} aiService - Instância do AiService.
+ */
+export async function fetchMoreHistory(offset, aiService) {
+  try {
+    if (!aiService) return;
+
+    const result = await aiService.loadChatHistoryPaged({
+      sessionOffset: offset,
+    });
+
+    // Permite disparar o evento mesmo com mensagens vazias se hasMore for false
+    if (result && Array.isArray(result.messages)) {
+      uiBus.emit("chat:append-history", result);
+    }
+  } catch (error) {
+    console.error("[ChatHandler] Erro ao buscar mais histórico antigo:", error);
   }
 }

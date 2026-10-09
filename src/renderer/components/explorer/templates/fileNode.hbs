@@ -1,0 +1,17 @@
+<li
+  data-path="{{relativePath}}"
+  data-absolute-path="{{entry.path}}"
+  class="{{#if isAdvanced}}advanced-item{{/if}} {{#if isReadonly}}readonly{{/if}} {{#if isTemp}}has-temp{{/if}}"
+>
+  <span
+    class="file-name"
+    data-path="{{relativePath}}"
+    data-absolute-path="{{entry.path}}"
+  >
+    <i class="fa-regular fa-file-lines notes-icon icon-file"></i>
+    <span class="file-title-wrapper">
+      <span class="file-title">{{meta.title}}</span>
+      {{#if isTemp}}<span class="dirty-asterisk">*</span>{{/if}}
+    </span>
+  </span>
+</li>

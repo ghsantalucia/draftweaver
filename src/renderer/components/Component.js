@@ -120,4 +120,29 @@ export class Component {
   setupListeners() {
     // Vazio por padrão
   }
+
+  // ========= Utilitários Handlebars ========= //
+
+  /**
+   * Compila uma string de template Handlebars com um contexto de dados e retorna a string HTML.
+   * @param {string} templateStr - String do template Handlebars.
+   * @param {Object} [data={}] - Dados para preencher o template.
+   * @returns {string} HTML final processado.
+   */
+  compile(templateStr, data = {}) {
+    if (!templateStr) return "";
+    const templateFn = Handlebars.compile(templateStr);
+    return templateFn(data);
+  }
+
+  /**
+   * Converte uma string HTML em um elemento DOM individual (Node).
+   * @param {string} htmlString - String HTML bem formatada.
+   * @returns {HTMLElement} Elemento DOM pronto para append/prepend.
+   */
+  createDOMElement(htmlString) {
+    const template = document.createElement("template");
+    template.innerHTML = htmlString.trim();
+    return template.content.firstElementChild;
+  }
 }

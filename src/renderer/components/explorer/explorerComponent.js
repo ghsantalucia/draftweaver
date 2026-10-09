@@ -3,12 +3,12 @@
  */
 
 import "./styles.css";
-import templateHtml from "./template.html?raw";
+import templateHtml from "./templates/main.hbs?raw";
+import folderNodeTpl from "./templates/folderNode.hbs?raw";
+import fileNodeTpl from "./templates/fileNode.hbs?raw";
 import { Component } from "../Component.js";
 import { normalizeItemMetadata } from "../../utils/helpers.js";
 import { parseMarkdown } from "../../utils/markdown.js";
-import nodeTemplateHtml from "./nodeTemplate.html?raw";
-import Handlebars from "handlebars";
 
 /**
  * Representa o explorer de arquivos.
@@ -16,16 +16,14 @@ import Handlebars from "handlebars";
  */
 export class ExplorerComponent extends Component {
   /**
-   * Cria uma instância da classe
+   * Cria uma instância da classe.
    * @param {string} selector - Seletor CSS do elemento do DOM onde será injetada.
-   * @param {Object} context - Objeto de contexto e infraestrutura (state, uiBus, domainBus)
+   * @param {Object} context - Objeto de contexto e infraestrutura (state, uiBus, domainBus).
    * @param {Object|Array|null} [params=null] - Parâmetros opcionais dinâmicos.
-   * @param {Component} [parent=null]
+   * @param {Component|null} [parent=null] - Componente pai opcional.
    */
   constructor(selector, context, params, parent = null) {
     super(selector, context, templateHtml, params, parent);
-
-    this.nodeTemplate = Handlebars.compile(nodeTemplateHtml);
   }
 
   /**
@@ -252,7 +250,7 @@ export class ExplorerComponent extends Component {
   }
 
   /**
-   * Processa e cria o nó de pasta utilizando o template unificado.
+   * Processa e cria o nó de pasta utilizando o template dedicado de pasta via Handlebars.
    * @param {Object} entry - Objeto contendo os dados do diretório (caminho, nome, etc.).
    * @param {string} relativePath - Caminho relativo do diretório na árvore.
    * @param {Object|null} [parentMeta=null] - Metadados do diretório pai, se houver.
@@ -298,7 +296,6 @@ export class ExplorerComponent extends Component {
         currentBook.explorer_state &&
         Array.isArray(currentBook.explorer_state.open_folders)
       ) {
-        // Normaliza as barras para garantir o match exato com o path salvo
         const normalizedRelPath = relativePath.replace(/\\/g, "/");
         isOpen = currentBook.explorer_state.open_folders.some(
           (p) => p && p.replace(/\\/g, "/") === normalizedRelPath,
@@ -306,22 +303,18 @@ export class ExplorerComponent extends Component {
       }
     }
 
-    // Renderiza usando o template único com isFolder: true e a flag isOpen
-    const htmlString = this.nodeTemplate({
-      isFolder: true,
+    // Compila e cria o nó DOM do folder usando os utilitários da classe Component
+    const htmlString = this.compile(folderNodeTpl, {
       meta,
       relativePath,
       parentMeta,
       rootClass,
       isOpen,
     });
-    const templateContainer = document.createElement("template");
-    templateContainer.innerHTML = htmlString.trim();
-    const li = templateContainer.content.firstChild;
+    const li = this.createDOMElement(htmlString);
 
     const span = li.querySelector(".folder-name");
     span.onclick = (e) => {
-      // e.stopPropagation();
       li.classList.toggle("collapsed");
 
       const folderIcon = span.querySelector(".icon-folder");
@@ -341,8 +334,9 @@ export class ExplorerComponent extends Component {
 
     return li;
   }
+
   /**
-   * Cria o nó de arquivo emitindo eventos via uiBus e utilizando o template unificado.
+   * Cria o nó de arquivo emitindo eventos via uiBus e utilizando o template dedicado de arquivo via Handlebars.
    * @param {Object} entry - Objeto contendo os dados do arquivo (caminho, nome, etc.).
    * @param {string} relativePath - Caminho relativo do arquivo na árvore.
    * @param {Object|null} [parentMeta=null] - Metadados do diretório pai, se houver.
@@ -373,9 +367,8 @@ export class ExplorerComponent extends Component {
       (parentMeta && parentMeta.advanced === true) || meta.advanced === true;
     const isReadonly = meta.humanRead && !meta.humanWrite;
 
-    // Renderiza usando o template único com isFolder: false
-    const htmlString = this.nodeTemplate({
-      isFolder: false,
+    // Compila e cria o nó DOM do file usando os utilitários da classe Component
+    const htmlString = this.compile(fileNodeTpl, {
       entry,
       relativePath,
       meta,
@@ -383,13 +376,10 @@ export class ExplorerComponent extends Component {
       isReadonly,
       isTemp,
     });
-    const templateContainer = document.createElement("template");
-    templateContainer.innerHTML = htmlString.trim();
-    const li = templateContainer.content.firstChild;
+    const li = this.createDOMElement(htmlString);
 
     const span = li.querySelector(".file-name");
     span.onclick = (e) => {
-      // e.stopPropagation();
       this.element
         .querySelectorAll(".file-name")
         .forEach((el) => el.classList.remove("active"));
@@ -410,10 +400,6 @@ export class ExplorerComponent extends Component {
    * @returns {void}
    */
   async autoOpenFileByPath(targetPath) {
-    // console.log(
-    //   "[ExplorerComponent] Tentando abrir arquivo na árvore:",
-    //   targetPath,
-    // );
     if (!targetPath) return;
 
     let decodedPath = targetPath;
@@ -429,9 +415,8 @@ export class ExplorerComponent extends Component {
       .replace(/^content\//, "")
       .replace(/^\.\.\/books\//, "");
 
-    // 1. Identifica a raiz (notes, content, assets) para selecionar a aba correta
     const pathSegments = cleanTargetPath.split("/");
-    const rootFolder = pathSegments[1]; // ex: "content", "notes", "assets"
+    const rootFolder = pathSegments[1];
 
     if (rootFolder) {
       const tabBtn = this.element.querySelector(
@@ -455,7 +440,6 @@ export class ExplorerComponent extends Component {
       }
     }
 
-    // Função interna para tentar localizar e marcar o elemento na árvore
     const attemptSelection = () => {
       const fileSpan = this.element.querySelector(
         `.file-name[data-path$="${CSS.escape(cleanTargetPath)}"]`,
@@ -465,7 +449,6 @@ export class ExplorerComponent extends Component {
 
       const parentLi = fileSpan.closest("li");
 
-      // 2. Ativa o switch avançado se o arquivo for avançado
       if (parentLi && parentLi.classList.contains("advanced-item")) {
         const modeToggle = this.element.querySelector("#mode-toggle");
         const container = this.element.querySelector("#file-tree");
@@ -476,7 +459,6 @@ export class ExplorerComponent extends Component {
         if (container) container.classList.add("show-advanced");
       }
 
-      // 3. Expande todas as pastas pai recursivamente
       let currentElement = fileSpan.parentElement;
       while (currentElement && currentElement !== this.element) {
         if (
@@ -494,7 +476,6 @@ export class ExplorerComponent extends Component {
         currentElement = currentElement.parentElement;
       }
 
-      // 4. Seleciona o arquivo visualmente
       this.element
         .querySelectorAll(".file-name")
         .forEach((el) => el.classList.remove("active"));
@@ -503,7 +484,6 @@ export class ExplorerComponent extends Component {
       return true;
     };
 
-    // Tenta executar imediatamente; se a árvore estiver carregando, tenta novamente após um pequeno delay
     if (!attemptSelection()) {
       setTimeout(() => {
         attemptSelection();

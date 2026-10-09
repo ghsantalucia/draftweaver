@@ -234,6 +234,21 @@
   margin-bottom: 4px;
 }
 
+.chat-date-divider {
+  text-align: center;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 12px 0;
+  user-select: none;
+  font-weight: 500;
+}
+
+.chat-date-divider.start-of-chat {
+  color: rgba(255, 255, 255, 0.25);
+  font-style: italic;
+  margin: 16px 0;
+}
+
 /* --------------------------------------------------------------------------
    TEXTAREA AUTO-EXPANSÍVEL E BOTÃO EMBUTIDO (ESTILO GEMINI)
    -------------------------------------------------------------------------- */
