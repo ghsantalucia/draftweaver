@@ -2,7 +2,7 @@
  * @file Classe gerenciadora da pilha de modais dinâmicos da aplicação.
  */
 
-import { ModalComponent } from "./modalComponent.js";
+import { ModalComponent } from "./ModalComponent.js";
 
 /**
  * Gerenciador responsável por controlar a pilha de modais, overlay escuro e âncoras globais da aplicação.

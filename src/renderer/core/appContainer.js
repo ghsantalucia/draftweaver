@@ -11,15 +11,17 @@ import { DomainController } from "../controllers/domainController.js";
 import { uiBus } from "../events/uiBus.js";
 import { domainBus } from "../events/domainBus.js";
 
-import { SidebarComponent } from "../components/sidebar/sidebarComponent.js";
-import { ToolbarComponent } from "../components/toolbar/toolbarComponent.js";
-import { EditorComponent } from "../components/editor/editorComponent.js";
-import { ChatComponent } from "../components/chat/chatComponent.js";
-import { ExplorerComponent } from "../components/explorer/explorerComponent.js";
-import { SettingsComponent } from "../components/settings/settingsComponent.js";
-import { EditorOverlayComponent } from "../components/editor-overlay/editorOverlayComponent.js";
-import { ModalManager } from "../components/modal/modalManager.js";
-import { ToastComponent } from "../components/toast/toastComponent.js";
+import {
+  SidebarComponent,
+  ToolbarComponent,
+  EditorComponent,
+  ChatComponent,
+  ExplorerComponent,
+  SettingsComponent,
+  EditorOverlayComponent,
+  ModalManager,
+  ToastComponent,
+} from "../components/index.js";
 
 /**
  * Orquestrador principal da aplicação no processo de renderização.
