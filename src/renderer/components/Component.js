@@ -63,8 +63,12 @@ export class Component {
    * Ciclo de vida principal padronizado.
    * @param {boolean} verifica se é o pai que está inicializando
    */
-  init(isParent = false) {
-    // Se é componente filho e não é o pai que inicia, retorna
+  /**
+   * Ciclo de vida principal padronizado e assíncrono.
+   * @param {boolean} isParent - verifica se é o pai que está inicializando
+   * @returns {Promise<void>}
+   */
+  async init(isParent = false) {
     if (this.parent && !isParent) return;
 
     this.element = document.querySelector(this.selector);
@@ -77,21 +81,25 @@ export class Component {
     }
 
     // 1. Renderiza o HTML principal
-    this.render();
+    await this.render();
 
-    // 2. Gancho opcional para lógica pós-renderização na classe filha
+    // 2. Gancho opcional (suporta assincronicidade se o filho precisar)
     if (typeof this.onInit === "function") {
-      this.onInit();
+      await this.onInit();
     }
 
     // 3. Configura ouvintes de eventos da classe filha
     this.setupListeners();
 
-    // 4. Se houver filhos cadastrados, inicializa todos em cascata
-    for (const child of this.children) {
-      if (typeof child.init === "function") {
-        child.init(true);
-      }
+    // 4. Inicializa todos os filhos em cascata e aguarda a conclusão de todos via Promise.all
+    if (this.children.length > 0) {
+      const childPromises = this.children.map((child) => {
+        if (typeof child.init === "function") {
+          return child.init(true);
+        }
+        return Promise.resolve();
+      });
+      await Promise.all(childPromises);
     }
 
     const isChild = this.parent ? " (child)" : "";
@@ -103,7 +111,7 @@ export class Component {
   /**
    * Motor de renderização centralizado usando Handlebars.
    */
-  render() {
+  async render() {
     if (!this.element || !this.templateHtml) return;
 
     // Se a filha tiver o método getContext, usa ele. Se não, usa um objeto vazio {} por padrão.

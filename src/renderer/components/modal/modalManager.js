@@ -72,6 +72,11 @@ export class ModalManager {
     // Inicializa o modal usando o ciclo de vida normal da classe Component
     modal.init();
 
+    // EXECUTA O CALLBACK DE MONTAGEM (Se foi passado no options pelo fileHandler)
+    if (typeof options.onMounted === "function") {
+      options.onMounted(modal);
+    }
+
     // Sobrescreve o close para gerenciar a pilha e remover o wrapper do DOM
     const originalClose = modal.close.bind(modal);
     modal.close = () => {

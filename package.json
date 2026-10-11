@@ -11,6 +11,7 @@
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "echo \"No linting configured\"",
+    "g": "node scripts/create-component.js",
     "docs:web": "jsdoc -c jsdoc.json",
     "file-map": "node scripts/project-map.js > docs/project-map.txt",
     "code-map": "node scripts/code-map.js > docs/code-map.txt",

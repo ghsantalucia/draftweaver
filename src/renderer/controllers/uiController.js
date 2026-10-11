@@ -69,8 +69,7 @@ export class UiController {
 
     // Evento que chama para tela de sincronização de arquivos .temp
     uiBus.on("sync:open-modal", () => {
-      file.onSyncOpenModal();
-      file.onSyncOpenModal();
+      file.onSyncOpenModal(this.services.file, this.state);
     });
 
     // Lida com seleção de livro/projeto
@@ -86,6 +85,7 @@ export class UiController {
     uiBus.on("book:changed", (bookPath) => {
       book.onBookChange(bookPath, this.state);
       chat.loadHistory(0, this.services.ai);
+      file.handlePendingTempFiles(this.services.file);
     });
 
     // Lida com editor resetado (nenhum arquivo aberto)
@@ -95,7 +95,7 @@ export class UiController {
 
     // Solicita o salvamento de um arquivo temporário (.temp) via IPC
     uiBus.on("file:save-temp", async ({ path, content }) => {
-      file.onSaveTemp(path, content);
+      file.onSaveTemp(path, content, this.services.file);
     });
 
     // Evento disparado quando um arquivo é aberto com sucesso
@@ -116,6 +116,15 @@ export class UiController {
     // Solicita mais histórico de chat
     uiBus.on("chat:fetch-more-history", ({ offset }) => {
       chat.fetchMoreHistory(offset, this.services.ai);
+    });
+
+    // Trata deleção de arquivo temporário
+    uiBus.on("temp-file:deleted", (filePath) => {
+      file.onTempDeleted(filePath, this.state, this.services.file);
+    });
+    // Trata sincronização de arquivo temporário
+    uiBus.on("temp-file:synced", (filePath) => {
+      file.onTempDeleted(filePath, this.state, this.services.file);
     });
   }
 }

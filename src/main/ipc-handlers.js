@@ -93,7 +93,7 @@ export function setupIpcHandlers(mainWindow) {
     }
   });
 
-  // Mapear pasta e subpastas (Assíncrono e Seguro)
+  // Mapear pasta e subpastas (Assíncrono e Seguro) com priorização de .temp
   ipcMain.handle("get-tree", async (event, folderPath) => {
     if (!folderPath) return null;
 
@@ -122,7 +122,19 @@ export function setupIpcHandlers(mainWindow) {
             children.map((child) => buildTree(path.join(dir, child))),
           );
           item.children = childrenNodes.filter(Boolean);
+        } else {
+          // Se for um arquivo markdown, verifica se existe uma versão .temp correspondente
+          const ext = path.extname(dir).toLowerCase();
+          if (ext === ".md" && !dir.endsWith(".temp")) {
+            const tempPath = `${dir}.temp`;
+            if (fs.existsSync(tempPath)) {
+              // Prioriza o arquivo .temp substituindo o caminho apontado para a UI
+              item.path = tempPath;
+              item.isTemp = true;
+            }
+          }
         }
+
         return item;
       } catch (err) {
         console.error(`[IPC get-tree] Erro ao ler ${dir}:`, err);

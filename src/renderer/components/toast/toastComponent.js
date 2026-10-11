@@ -26,6 +26,39 @@ export class ToastComponent extends Component {
    * Configura os ouvintes de eventos da interface.
    */
   setupListeners() {
-    // TODO: Implementar ouvintes se necessário.
+    this.uiBus.on("toast:show", ({ message, type }) => {
+      this.show(message, type);
+    });
+  }
+
+  /**
+   * Exibe uma mensagem de notificação toast temporária na tela.
+   * @param {string} message - Texto da mensagem.
+   * @param {string} [type='success'] - Tipo do toast ('success' ou 'error').
+   */
+  show(message, type = "success") {
+    const container = document.getElementById("toast-container");
+    const messageEl = document.getElementById("toast-message");
+
+    if (!container || !messageEl) return;
+
+    // Define o texto e limpa classes anteriores de tipo
+    messageEl.textContent = message;
+    container.classList.remove("success", "error", "hidden");
+
+    // Adiciona a classe correspondente ao tipo (success ou error)
+    if (type) {
+      container.classList.add(type);
+    }
+
+    // Limpa timer anterior caso já estivesse visível
+    if (this._toastTimer) {
+      clearTimeout(this._toastTimer);
+    }
+
+    // Oculta automaticamente após 3 segundos com animação suave
+    this._toastTimer = setTimeout(() => {
+      container.classList.add("hidden");
+    }, 3000);
   }
 }

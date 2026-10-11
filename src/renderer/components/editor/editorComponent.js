@@ -10,7 +10,11 @@ import "./styles.css";
 import templateHtml from "./templates/main.hbs?raw";
 import { Component } from "../Component.js";
 import { parseMarkdown, stringifyFrontmatter } from "../../utils/markdown.js";
-import { normalizeItemMetadata, getRelativePath } from "../../utils/helpers.js";
+import {
+  normalizeItemMetadata,
+  getRelativePath,
+  normalizePath,
+} from "../../utils/helpers.js";
 
 /**
  * Representa o Editor Markdown da aplicação baseado em eventos.
@@ -53,6 +57,11 @@ export class EditorComponent extends Component {
       // Reseta e bloqueia o editor sempre que um novo livro/projeto for selecionado
       this.uiBus.on("editor:reset", () => {
         this.resetEditorState();
+      });
+
+      this.uiBus.on("temp-file:saved", (path) => {
+        if (normalizePath(this.state.currentFilePath) === normalizePath(path))
+          this.uiBus.emit("toolbar:save-status", "saved");
       });
     }
   }
@@ -177,7 +186,7 @@ export class EditorComponent extends Component {
   handleEditorChange() {
     if (!this.state || !this.state.currentFilePath) return;
 
-    this.setSaveStatus("unsaved");
+    this.uiBus.emit("toolbar:save-status", "unsaved");
 
     if (this.autoSaveTimer) clearTimeout(this.autoSaveTimer);
 
@@ -196,53 +205,16 @@ export class EditorComponent extends Component {
     if (!this.state || !this.state.currentFilePath || !this.state.editor)
       return;
 
-    this.setSaveStatus("saving");
+    this.uiBus.emit("toolbar:save-status", "saving");
     const contentToSave = stringifyFrontmatter(
       this.state.currentFileMetadata,
       this.state.editor.getMarkdown(),
     );
 
-    // Emite evento fictício/arquitetural para o service de arquivo salvar via barramento
-    if (this.uiBus) {
-      this.uiBus.emit("file:save-temp", {
-        path: this.state.currentFilePath,
-        content: contentToSave,
-      });
-    }
-
-    // Simulação visual de sucesso baseada em eventos
-    this.setSaveStatus("saved");
-
-    if (this.uiBus) {
-      this.uiBus.emit("editor:saved-success", this.state.currentFilePath);
-    }
-  }
-
-  /**
-   * Atualiza o ícone visual de status de salvamento na UI.
-   * @param {string} status - O estado atual do salvamento.
-   * @returns {void}
-   */
-  setSaveStatus(status) {
-    const statusEl = document.getElementById("save-status-indicator");
-    if (!statusEl) return;
-
-    statusEl.className = `save-status ${status}`;
-    const iconEl = statusEl.querySelector("i");
-    const textEl = statusEl.querySelector(".status-text");
-
-    if (status === "unsaved") {
-      if (iconEl) iconEl.className = "fas fa-spinner fa-spin";
-      if (textEl) textEl.textContent = "Alterações pendentes...";
-    } else if (status === "saving") {
-      if (iconEl) iconEl.className = "fas fa-spinner fa-spin";
-      if (textEl) textEl.textContent = "Salvando rascunho...";
-    } else if (status === "saved") {
-      if (iconEl) iconEl.className = "fas fa-check-circle";
-      if (textEl) textEl.textContent = "Rascunho salvo";
-    } else if (status === "hidden") {
-      if (textEl) textEl.textContent = "";
-    }
+    this.uiBus.emit("file:save-temp", {
+      path: this.state.currentFilePath,
+      content: contentToSave,
+    });
   }
 
   /**
@@ -333,7 +305,7 @@ export class EditorComponent extends Component {
     const isReadOnly =
       !metadata.humanWrite || (this.state && this.state.aiLockState);
     this.setEditorReadOnly(isReadOnly);
-    this.setSaveStatus("hidden");
+    this.uiBus.emit("toolbar:save-status", "hidden");
 
     if (this.uiBus) {
       this.uiBus.emit("editor-overlay:close", "no-file");
@@ -368,6 +340,6 @@ export class EditorComponent extends Component {
       this.uiBus.emit("editor:reseted");
     }
 
-    this.setSaveStatus("hidden");
+    this.uiBus.emit("toolbar:save-status", "hidden");
   }
 }

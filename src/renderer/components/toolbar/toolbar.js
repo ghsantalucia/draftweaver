@@ -2,13 +2,25 @@
  * @file Barra de Ferramentas do framework acima do editor
  */
 
+// FIXME: Colocar no padrão componente class extends component, já importa o styles e o template.hbs
+
 import "./styles.css";
 
+// FIXME: Inicializar a animação do botão no momento adequado
+import { initSaveButtonAnimation } from "./animations.js";
+
+// FIXME: Recebe o state by default no constructor, não se preocupar
 import { state } from "../../core/state.js";
+
+// FIXME: Se necessário, ainda pode recorrer ao utils
 import { stringifyFrontmatter } from "../../utils/markdown.js";
 import { normalizePath } from "../../utils/helpers.js";
+
+// FIXME: Não vamos mais importar outros componentes, arquitetura totalmente desacoplada, orientada a eventos (uiBus - mitt)
 import { showToast } from "../toast/toast.js";
 import { Modal } from "../modal/modal.js";
+
+// FIXME: Não deve ter acesso direto aos services, ele emite eventos e o controlador irá chamar o service (uiController)
 import {
   readFile,
   saveFile,
@@ -184,6 +196,7 @@ export async function openSyncModal() {
   attachSyncModalEvents(syncModal);
 }
 
+// FIXME: Não deve ter conteúdo HTML direto no javascript, utilizar templates handlebars (criar novo arquivo na pasta /templates)
 /**
  * Gera o HTML dinâmico contendo a lista de arquivos temporários para exibição no modal de sincronização.
  * @param {Array<Object>} tempFiles - Lista de objetos contendo o nome e caminho dos arquivos temporários.
@@ -391,6 +404,7 @@ function attachSyncModalEvents(syncModal) {
   updateListState();
 }
 
+// FIXME: O comportamento do botão da toolbar continua responsabilidade dela, porém ativada via eventos
 /**
  * Centraliza a regra de ativação/desativação do botão Salvar/Sincronizar
  */

@@ -7,7 +7,7 @@ import templateHtml from "./templates/main.hbs?raw";
 import folderNodeTpl from "./templates/folderNode.hbs?raw";
 import fileNodeTpl from "./templates/fileNode.hbs?raw";
 import { Component } from "../Component.js";
-import { normalizeItemMetadata } from "../../utils/helpers.js";
+import { normalizeItemMetadata, normalizePath } from "../../utils/helpers.js";
 import { parseMarkdown } from "../../utils/markdown.js";
 
 /**
@@ -31,7 +31,8 @@ export class ExplorerComponent extends Component {
    * @returns {void}
    */
   onInit() {
-    this.initExplorerEvents();
+    this.toggleAdvancedExplorerView();
+    this.tabSelectionEvents();
   }
 
   /**
@@ -40,33 +41,30 @@ export class ExplorerComponent extends Component {
    */
   setupListeners() {
     // Ouve alterações no livro atual para re-renderizar a árvore
-    if (this.uiBus) {
-      this.uiBus.on("book:selected", () => {
-        this.syncAdvancedModeView();
-        this.renderTree();
+    this.uiBus.on("book:selected", async () => {
+      await this.renderTree();
+      this.syncAdvancedModeView();
+
+      // Adiciona arquivo .temp à árvore
+      this.uiBus.on("temp-file:saved", (path) => {
+        this.updateFileTempStatus(path, true);
+      });
+
+      // Ouvinte geral de todos os arquivos .temp
+      this.uiBus.on("temp-files:pending-list", (arr) => {
+        if (Array.isArray(arr)) {
+          this.clearAllTemp();
+          arr.forEach((file) => {
+            this.updateFileTempStatus(normalizePath(file.path), true);
+          });
+        }
       });
 
       // Ouve quando o arquivo atual muda para sincronizar a seleção visual na árvore
       this.uiBus.on("file:opened", (payload) => {
         this.autoOpenFileByPath(payload.relativePath);
       });
-    }
-
-    // Ouve evento global ou do uiBus para sincronizar arquivo selecionado se necessário
-    if (this.uiBus) {
-      this.uiBus.on("file:sync-selection", (relativePath) => {
-        this.syncTreeSelection(relativePath);
-      });
-    }
-  }
-
-  /**
-   * Inicializa todos os ouvintes de eventos e comportamentos visuais do explorador.
-   * @returns {void}
-   */
-  initExplorerEvents() {
-    this.toggleAdvancedExplorerView();
-    this.tabSelectionEvents();
+    });
   }
 
   /**
@@ -257,7 +255,7 @@ export class ExplorerComponent extends Component {
    * @returns {Promise<HTMLLIElement|null>} O elemento HTML da pasta montada ou null se não for legível.
    */
   async createFolderNode(entry, relativePath, parentMeta = null) {
-    const folderYmlPath = `${entry.path}/folder.yml`;
+    const folderYmlPath = `${normalizePath(entry.path)}/folder.yml`;
     let rawMeta = {};
 
     const rawText = await window.electronAPI.readFile(folderYmlPath);
@@ -367,9 +365,12 @@ export class ExplorerComponent extends Component {
       (parentMeta && parentMeta.advanced === true) || meta.advanced === true;
     const isReadonly = meta.humanRead && !meta.humanWrite;
 
+    let absolutePath = normalizePath(entry.path);
+    relativePath = normalizePath(relativePath);
+
     // Compila e cria o nó DOM do file usando os utilitários da classe Component
     const htmlString = this.compile(fileNodeTpl, {
-      entry,
+      absolutePath,
       relativePath,
       meta,
       isAdvanced,
@@ -489,5 +490,82 @@ export class ExplorerComponent extends Component {
         attemptSelection();
       }, 150);
     }
+  }
+
+  /**
+   * Adiciona ou remove a indicação de arquivo temporário (.temp) na UI do Explorer.
+   * @param {string} filePath - Caminho do arquivo afetado.
+   * @param {boolean} isTemp - True para marcar como temporário, false para limpar.
+   */
+  updateFileTempStatus(filePath, isTemp) {
+    console.log("updateFileTempStatus()", filePath, isTemp);
+    if (!filePath) return;
+
+    // Normaliza o caminho para garantir compatibilidade com os atributos data-path e data-absolute-path
+    const cleanPath = filePath.replace(/\.temp$/, "");
+
+    // Seleciona todos os elementos <li> da árvore que correspondem ao arquivo
+    const fileNodes = this.element.querySelectorAll(
+      "#file-tree li, #file-tree [data-path]",
+    );
+
+    fileNodes.forEach((node) => {
+      const nodePath = node.getAttribute("data-path") || "";
+      const absPath = node.getAttribute("data-absolute-path") || "";
+
+      const isMatch =
+        nodePath === cleanPath ||
+        absPath === cleanPath ||
+        cleanPath.endsWith(nodePath);
+
+      if (isMatch) {
+        const fileNameSpan = node.querySelector(".file-name");
+        const titleWrapper = node.querySelector(".file-title-wrapper");
+
+        if (isTemp) {
+          // Adiciona a marcação apenas se já não estiver cadastrado/marcado
+          if (!node.classList.contains("has-temp")) {
+            node.classList.add("has-temp");
+            fileNameSpan?.classList.add("has-temp");
+
+            if (
+              titleWrapper &&
+              !titleWrapper.classList.contains("dirty-asterisk")
+            ) {
+              titleWrapper.classList.add("dirty-asterisk");
+            }
+          }
+        } else {
+          // Remove a marcação caso o arquivo tenha sido sincronizado ou descartado
+          node.classList.remove("has-temp");
+          fileNameSpan?.classList.remove("has-temp");
+          titleWrapper?.classList.remove("dirty-asterisk");
+        }
+      }
+    });
+  }
+
+  /**
+   * Remove todas as marcações de arquivos temporários (.temp) da interface do Explorer.
+   */
+  clearAllTemp() {
+    if (!this.element) return;
+
+    // Seleciona todos os nós que possuem alguma marcação temporária
+    const tempNodes = this.element.querySelectorAll(
+      "#file-tree .has-temp, #file-tree .dirty-asterisk",
+    );
+
+    tempNodes.forEach((node) => {
+      node.classList.remove("has-temp");
+      // Se for o wrapper do título, remove a classe do asterisco
+      if (node.classList.contains("dirty-asterisk")) {
+        node.classList.remove("dirty-asterisk");
+      }
+    });
+
+    console.log(
+      "[ExplorerComponent] Todas as marcações .temp foram limpas da UI.",
+    );
   }
 }

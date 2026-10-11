@@ -13,10 +13,13 @@ import { initDeclarativeEvents } from "./uiDeclarativeEvents.js";
 export class UiEventBus {
   /**
    * @constructor
-   * @description Inicializa a instância interna do Mitt, os eventos declarativos e o listener de depuração global.
+   * @description Inicializa a instância interna do Mitt, o armazenamento de histórico e os ouvintes.
    */
   constructor() {
     this.bus = mitt();
+    this.eventHistory = []; // Histórico geral de todos os eventos (limite de 250)
+    this.maxHistorySize = 250;
+
     initDeclarativeEvents(this.bus);
 
     // DEBUG Ouve absolutamente tudo o que passa pelo uiBus
@@ -27,31 +30,52 @@ export class UiEventBus {
 
   /**
    * @method emit
-   * @description Dispara um evento de forma direta (fire-and-forget) para notificações ou intenções.
-   * @param {string} event - Nome do evento a ser emitido.
-   * @param {any} [payload] - Dados opcionais a serem transmitidos junto com o evento.
+   * @description Dispara um evento e armazena no histórico geral.
+   * @param {string} event Nome do evento a ser emitido.
+   * @param {any} [payload] Dados opcionais a serem transmitidos.
    * @returns {void}
    */
-  emit(event, payload) {
+  emit(event, payload = null) {
+    // Adiciona o evento ao histórico geral
+    this.eventHistory.push({ event, payload, timestamp: Date.now() });
+
+    // Mantém o limite máximo de 250 eventos (remove o mais antigo se estourar)
+    if (this.eventHistory.length > this.maxHistorySize) {
+      this.eventHistory.shift();
+    }
+
     this.bus.emit(event, payload);
   }
 
   /**
    * @method on
-   * @description Registra um listener para um evento. Intercepta automaticamente eventos de requisição (*:req:*) para embrulhar o payload em um contexto inteligente com métodos de resposta.
-   * @param {string} event - Nome do evento a ser escutado.
-   * @param {Function} callback - Função executada quando o evento for disparado.
+   * @description Registra um listener e opcionalmente faz o replay de eventos passados daquele tipo específico.
+   * @param {string} event Nome do evento a ser escutado.
+   * @param {Function} callback Função executada quando o evento for disparado.
+   * @param {boolean} [replay=true] Se deve rodar o histórico anterior para este evento específico.
    * @returns {void}
    */
-  on(event, callback) {
+  on(event, callback, replay = true) {
+    // 1. Se replay for verdadeiro, varre o histórico geral filtrando apenas por este evento
+    if (replay) {
+      const pastEvents = this.eventHistory.filter(
+        (item) => item.event === event,
+      );
+      if (pastEvents.length > 0) {
+        pastEvents.forEach((item) => {
+          setTimeout(() => {
+            callback(item.payload);
+          }, 0);
+        });
+      }
+    }
+
+    // 2. Configuração normal de registro (com suporte a requisições se houver :req:)
     if (event.includes(":req:")) {
       this.bus.on(event, (payload) => {
-        // Extrai o requestId e separa o restante dos dados reais
         const { requestId, ...cleanPayload } = payload || {};
-
-        // Cria o objeto de requisição inteligente
         const reqContext = {
-          data: cleanPayload, // Contém apenas os dados enviados pelo componente, sem o lixo do requestId
+          data: cleanPayload,
           reply: (data) => {
             const resEvent = event.replace(":req:", ":res:");
             this.bus.emit(resEvent, { requestId, data });
@@ -61,7 +85,6 @@ export class UiEventBus {
             this.bus.emit(resEvent, { requestId, error: errorMessage });
           },
         };
-
         callback(reqContext);
       });
     } else {
@@ -70,26 +93,10 @@ export class UiEventBus {
   }
 
   /**
-   * @method onReq
-   * @description Atalho declarativo para registrar um listener de requisição a partir de um nome base (ex: "books:fetch-list" converte-se internamente para "books:req:fetch-list").
-   * @param {string} event - Nome base da requisição.
-   * @param {Function} callback - Função executada recebendo o contexto inteligente da requisição.
-   * @returns {void}
-   */
-  onReq(event, callback) {
-    const parts = event.split(":");
-    const domain = parts[0];
-    const action = parts.slice(1).join(":");
-    const reqEvent = `${domain}:req:${action}`;
-
-    this.on(reqEvent, callback);
-  }
-
-  /**
    * @method off
    * @description Remove um listener de evento previamente cadastrado.
-   * @param {string} event - Nome do evento.
-   * @param {Function} callback - Referência da função callback associada.
+   * @param {string} event Nome do evento.
+   * @param {Function} callback Referência da função callback associada.
    * @returns {void}
    */
   off(event, callback) {
@@ -139,6 +146,22 @@ export class UiEventBus {
       this.bus.on(resEvent, handleResponse);
       this.bus.emit(reqEvent, { ...payload, requestId });
     });
+  }
+
+  /**
+   * @method onReq
+   * @description Atalho declarativo para registrar um listener de requisição a partir de um nome base (ex: "books:fetch-list" converte-se internamente para "books:req:fetch-list").
+   * @param {string} event - Nome base da requisição.
+   * @param {Function} callback - Função executada recebendo o contexto inteligente da requisição.
+   * @returns {void}
+   */
+  onReq(event, callback) {
+    const parts = event.split(":");
+    const domain = parts[0];
+    const action = parts.slice(1).join(":");
+    const reqEvent = `${domain}:req:${action}`;
+
+    this.on(reqEvent, callback);
   }
 }
 

@@ -1,0 +1,66 @@
+<div class="sync-modal-container">
+  <p class="sync-modal-desc">
+    Os seguintes arquivos possuem alterações temporárias não salvas no arquivo
+    original:
+  </p>
+
+  <div class="sync-select-all-wrapper">
+    <label class="custom-checkbox-label">
+      <input type="checkbox" id="sync-select-all" checked />
+      <span class="checkbox-mark"></span>
+      <span class="checkbox-text">
+        <strong id="sync-count-label">Selecionar Todos ({{tempFiles.length}})</strong>
+      </span>
+    </label>
+  </div>
+
+  <ul class="sync-file-list" id="sync-file-list">
+    {{#each tempFiles}}
+      <li class="sync-file-item" data-path="{{this.path}}">
+        <label class="custom-checkbox-label">
+          <input
+            type="checkbox"
+            class="sync-file-checkbox"
+            data-path="{{this.path}}"
+            checked
+          />
+          <span class="checkbox-mark"></span>
+        </label>
+
+        <span class="sync-file-title">
+          <a
+            href="#"
+            class="sync-file-link"
+            data-path="{{this.path}}"
+            title="Visualizar arquivo"
+          >
+            {{this.name}}
+          </a>
+        </span>
+
+        <button
+          class="btn-discard-temp"
+          data-path="{{this.path}}"
+          data-name="{{this.name}}"
+          title="Descartar alterações temporárias"
+        >
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path
+              d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+            ></path>
+          </svg>
+        </button>
+      </li>
+    {{/each}}
+  </ul>
+</div>

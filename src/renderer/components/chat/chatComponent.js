@@ -4,7 +4,7 @@
 
 import "./styles.css";
 import templateHtml from "./templates/main.hbs?raw";
-import { initStarryBackground } from "./chatAnimations.js";
+import { initStarryBackground } from "./animations.js";
 import { Component } from "../Component.js";
 import { gsap } from "gsap";
 

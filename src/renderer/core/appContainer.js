@@ -11,17 +11,7 @@ import { DomainController } from "../controllers/domainController.js";
 import { uiBus } from "../events/uiBus.js";
 import { domainBus } from "../events/domainBus.js";
 
-import {
-  SidebarComponent,
-  ToolbarComponent,
-  EditorComponent,
-  ChatComponent,
-  ExplorerComponent,
-  SettingsComponent,
-  EditorOverlayComponent,
-  ModalManager,
-  ToastComponent,
-} from "../components/index.js";
+import * as ComponentClass from "../components/index.js";
 
 /**
  * Orquestrador principal da aplicação no processo de renderização.
@@ -43,7 +33,10 @@ export class AppContainer {
       state: this.state,
     };
     this.themeManager = new ThemeManager();
-    this.modalManager = new ModalManager("#modal-container", context);
+    this.modalManager = new ComponentClass.ModalManager(
+      "#modal-container",
+      context,
+    );
 
     // 2. Centraliza os serviços em um único lugar
     this.services = new ServiceManager(this.state);
@@ -55,35 +48,41 @@ export class AppContainer {
     // 4. Agrupamos os componentes de UI em um array/objeto central
     this.components = {};
 
-    this.components.sidebar = new SidebarComponent(
+    this.components.sidebar = new ComponentClass.SidebarComponent(
       "#sidebar-container",
       context,
     );
     this.components.chat = this.components.sidebar.newChild(
-      ChatComponent,
+      ComponentClass.ChatComponent,
       "#chat-container",
       context,
     );
     this.components.explorer = this.components.sidebar.newChild(
-      ExplorerComponent,
+      ComponentClass.ExplorerComponent,
       "#explorer-container",
       context,
     );
-    this.components.editor = new EditorComponent("#editor-container", context);
+    this.components.editor = new ComponentClass.EditorComponent(
+      "#editor-container",
+      context,
+    );
     this.components.editorOverlay = this.components.editor.newChild(
-      EditorOverlayComponent,
+      ComponentClass.EditorOverlayComponent,
       "#editor-overlay-container",
       context,
     );
-    this.components.toolbar = new ToolbarComponent(
+    this.components.toolbar = new ComponentClass.ToolbarComponent(
       "#toolbar-container",
       context,
     );
-    this.components.settings = new SettingsComponent(
+    this.components.settings = new ComponentClass.SettingsComponent(
       "#settings-container",
       context,
     );
-    this.components.toast = new ToastComponent("#toast-container", context);
+    this.components.toast = new ComponentClass.ToastComponent(
+      "#toast-container",
+      context,
+    );
   }
 
   /**
@@ -94,12 +93,16 @@ export class AppContainer {
     // Inicializa o estado global da aplicação antes de tudo.
     await this.setupState();
 
-    // Percorre os valores do objeto de componentes de forma segura
-    for (const component of Object.values(this.components)) {
-      if (component && typeof component.init === "function") {
-        component.init();
-      }
-    }
+    // Aguarda a inicialização e renderização de todos os componentes principais em paralelo
+    const componentPromises = Object.values(this.components).map(
+      async (component) => {
+        if (component && typeof component.init === "function") {
+          await component.init();
+        }
+      },
+    );
+
+    await Promise.all(componentPromises);
 
     // Inicia o tema depois que todos os elementos UI estão renderizados
     this.themeManager.init();

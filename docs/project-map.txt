@@ -31,6 +31,7 @@ Estrutura do Projeto com Descrições:
 ├── README.md
 ├── [scripts]
 │   ├── code-map.js — scripts/code-map.js
+│   ├── create-component.js
 │   ├── event-map.js
 │   └── project-map.js — ou @description no início do arquivo
 ├── [src]
@@ -60,51 +61,63 @@ Estrutura do Projeto com Descrições:
 │       │       │   └── switch.css
 │       │       └── main.css
 │       ├── [components]
-│       │   ├── [chat]
-│       │   │   ├── chatAnimations.js — Gerencia as animações da interface do chat de IA
-│       │   │   ├── chatComponent.js — Componente responsável pela renderização estrutural do chat do assistente de IA
-│       │   │   ├── chatPipeline.js — Controlador da pipeline do assistente de IA, gerenciando o fluxo entre o envio do usuário e a resposta da IA.
-│       │   │   ├── chatStorage.js — Módulo de armazenamento do chat, responsável por gerenciar o histórico de mensagens e a persistência dos dados do chat.
-│       │   │   ├── chatUi.js — Responsável pelos eventos e comportamentos da interface do Chat com a IA (auto-resize do input, envio com tecla Enter, renderização e estado do chat).
+│       │   ├── [Chat]
+│       │   │   ├── animations.js — Gerencia as animações da interface do chat de IA
+│       │   │   ├── ChatComponent.js — Componente responsável pela renderização estrutural do chat do assistente de IA
 │       │   │   ├── styles.css
-│       │   │   └── template.html
+│       │   │   └── [templates]
+│       │   │       ├── dateDivider.hbs
+│       │   │       ├── main.hbs
+│       │   │       ├── message.hbs
+│       │   │       └── startMarker.hbs
 │       │   ├── Component.js
-│       │   ├── [editor]
-│       │   │   ├── editorComponent.js — Componente responsável pela renderização estrutural do editor markdown e manipulação de eventos via uiBus.
+│       │   ├── [Editor]
+│       │   │   ├── EditorComponent.js — Componente responsável pela renderização estrutural do editor markdown e manipulação de eventos via uiBus.
 │       │   │   ├── styles.css
-│       │   │   └── template.html
-│       │   ├── [editor-overlay]
-│       │   │   ├── editorOverlayComponent.js — Componente responsável pela renderização estrutural do editor overlay
+│       │   │   └── [templates]
+│       │   │       └── main.hbs
+│       │   ├── [EditorOverlay]
+│       │   │   ├── EditorOverlayComponent.js — Componente responsável pela renderização estrutural do editor overlay
 │       │   │   ├── styles.css
-│       │   │   └── template.html
-│       │   ├── [explorer]
-│       │   │   ├── explorerComponent.js — Componente responsável pela renderização estrutural e lógica do explorer de arquivos.
-│       │   │   ├── nodeTemplate.html
+│       │   │   └── [templates]
+│       │   │       └── main.hbs
+│       │   ├── [Explorer]
+│       │   │   ├── ExplorerComponent.js — Componente responsável pela renderização estrutural e lógica do explorer de arquivos.
 │       │   │   ├── styles.css
-│       │   │   └── template.html
-│       │   ├── [modal]
-│       │   │   ├── modalComponent.js — Classe gerenciadora de modais em pilha (Stack).
-│       │   │   ├── modalManager.js — Classe gerenciadora da pilha de modais dinâmicos da aplicação.
+│       │   │   └── [templates]
+│       │   │       ├── fileNode.hbs
+│       │   │       ├── folderNode.hbs
+│       │   │       └── main.hbs
+│       │   ├── index.js — Barrel para exportação centralizada de todos os componentes de interface.
+│       │   ├── [Modal]
+│       │   │   ├── ModalComponent.js — Classe gerenciadora de modais em pilha (Stack).
+│       │   │   ├── ModalManager.js — Classe gerenciadora da pilha de modais dinâmicos da aplicação.
 │       │   │   ├── styles.css
-│       │   │   └── template.html
-│       │   ├── [settings]
-│       │   │   ├── settingsComponent.js — Componente responsável pela renderização estrutural da drawer de configurações
+│       │   │   └── [templates]
+│       │   │       ├── main.hbs
+│       │   │       └── syncForm.hbs
+│       │   ├── [Settings]
+│       │   │   ├── SettingsComponent.js — Componente responsável pela renderização estrutural da drawer de configurações
 │       │   │   ├── styles.css
-│       │   │   └── template.html
-│       │   ├── [sidebar]
-│       │   │   ├── sidebarComponent.js — Componente responsável pela renderização estrutural da barra lateral (Sidebar).
+│       │   │   └── [templates]
+│       │   │       └── main.hbs
+│       │   ├── [Sidebar]
+│       │   │   ├── SidebarComponent.js — Componente responsável pela renderização estrutural da barra lateral (Sidebar).
 │       │   │   ├── styles.css
-│       │   │   └── template.html
-│       │   ├── [toast]
+│       │   │   └── [templates]
+│       │   │       └── main.hbs
+│       │   ├── [Toast]
 │       │   │   ├── styles.css
-│       │   │   ├── template.html
-│       │   │   └── toastComponent.js — Componente responsável pela renderização estrutural do toast.
-│       │   └── [toolbar]
+│       │   │   ├── [templates]
+│       │   │   │   └── main.hbs
+│       │   │   └── ToastComponent.js — Componente responsável pela renderização estrutural do toast.
+│       │   └── [Toolbar]
 │       │       ├── animations.js — Gerencia as animações da interface do usuário
 │       │       ├── styles.css
-│       │       ├── template.html
+│       │       ├── [templates]
+│       │       │   └── main.hbs
 │       │       ├── toolbar.js — Barra de Ferramentas do framework acima do editor
-│       │       └── toolbarComponent.js — Componente responsável pela renderização estrutural da Toolbar.
+│       │       └── ToolbarComponent.js — Componente responsável pela estrutura e lógica reativa da Barra de Ferramentas (Toolbar).
 │       ├── [controllers]
 │       │   ├── domainController.js — Gerencia e despacha os eventos de negócio e domínio vindos do domainBus para os handlers específicos.
 │       │   ├── [handlers]
@@ -113,7 +126,7 @@ Estrutura do Projeto com Descrições:
 │       │   │   ├── characterHandler.js
 │       │   │   ├── chatHandler.js — Handler para orquestração de eventos e mensagens do chat.
 │       │   │   ├── configHandler.js — Handler para gerenciar alterações no arquivo config.json dos projetos.
-│       │   │   └── fileHandler.js — Handler dos eventos relacionados a arquivos .md e .temp
+│       │   │   └── fileHandler.js — Handler responsável pelas ações de sincronização e gerenciamento de arquivos .temp.
 │       │   └── uiController.js — Gerencia e despacha os eventos de interface (UI) vindos do uiBus para os handlers visuais.
 │       ├── [core]
 │       │   ├── appContainer.js — Contém a classe AppContainer, responsável por inicializar, instanciar e gerenciar

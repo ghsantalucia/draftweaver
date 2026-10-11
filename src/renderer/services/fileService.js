@@ -3,6 +3,7 @@
  */
 
 import { uiBus } from "../events/uiBus.js";
+import { parseMarkdown, stringifyFrontmatter } from "../utils/markdown.js";
 
 /**
  * Serviço de manipulação e persistência de arquivos locais via IPC do Electron.
@@ -17,29 +18,39 @@ export class FileService {
     this.state = state;
   }
 
-  /**
-   * Retorna o caminho do arquivo temporário (.temp) correspondente.
-   * @param {string|null} filePath - Caminho do arquivo original.
-   * @returns {string|null} Caminho do .temp ou null se inválido.
-   */
-  getTempPath(filePath) {
-    return filePath ? `${filePath}.temp` : null;
-  }
+  // ========== Ciclo de vida do arquivo ========== //
 
   /**
-   * Deleta um arquivo no disco via IPC.
-   * @param {string} fullPath - Caminho completo do arquivo a ser deletado.
-   * @returns {Promise<{success: boolean, error?: string}>} Resultado da exclusão.
+   * Persiste o conteúdo de um arquivo em disco substituindo o original pelo .temp e apagando o .temp.
+   * @param {string} fullPath - Caminho completo do arquivo.
+   * @param {string} content - Conteúdo oficial a ser gravado.
+   * @returns {Promise<{success: boolean, error?: string}>} Resultado da operação.
    */
-  async deleteFile(fullPath) {
+  async saveFile(fullPath, content) {
+    if (!fullPath) {
+      return { success: false, error: "Caminho de arquivo inválido." };
+    }
+
     try {
-      return await window.electronAPI.deleteFile(fullPath);
+      // 1. Grava no arquivo oficial
+      const res = await window.electronAPI.saveFile(fullPath, content);
+
+      if (res.success) {
+        // 2. Remove o arquivo .temp
+        const tempPath = this.getTempPath(fullPath);
+        await this.deleteFile(tempPath);
+      }
+
+      return res;
     } catch (error) {
       console.error(
-        `[FILE SERVICE] Erro ao deletar arquivo em ${fullPath}:`,
+        `[FILE SERVICE] Erro ao salvar arquivo em ${fullPath}:`,
         error,
       );
-      return { success: false, error: error.message };
+      return {
+        success: false,
+        error: error.message || "Erro desconhecido ao salvar.",
+      };
     }
   }
 
@@ -79,6 +90,25 @@ export class FileService {
   }
 
   /**
+   * Deleta um arquivo no disco via IPC.
+   * @param {string} fullPath - Caminho completo do arquivo a ser deletado.
+   * @returns {Promise<{success: boolean, error?: string}>} Resultado da exclusão.
+   */
+  async deleteFile(fullPath) {
+    try {
+      return await window.electronAPI.deleteFile(fullPath);
+    } catch (error) {
+      console.error(
+        `[FILE SERVICE] Erro ao deletar arquivo em ${fullPath}:`,
+        error,
+      );
+      return { success: false, error: error.message };
+    }
+  }
+
+  // ========== Ciclo de vida do arquivo .temp ========== //
+
+  /**
    * Salva o rascunho no arquivo .temp e notifica a interface via barramento de UI.
    * @param {string} fullPath - Caminho completo do arquivo original.
    * @param {string} content - Conteúdo a ser gravado no rascunho.
@@ -89,45 +119,118 @@ export class FileService {
     const tempPath = this.getTempPath(fullPath);
     const result = await window.electronAPI.saveFile(tempPath, content);
 
-    if (result.success) {
-      // Emite o evento real passando o arquivo original e o temp
-      uiBus.emit("temp-file:saved", { originalPath: fullPath, tempPath });
-    }
-
     return result;
   }
 
   /**
-   * Persiste o conteúdo de um arquivo em disco substituindo o original pelo .temp e apagando o .temp.
-   * @param {string} fullPath - Caminho completo do arquivo.
-   * @param {string} content - Conteúdo oficial a ser gravado.
-   * @returns {Promise<{success: boolean, error?: string}>} Resultado da operação.
+   * Retorna o caminho do arquivo temporário (.temp) correspondente.
+   * @param {string|null} filePath - Caminho do arquivo original.
+   * @returns {string|null} Caminho do .temp ou null se inválido.
    */
-  async saveFile(fullPath, content) {
-    if (!fullPath) {
-      return { success: false, error: "Caminho de arquivo inválido." };
-    }
+  getTempPath(filePath) {
+    return filePath ? `${filePath}.temp` : null;
+  }
+
+  /**
+   * Varre a pasta do livro atual no disco em busca de arquivos .temp e retorna um array completo.
+   * @async
+   * @returns {Promise<Array<{path: string, tempPath: string, name: string, content: string}>>}
+   */
+  async getPendingTempFiles() {
+    if (!this.state || !this.state.currentBookPath) return [];
 
     try {
-      // 1. Grava no arquivo oficial
-      const res = await window.electronAPI.saveFile(fullPath, content);
+      // 1. Obtém a árvore de arquivos completa do livro atual via IPC
+      const tree = await window.electronAPI.getTree(this.state.currentBookPath);
+      const tempFiles = [];
 
-      if (res.success) {
-        // 2. Remove o arquivo .temp
-        const tempPath = this.getTempPath(fullPath);
-        await this.deleteFile(tempPath);
-      }
+      // Função recursiva para varrer os nós do projeto
+      const walkTree = async (node) => {
+        if (!node) return;
 
-      return res;
+        if (node.children && Array.isArray(node.children)) {
+          for (const child of node.children) {
+            await walkTree(child);
+          }
+        } else if (node.name && node.name.endsWith(".temp")) {
+          const tempPath = node.path;
+          const originalPath = tempPath.replace(/\.temp$/, "");
+
+          // 2. Lê o conteúdo bruto do arquivo .temp diretamente do disco
+          const { content } = await this.readFile(tempPath);
+
+          let displayName = node.name
+            .replace(/\.temp$/, "")
+            .replace(/\.md$/, "");
+
+          // 3. Extrai o título dos metadados Frontmatter do .temp se existir
+          if (content) {
+            const { metadata } = parseMarkdown(content);
+            if (metadata && metadata.title) {
+              displayName = metadata.title;
+            }
+          }
+
+          tempFiles.push({
+            path: originalPath,
+            tempPath: tempPath,
+            name: displayName,
+            content: content || "",
+          });
+        }
+      };
+
+      await walkTree(tree);
+      return tempFiles;
     } catch (error) {
       console.error(
-        `[FILE SERVICE] Erro ao salvar arquivo em ${fullPath}:`,
+        "[FILE SERVICE] Erro ao varrer arquivos .temp do disco:",
         error,
       );
-      return {
-        success: false,
-        error: error.message || "Erro desconhecido ao salvar.",
-      };
+      return [];
     }
+  }
+
+  /**
+   * Sincroniza um único arquivo (.temp -> original) preservando integralmente o Frontmatter.
+   * @async
+   * @param {string} filePath - Caminho do arquivo original.
+   * @returns {Promise<{success: boolean, error?: string}>}
+   */
+  async syncFile(filePath) {
+    if (!filePath) return { success: false, error: "Caminho inválido" };
+
+    let contentToSave = null;
+
+    // 1. Caso o arquivo a ser sincronizado seja o atualmente focado no editor:
+    if (this.state?.currentFilePath === filePath && this.state?.editor) {
+      const bodyText = this.state.editor.getMarkdown();
+      const metadata = this.state.currentFileMetadata || {};
+
+      // Recompõe o Frontmatter YAML + Corpo antes de salvar
+      contentToSave = stringifyFrontmatter(metadata, bodyText);
+    } else {
+      // 2. Para arquivos em segundo plano, lê o rascunho .temp completo (que já contém o Frontmatter)
+      const tempPath = this.getTempPath(filePath);
+      const readRes = await this.readFile(tempPath);
+
+      if (!readRes.content) {
+        return {
+          success: false,
+          error: "Não foi possível ler o arquivo temporário.",
+        };
+      }
+
+      contentToSave = readRes.content;
+    }
+
+    // 3. Salva no arquivo original e apaga o .temp
+    const res = await this.saveFile(filePath, contentToSave);
+
+    if (res.success) {
+      uiBus.emit("temp-file:synced", { filePath });
+    }
+
+    return res;
   }
 }

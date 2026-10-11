@@ -59,7 +59,7 @@ export class ModalComponent extends Component {
           btn.className = `btn-modal ${btnConfig.class || "btn-secondary"}`;
           btn.textContent = btnConfig.text;
           btn.addEventListener("click", (e) => {
-            e.stopPropagation();
+            // e.stopPropagation();
             if (btnConfig.onClick) btnConfig.onClick(this);
             else this.close();
           });
@@ -75,11 +75,11 @@ export class ModalComponent extends Component {
    */
   setupListeners() {
     if (!this.element) return;
-    this.element.addEventListener("click", (e) => e.stopPropagation());
+    // this.element.addEventListener("click", (e) => e.stopPropagation());
 
     const closeBtn = this.element.querySelector(".modal-close-btn");
     closeBtn?.addEventListener("click", (e) => {
-      e.stopPropagation();
+      // e.stopPropagation();
       this.close();
     });
   }

@@ -6,15 +6,15 @@
 --------------------------------------------------
 ⚙️ [advanced-mode:toggle]
     * Emissores:
-      └── input#mode-toggle (src\renderer\components\explorer\template.html)
+      └── ---
     * Escutadores:
       └── registerEvents (src\renderer\controllers\uiController.js)
 
 ⚙️ [ai-chat:toggle]
     * Emissores:
-      └── div#ai-assistant-header (src\renderer\components\chat\template.html)
+      └── ---
     * Escutadores:
-      └── setupListeners (src\renderer\components\chat\chatComponent.js)
+      └── setupListeners (src\renderer\components\Chat\ChatComponent.js)
 
 ⚙️ [app:ready]
     * Emissores:
@@ -26,16 +26,16 @@
     * Emissores:
       └── onBookSelect (src\renderer\controllers\handlers\bookHandler.js)
     * Escutadores:
-      ├── setupListeners (src\renderer\components\sidebar\sidebarComponent.js)
+      ├── setupListeners (src\renderer\components\Sidebar\SidebarComponent.js)
       └── registerEvents (src\renderer\controllers\uiController.js)
 
 ⚙️ [book:selected]
     * Emissores:
-      ├── selectLastBook (src\renderer\components\sidebar\sidebarComponent.js)
-      ├── select#select-book (src\renderer\components\sidebar\template.html)
+      ├── selectLastBook (src\renderer\components\Sidebar\SidebarComponent.js)
       └── registerEvents (src\renderer\controllers\uiController.js)
     * Escutadores:
-      ├── setupListeners (src\renderer\components\explorer\explorerComponent.js)
+      ├── setupListeners (src\renderer\components\Explorer\ExplorerComponent.js)
+      ├── setupListeners (src\renderer\components\Toolbar\ToolbarComponent.js)
       └── registerEvents (src\renderer\controllers\uiController.js)
 
 ⚙️ [book:title-changed]
@@ -54,35 +54,41 @@
     * Emissores:
       └── registerEvents (src\renderer\controllers\uiController.js)
     * Escutadores:
-      └── setupListeners (src\renderer\components\sidebar\sidebarComponent.js)
+      └── setupListeners (src\renderer\components\Sidebar\SidebarComponent.js)
 
 ⚙️ [chat:append-history]
     * Emissores:
-      └── ---
+      └── fetchMoreHistory (src\renderer\controllers\handlers\chatHandler.js)
     * Escutadores:
-      └── setupListeners (src\renderer\components\chat\chatComponent.js)
+      └── setupListeners (src\renderer\components\Chat\ChatComponent.js)
 
 ⚙️ [chat:clear]
     * Emissores:
       └── onBookChange (src\renderer\controllers\handlers\bookHandler.js)
     * Escutadores:
-      └── setupListeners (src\renderer\components\chat\chatComponent.js)
+      └── setupListeners (src\renderer\components\Chat\ChatComponent.js)
+
+⚙️ [chat:fetch-more-history]
+    * Emissores:
+      └── setupScrollListener (src\renderer\components\Chat\ChatComponent.js)
+    * Escutadores:
+      └── registerEvents (src\renderer\controllers\uiController.js)
 
 ⚙️ [chat:render-history]
     * Emissores:
       └── loadHistory (src\renderer\controllers\handlers\chatHandler.js)
     * Escutadores:
-      └── setupListeners (src\renderer\components\chat\chatComponent.js)
+      └── setupListeners (src\renderer\components\Chat\ChatComponent.js)
 
 ⚙️ [chat:render-message]
     * Emissores:
       └── onSendMessage (src\renderer\controllers\handlers\chatHandler.js)
     * Escutadores:
-      └── setupListeners (src\renderer\components\chat\chatComponent.js)
+      └── setupListeners (src\renderer\components\Chat\ChatComponent.js)
 
 ⚙️ [chat:send-message]
     * Emissores:
-      └── triggerSendMessage (src\renderer\components\chat\chatComponent.js)
+      └── triggerSendMessage (src\renderer\components\Chat\ChatComponent.js)
     * Escutadores:
       └── registerEvents (src\renderer\controllers\uiController.js)
 
@@ -90,138 +96,177 @@
     * Emissores:
       └── onSendMessage (src\renderer\controllers\handlers\chatHandler.js)
     * Escutadores:
-      └── setupListeners (src\renderer\components\chat\chatComponent.js)
+      └── setupListeners (src\renderer\components\Chat\ChatComponent.js)
 
 ⚙️ [editor-overlay:close]
     * Emissores:
-      └── renderFileContent (src\renderer\components\editor\editorComponent.js)
+      └── renderFileContent (src\renderer\components\Editor\EditorComponent.js)
     * Escutadores:
-      └── setupListeners (src\renderer\components\editor-overlay\editorOverlayComponent.js)
+      └── setupListeners (src\renderer\components\EditorOverlay\EditorOverlayComponent.js)
 
 ⚙️ [editor-overlay:open]
     * Emissores:
-      └── resetEditorState (src\renderer\components\editor\editorComponent.js)
+      └── resetEditorState (src\renderer\components\Editor\EditorComponent.js)
     * Escutadores:
-      └── setupListeners (src\renderer\components\editor-overlay\editorOverlayComponent.js)
+      └── setupListeners (src\renderer\components\EditorOverlay\EditorOverlayComponent.js)
 
 ⚙️ [editor:locked]
     * Emissores:
-      └── readOnlyKeyHandler (src\renderer\components\editor\editorComponent.js)
+      └── readOnlyKeyHandler (src\renderer\components\Editor\EditorComponent.js)
     * Escutadores:
       └── ---
 
 ⚙️ [editor:open-file]
     * Emissores:
-      ├── setupInternalLinkHandler (src\renderer\components\editor\editorComponent.js)
-      ├── onclick (src\renderer\components\explorer\explorerComponent.js)
+      ├── setupInternalLinkHandler (src\renderer\components\Editor\EditorComponent.js)
+      ├── onclick (src\renderer\components\Explorer\ExplorerComponent.js)
       ├── onBookChange (src\renderer\controllers\handlers\bookHandler.js)
+      ├── updateListState (src\renderer\controllers\handlers\fileHandler.js)
+      ├── onTempDeleted (src\renderer\controllers\handlers\fileHandler.js)
       └── registerEvents (src\renderer\controllers\uiController.js)
     * Escutadores:
-      └── setupListeners (src\renderer\components\editor\editorComponent.js)
+      └── setupListeners (src\renderer\components\Editor\EditorComponent.js)
 
 ⚙️ [editor:reset]
     * Emissores:
       └── onBookChange (src\renderer\controllers\handlers\bookHandler.js)
     * Escutadores:
-      └── setupListeners (src\renderer\components\editor\editorComponent.js)
+      └── setupListeners (src\renderer\components\Editor\EditorComponent.js)
 
 ⚙️ [editor:reseted]
     * Emissores:
-      ├── resetEditorState (src\renderer\components\editor\editorComponent.js)
+      ├── resetEditorState (src\renderer\components\Editor\EditorComponent.js)
       └── registerEvents (src\renderer\controllers\uiController.js)
     * Escutadores:
       └── registerEvents (src\renderer\controllers\uiController.js)
 
 ⚙️ [editor:saved-success]
     * Emissores:
-      └── triggerAutoSave (src\renderer\components\editor\editorComponent.js)
+      └── triggerAutoSave (src\renderer\components\Editor\EditorComponent.js)
     * Escutadores:
       └── ---
 
 ⚙️ [editor:unlocked]
     * Emissores:
-      └── readOnlyKeyHandler (src\renderer\components\editor\editorComponent.js)
+      └── readOnlyKeyHandler (src\renderer\components\Editor\EditorComponent.js)
     * Escutadores:
       └── ---
 
 ⚙️ [file:opened]
     * Emissores:
-      └── renderFileContent (src\renderer\components\editor\editorComponent.js)
+      └── renderFileContent (src\renderer\components\Editor\EditorComponent.js)
     * Escutadores:
-      ├── setupListeners (src\renderer\components\explorer\explorerComponent.js)
+      ├── setupListeners (src\renderer\components\Explorer\ExplorerComponent.js)
       └── registerEvents (src\renderer\controllers\uiController.js)
 
 ⚙️ [file:save-temp]
     * Emissores:
-      └── triggerAutoSave (src\renderer\components\editor\editorComponent.js)
+      └── triggerAutoSave (src\renderer\components\Editor\EditorComponent.js)
     * Escutadores:
       └── registerEvents (src\renderer\controllers\uiController.js)
-
-⚙️ [file:save-temp-error]
-    * Emissores:
-      └── onSaveTemp (src\renderer\controllers\handlers\fileHandler.js)
-    * Escutadores:
-      └── ---
-
-⚙️ [file:save-temp-success]
-    * Emissores:
-      └── onSaveTemp (src\renderer\controllers\handlers\fileHandler.js)
-    * Escutadores:
-      └── ---
 
 ⚙️ [file:sync-selection]
     * Emissores:
       └── ---
     * Escutadores:
-      └── setupListeners (src\renderer\components\explorer\explorerComponent.js)
+      └── setupListeners (src\renderer\components\Explorer\ExplorerComponent.js)
 
 ⚙️ [folder:toggle]
     * Emissores:
-      └── li.folder (src\renderer\components\explorer\nodeTemplate.html)
+      └── ---
     * Escutadores:
       └── registerEvents (src\renderer\controllers\uiController.js)
 
 ⚙️ [modal:open]
     * Emissores:
-      └── onSyncOpenModal (src\renderer\controllers\handlers\fileHandler.js)
+      ├── onSyncOpenModal (src\renderer\controllers\handlers\fileHandler.js)
+      └── handleDiscardTemp (src\renderer\controllers\handlers\fileHandler.js)
     * Escutadores:
-      └── setupListeners (src\renderer\components\modal\modalManager.js)
+      └── setupListeners (src\renderer\components\Modal\ModalManager.js)
 
 ⚙️ [settings:close]
     * Emissores:
-      └── button#btn-close-menu (src\renderer\components\settings\template.html)
+      └── ---
     * Escutadores:
-      └── setupListeners (src\renderer\components\settings\settingsComponent.js)
+      └── setupListeners (src\renderer\components\Settings\SettingsComponent.js)
 
 ⚙️ [settings:open]
     * Emissores:
-      └── button#btn-open-menu (src\renderer\components\sidebar\template.html)
+      └── ---
     * Escutadores:
-      └── setupListeners (src\renderer\components\settings\settingsComponent.js)
+      └── setupListeners (src\renderer\components\Settings\SettingsComponent.js)
 
 ⚙️ [sync:open-modal]
     * Emissores:
-      └── button#btn-save (src\renderer\components\toolbar\template.html)
+      └── ---
+    * Escutadores:
+      └── registerEvents (src\renderer\controllers\uiController.js)
+
+⚙️ [temp-file:deleted]
+    * Emissores:
+      └── onClick (src\renderer\controllers\handlers\fileHandler.js)
     * Escutadores:
       └── registerEvents (src\renderer\controllers\uiController.js)
 
 ⚙️ [temp-file:saved]
     * Emissores:
-      └── saveTempFile (src\renderer\services\fileService.js)
+      └── onSaveTemp (src\renderer\controllers\handlers\fileHandler.js)
+    * Escutadores:
+      └── setupListeners (src\renderer\components\Toolbar\ToolbarComponent.js)
+
+⚙️ [temp-file:saving-error]
+    * Emissores:
+      └── onSaveTemp (src\renderer\controllers\handlers\fileHandler.js)
     * Escutadores:
       └── ---
+
+⚙️ [temp-file:synced]
+    * Emissores:
+      ├── syncFile (src\renderer\controllers\handlers\fileHandler.js)
+      └── syncFile (src\renderer\services\fileService.js)
+    * Escutadores:
+      └── registerEvents (src\renderer\controllers\uiController.js)
+
+⚙️ [temp-files:pending-list]
+    * Emissores:
+      └── handlePendingTempFiles (src\renderer\controllers\handlers\fileHandler.js)
+    * Escutadores:
+      └── setupListeners (src\renderer\components\Toolbar\ToolbarComponent.js)
 
 ⚙️ [theme:changed]
     * Emissores:
       └── applyTheme (src\renderer\core\themeManager.js)
     * Escutadores:
-      └── setupListeners (src\renderer\components\settings\settingsComponent.js)
+      └── setupListeners (src\renderer\components\Settings\SettingsComponent.js)
 
 ⚙️ [theme:toggle]
     * Emissores:
-      └── input#theme-toggle (src\renderer\components\settings\template.html)
+      └── ---
     * Escutadores:
       └── setupListeners (src\renderer\core\themeManager.js)
+
+⚙️ [toast:show]
+    * Emissores:
+      ├── syncMultipleFiles (src\renderer\controllers\handlers\fileHandler.js)
+      ├── onSyncOpenModal (src\renderer\controllers\handlers\fileHandler.js)
+      ├── onClick (src\renderer\controllers\handlers\fileHandler.js)
+      └── updateListState (src\renderer\controllers\handlers\fileHandler.js)
+    * Escutadores:
+      └── ---
+
+⚙️ [toolbar:check-pending-temp]
+    * Emissores:
+      ├── checkInitialTempState (src\renderer\components\Toolbar\ToolbarComponent.js)
+      ├── syncFile (src\renderer\controllers\handlers\fileHandler.js)
+      └── updateListState (src\renderer\controllers\handlers\fileHandler.js)
+    * Escutadores:
+      └── ---
+
+⚙️ [toolbar:open-sync-modal]
+    * Emissores:
+      └── handleSyncClick (src\renderer\components\Toolbar\ToolbarComponent.js)
+    * Escutadores:
+      └── ---
 
 
 [domainBus] - Eventos de Domínio e Negócio
