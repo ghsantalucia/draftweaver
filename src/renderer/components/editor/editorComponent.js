@@ -48,22 +48,26 @@ export class EditorComponent extends Component {
    * @returns {void}
    */
   setupListeners() {
-    // Escuta a intenção de abrir o arquivo (cliques em links internos)
-    if (this.uiBus) {
-      this.uiBus.on("editor:open-file", (payload) => {
-        this.openFile(payload.path);
-      });
+    this.uiBus.on("editor:open-file", (payload) => {
+      this.openFile(payload.path);
+    });
 
-      // Reseta e bloqueia o editor sempre que um novo livro/projeto for selecionado
-      this.uiBus.on("editor:reset", () => {
-        this.resetEditorState();
-      });
+    // Reseta e bloqueia o editor sempre que um novo livro/projeto for selecionado
+    this.uiBus.on("editor:reset", () => {
+      this.resetEditorState();
+    });
 
-      this.uiBus.on("temp-file:saved", (path) => {
-        if (normalizePath(this.state.currentFilePath) === normalizePath(path))
-          this.uiBus.emit("toolbar:save-status", "saved");
-      });
-    }
+    this.uiBus.on("temp-file:saved", (path) => {
+      if (normalizePath(this.state.currentFilePath) === normalizePath(path))
+        this.uiBus.emit("toolbar:save-status", "saved");
+    });
+
+    this.uiBus.on("editor:lock", () => {
+      this.setEditorReadOnly(true);
+    });
+    this.uiBus.on("editor:unlock", () => {
+      this.setEditorReadOnly(false);
+    });
   }
 
   /**

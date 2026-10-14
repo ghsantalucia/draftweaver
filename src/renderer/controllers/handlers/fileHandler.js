@@ -373,6 +373,38 @@ export function onEditorReset(state) {
   state.currentFileMetadata = "";
 }
 
+/**
+ * Manipula o evento de salvamento de arquivo temporário (.temp), validando
+ * se o arquivo pertence ao livro atualmente ativo antes de atualizar o estado.
+ *
+ * @async
+ * @function onTempSaved
+ * @param {string} filePath - Caminho absoluto ou relativo do arquivo temporário.
+ * @param {Object} state - Instância contendo o estado global da aplicação.
+ * @param {string} state.currentBookPath - Caminho do livro atualmente selecionado.
+ * @param {Object} [state.currentBookMap] - Mapa de arquivos do livro atual.
+ * @param {Object} bookService - Serviço de manipulação de dados e mapas dos livros.
+ * @param {Function} bookService.getMap - Método para carregar o mapa normalizado do livro.
+ * @returns {Promise<void>} Retorna vazio e encerra a execução caso o arquivo não pertença ao livro ativo.
+ */
+export async function onTempChanged(filePath, state, bookService) {
+  if (!filePath || !state || !state.currentBookPath || !bookService) {
+    return;
+  }
+
+  const normFilePath = normalizePath(filePath);
+  const normBookPath = normalizePath(state.currentBookPath);
+
+  // Verifica se o arquivo pertence ao livro atual. Caso contrário, aborta.
+  if (!normFilePath.includes(normBookPath)) {
+    return;
+  }
+
+  // Atualiza o mapa do livro atual com os dados mais recentes do serviço
+  const bookMap = await bookService.getMap(normBookPath);
+  state.currentBookMap = bookMap;
+}
+
 export async function onTempDeleted(filePath, state, fileService) {
   // Se o arquivo deletado estava aberto no editor, recarrega o arquivo original
   if (normalizePath(state.currentFilePath) === normalizePath(filePath)) {

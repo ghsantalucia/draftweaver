@@ -27,4 +27,4 @@ export class ServiceManager {
   }
 }
 
-console.log("[SERVICE-MANAGER.JS]");
+console.log("[5. SERVICE-MANAGER.JS]");

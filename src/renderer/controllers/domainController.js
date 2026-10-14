@@ -3,6 +3,7 @@
  */
 
 import { domainBus } from "../events/domainBus.js";
+import { uiBus } from "../events/uiBus.js";
 import { normalizePath } from "../utils/helpers.js";
 import * as config from "./handlers/configHandler.js";
 
@@ -32,14 +33,8 @@ export class DomainController {
     });
 
     // Evento disparado quando um livro é selecionado
-    domainBus.on("fs:config-changed", (payload) => {
-      console.log(payload);
-      config.onConfigChanged(
-        this.state,
-        normalizePath(payload.filePath),
-        normalizePath(payload.relativePath),
-        this.services.file,
-      );
+    domainBus.on("fs:config-changed", async (payload) => {
+      config.onConfigChanged(payload, this.state, this.services.book);
     });
   }
 }

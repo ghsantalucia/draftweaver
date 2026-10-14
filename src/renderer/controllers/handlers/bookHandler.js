@@ -173,3 +173,17 @@ export async function onFetchBooksList(req, bookService) {
     req.reply({ books: booksArray });
   }
 }
+
+export function onAiLock(locked) {
+  if (locked) {
+    uiBus.emit("editor-overlay:open", {
+      key: "ai-lock",
+      message: "Aguarde enquanto a IA trabalha no seu projeto...",
+      showSpinner: true,
+    });
+    uiBus.emit("editor:lock");
+  } else {
+    uiBus.emit("editor-overlay:close", "ai-lock");
+    uiBus.emit("editor:unlock");
+  }
+}

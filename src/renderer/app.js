@@ -10,4 +10,4 @@ document.addEventListener("DOMContentLoaded", async () => {
   await appContainer.init();
 });
 
-console.log("[APP.JS]");
+console.log("[3. APP.JS]");

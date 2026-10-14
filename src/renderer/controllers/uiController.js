@@ -7,6 +7,7 @@ import { uiBus } from "../events/uiBus.js";
 import * as book from "./handlers/bookHandler.js";
 import * as file from "./handlers/fileHandler.js";
 import * as chat from "./handlers/chatHandler.js";
+import * as config from "./handlers/configHandler.js";
 
 /**
  * Controller responsável pelas reações visuais da interface.
@@ -61,6 +62,16 @@ export class UiController {
     //==========================================//
     //             Eventos  de  UI              //
     //==========================================//
+
+    //
+    uiBus.on("config:changed", async () => {
+      const bookList = await book.fetchBooks(this.state, this.services.book);
+      const currentBookConfig = bookList.find(
+        (b) => b.fullPath === this.state.currentBookPath,
+      );
+      //config.onConfigChanged(currentBookConfig);
+      console.log(currentBookConfig);
+    });
 
     // Atualiza estado da árvore de arquivos quando uma pasta é aberta ou fechada
     uiBus.on("folder:toggle", (payload) => {
@@ -122,10 +133,24 @@ export class UiController {
     // Trata deleção de arquivo temporário
     uiBus.on("temp-file:deleted", (filePath) => {
       file.onTempDeleted(filePath, this.state, this.services.file);
+      file.onTempChanged(filePath, this.state, this.services.book);
     });
     // Trata sincronização de arquivo temporário
     uiBus.on("temp-file:synced", (filePath) => {
       file.onTempDeleted(filePath, this.state, this.services.file);
+      file.onTempChanged(filePath, this.state, this.services.book);
+    });
+    uiBus.on("temp-file:saved", (filePath) => {
+      file.onTempChanged(filePath, this.state, this.services.book);
+    });
+
+    //
+    uiBus.on("book:ai-locked", () => {
+      book.onAiLock(true);
+    });
+    //
+    uiBus.on("book:ai-unlocked", () => {
+      book.onAiLock(false);
     });
   }
 }

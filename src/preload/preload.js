@@ -55,4 +55,4 @@ contextBridge.exposeInMainWorld("api", {
   },
 });
 
-console.log("[PRELOAD]");
+console.log("[1. PRELOAD]");

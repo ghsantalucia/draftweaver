@@ -160,4 +160,4 @@ export class AppContainer {
   }
 }
 
-console.log("[APP-CONTAINER.JS]");
+console.log("[4. APP-CONTAINER.JS]");

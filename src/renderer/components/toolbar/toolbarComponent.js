@@ -48,14 +48,24 @@ export class ToolbarComponent extends Component {
         this.refreshSaveButtonState(true);
       }
     });
+
     // Trata atualização da lista de temp files
     this.uiBus.on("temp-file:saved", () => {
       this.refreshSaveButtonState(true);
     });
 
-    //
+    // Exibe status de salvamento do arquivo aberto no editor
     this.uiBus.on("toolbar:save-status", (status) => {
       this.setSaveStatus(status);
+    });
+
+    //
+    this.uiBus.on("book:ai-locked", () => {
+      this.toggleSaveBtn(false);
+    });
+    //
+    this.uiBus.on("book:ai-unlocked", () => {
+      this.toggleSaveBtn(true);
     });
 
     // Evento do botão de sincronização/salvamento na barra de ferramentas
@@ -66,6 +76,16 @@ export class ToolbarComponent extends Component {
           this.handleSyncClick();
         }
       });
+    }
+  }
+
+  toggleSaveBtn(active = null) {
+    const btnSave = this.element?.querySelector("#btn-save");
+
+    if (active !== null) {
+      btnSave.disabled = !active;
+    } else {
+      btnSave.disabled = !btnSave.disabled;
     }
   }
 

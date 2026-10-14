@@ -441,8 +441,6 @@ export class ExplorerComponent extends Component {
       return;
     }
 
-    console.log("[ExplorerDebug] 1. targetPath recebido:", targetPath);
-
     let decodedPath = targetPath;
     try {
       decodedPath = decodeURIComponent(targetPath);
@@ -462,11 +460,6 @@ export class ExplorerComponent extends Component {
       cleanTargetPath = cleanTargetPath.slice(0, -5);
     }
 
-    console.log(
-      "[ExplorerDebug] 2. cleanTargetPath normalizado:",
-      cleanTargetPath,
-    );
-
     const pathSegments = cleanTargetPath.split("/");
     const rootFolder =
       pathSegments.length > 1 &&
@@ -474,21 +467,9 @@ export class ExplorerComponent extends Component {
         ? pathSegments[0]
         : pathSegments[1] || pathSegments[0];
 
-    console.log(
-      "[ExplorerDebug] 3. Segmentos detectados:",
-      pathSegments,
-      "-> rootFolder calculado:",
-      rootFolder,
-    );
-
     if (rootFolder) {
       const tabBtn = this.element.querySelector(
         `.tab-btn[folder="${rootFolder}"]`,
-      );
-      console.log(
-        "[ExplorerDebug] 4. Botão da aba encontrado para [%s]?",
-        rootFolder,
-        !!tabBtn,
       );
 
       if (tabBtn) {
@@ -505,10 +486,6 @@ export class ExplorerComponent extends Component {
             "active-tab-assets",
           );
           fileTreeContainer.classList.add(`active-tab-${rootFolder}`);
-          console.log(
-            "[ExplorerDebug] 5. Classe da aba aplicada com sucesso no container:",
-            `active-tab-${rootFolder}`,
-          );
         }
       } else {
         console.warn(
@@ -521,11 +498,6 @@ export class ExplorerComponent extends Component {
     const attemptSelection = (retries = 10, delay = 100) => {
       const selector = `.file-name[data-path$="${CSS.escape(cleanTargetPath)}"]`;
       const fileSpan = this.element.querySelector(selector);
-
-      console.log(
-        `[ExplorerDebug] 6. Tentativa de seleção [Restam: ${retries}]. Seletor: ${selector} -> Encontrado?`,
-        !!fileSpan,
-      );
 
       if (!fileSpan) {
         if (retries > 0) {
@@ -575,10 +547,6 @@ export class ExplorerComponent extends Component {
         .querySelectorAll(".file-name")
         .forEach((el) => el.classList.remove("active"));
       fileSpan.classList.add("active");
-      console.log(
-        "[ExplorerDebug] 7. SUCESSO: Arquivo selecionado e destacado no DOM:",
-        cleanTargetPath,
-      );
 
       return true;
     };
@@ -588,8 +556,8 @@ export class ExplorerComponent extends Component {
 
   /**
    * Adiciona ou remove a indicação de arquivo temporário (.temp) na UI do Explorer.
-   * @param {string} filePath - Caminho do arquivo afetado.
-   * @param {boolean} isTemp - True para marcar como temporário, false para limpar.
+   * @param {string} filePath Caminho do arquivo afetado.
+   * @param {boolean} isTemp True para marcar como temporário, false para limpar.
    */
   updateFileTempStatus(filePath, isTemp) {
     if (!filePath) return;
@@ -621,44 +589,40 @@ export class ExplorerComponent extends Component {
             node.classList.add("has-temp");
             fileNameSpan?.classList.add("has-temp");
 
+            // Insere o elemento físico do asterisco (*) se ele ainda não existir no HTML
             if (
               titleWrapper &&
-              !titleWrapper.classList.contains("dirty-asterisk")
+              !titleWrapper.querySelector(".dirty-asterisk")
             ) {
-              titleWrapper.classList.add("dirty-asterisk");
+              const asterisk = document.createElement("span");
+              asterisk.className = "dirty-asterisk";
+              asterisk.textContent = "*";
+              titleWrapper.appendChild(asterisk);
             }
           }
-        } else {
-          // Remove a marcação caso o arquivo tenha sido sincronizado ou descartado
-          node.classList.remove("has-temp");
-          fileNameSpan?.classList.remove("has-temp");
-          titleWrapper?.classList.remove("dirty-asterisk");
         }
       }
     });
   }
 
   /**
-   * Remove todas as marcações de arquivos temporários (.temp) da interface do Explorer.
+   * Remove todas as marcações de arquivos temporários (.temp) e os elementos físicos do asterisco (*) da UI do Explorer.
    */
   clearAllTemp() {
     if (!this.element) return;
 
-    // Seleciona todos os nós que possuem alguma marcação temporária
-    const tempNodes = this.element.querySelectorAll(
-      "#file-tree .has-temp, #file-tree .dirty-asterisk",
-    );
-
+    // 1. Remove a classe has-temp de todos os nós que a possuem
+    const tempNodes = this.element.querySelectorAll("#file-tree .has-temp");
     tempNodes.forEach((node) => {
       node.classList.remove("has-temp");
-      // Se for o wrapper do título, remove a classe do asterisco
-      if (node.classList.contains("dirty-asterisk")) {
-        node.classList.remove("dirty-asterisk");
-      }
     });
 
-    // console.log(
-    //   "[ExplorerComponent] Todas as marcações .temp foram limpas da UI.",
-    // );
+    // 2. Remove fisicamente todos os elementos span do asterisco (.dirty-asterisk) do DOM
+    const asteriskElements = this.element.querySelectorAll(
+      "#file-tree .dirty-asterisk",
+    );
+    asteriskElements.forEach((asterisk) => {
+      asterisk.remove();
+    });
   }
 }
