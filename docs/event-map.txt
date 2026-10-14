@@ -18,7 +18,7 @@
 
 ⚙️ [app:ready]
     * Emissores:
-      └── init (src\renderer\core\appContainer.js)
+      └── async (src\renderer\core\appContainer.js)
     * Escutadores:
       └── registerEvents (src\renderer\controllers\uiController.js)
 
@@ -35,7 +35,6 @@
       └── registerEvents (src\renderer\controllers\uiController.js)
     * Escutadores:
       ├── setupListeners (src\renderer\components\Explorer\ExplorerComponent.js)
-      ├── setupListeners (src\renderer\components\Toolbar\ToolbarComponent.js)
       └── registerEvents (src\renderer\controllers\uiController.js)
 
 ⚙️ [book:title-changed]
@@ -140,12 +139,6 @@
     * Escutadores:
       └── registerEvents (src\renderer\controllers\uiController.js)
 
-⚙️ [editor:saved-success]
-    * Emissores:
-      └── triggerAutoSave (src\renderer\components\Editor\EditorComponent.js)
-    * Escutadores:
-      └── ---
-
 ⚙️ [editor:unlocked]
     * Emissores:
       └── readOnlyKeyHandler (src\renderer\components\Editor\EditorComponent.js)
@@ -164,12 +157,6 @@
       └── triggerAutoSave (src\renderer\components\Editor\EditorComponent.js)
     * Escutadores:
       └── registerEvents (src\renderer\controllers\uiController.js)
-
-⚙️ [file:sync-selection]
-    * Emissores:
-      └── ---
-    * Escutadores:
-      └── setupListeners (src\renderer\components\Explorer\ExplorerComponent.js)
 
 ⚙️ [folder:toggle]
     * Emissores:
@@ -212,6 +199,8 @@
     * Emissores:
       └── onSaveTemp (src\renderer\controllers\handlers\fileHandler.js)
     * Escutadores:
+      ├── setupListeners (src\renderer\components\Editor\EditorComponent.js)
+      ├── setupListeners (src\renderer\components\Explorer\ExplorerComponent.js)
       └── setupListeners (src\renderer\components\Toolbar\ToolbarComponent.js)
 
 ⚙️ [temp-file:saving-error]
@@ -231,6 +220,7 @@
     * Emissores:
       └── handlePendingTempFiles (src\renderer\controllers\handlers\fileHandler.js)
     * Escutadores:
+      ├── setupListeners (src\renderer\components\Explorer\ExplorerComponent.js)
       └── setupListeners (src\renderer\components\Toolbar\ToolbarComponent.js)
 
 ⚙️ [theme:changed]
@@ -252,21 +242,24 @@
       ├── onClick (src\renderer\controllers\handlers\fileHandler.js)
       └── updateListState (src\renderer\controllers\handlers\fileHandler.js)
     * Escutadores:
-      └── ---
-
-⚙️ [toolbar:check-pending-temp]
-    * Emissores:
-      ├── checkInitialTempState (src\renderer\components\Toolbar\ToolbarComponent.js)
-      ├── syncFile (src\renderer\controllers\handlers\fileHandler.js)
-      └── updateListState (src\renderer\controllers\handlers\fileHandler.js)
-    * Escutadores:
-      └── ---
+      └── setupListeners (src\renderer\components\Toast\ToastComponent.js)
 
 ⚙️ [toolbar:open-sync-modal]
     * Emissores:
       └── handleSyncClick (src\renderer\components\Toolbar\ToolbarComponent.js)
     * Escutadores:
       └── ---
+
+⚙️ [toolbar:save-status]
+    * Emissores:
+      ├── setupListeners (src\renderer\components\Editor\EditorComponent.js)
+      ├── handleEditorChange (src\renderer\components\Editor\EditorComponent.js)
+      ├── triggerAutoSave (src\renderer\components\Editor\EditorComponent.js)
+      ├── renderFileContent (src\renderer\components\Editor\EditorComponent.js)
+      ├── resetEditorState (src\renderer\components\Editor\EditorComponent.js)
+      └── onTempDeleted (src\renderer\controllers\handlers\fileHandler.js)
+    * Escutadores:
+      └── setupListeners (src\renderer\components\Toolbar\ToolbarComponent.js)
 
 
 [domainBus] - Eventos de Domínio e Negócio
@@ -281,11 +274,11 @@
     * Emissores:
       └── checkAILock (src\renderer\services\bookService.js)
     * Escutadores:
-      └── registerEvents (src\renderer\controllers\domainController.js)
+      └── ---
 
 ⚙️ [app:ready]
     * Emissores:
-      └── init (src\renderer\core\appContainer.js)
+      └── async (src\renderer\core\appContainer.js)
     * Escutadores:
       └── ---
 
@@ -293,7 +286,7 @@
     * Emissores:
       └── selectBook (src\renderer\services\bookService.js)
     * Escutadores:
-      └── registerEvents (src\renderer\controllers\domainController.js)
+      └── ---
 
 ⚙️ [book:title-changed]
     * Emissores:
@@ -301,15 +294,21 @@
     * Escutadores:
       └── ---
 
-⚙️ [file:changed]
-    * Emissores:
-      └── ---
-    * Escutadores:
-      └── registerEvents (src\renderer\controllers\domainController.js)
-
 ⚙️ [fs:${eventType}]
     * Emissores:
       └── escopo global (src\renderer\renderer.js)
     * Escutadores:
       └── ---
+
+⚙️ [fs:config-changed]
+    * Emissores:
+      └── ---
+    * Escutadores:
+      └── registerEvents (src\renderer\controllers\domainController.js)
+
+⚙️ [fs:temp-changed]
+    * Emissores:
+      └── ---
+    * Escutadores:
+      └── registerEvents (src\renderer\controllers\domainController.js)
 

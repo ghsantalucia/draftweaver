@@ -40,31 +40,64 @@ export class ExplorerComponent extends Component {
    * @returns {void}
    */
   setupListeners() {
-    // Ouve alterações no livro atual para re-renderizar a árvore
+    // Na seleção de livro antes de trocar definitivamente, limpa a árvore
     this.uiBus.on("book:selected", async () => {
+      this._treeReady = false;
+      this.element.querySelector("#file-tree").innetHtml = "";
+    });
+
+    // Ouve alterações no livro atual para re-renderizar a árvore
+    this.uiBus.on("book:changed", async () => {
       await this.renderTree();
+      this._treeReady = true;
+
       this.syncAdvancedModeView();
 
-      // Adiciona arquivo .temp à árvore
-      this.uiBus.on("temp-file:saved", (path) => {
-        this.updateFileTempStatus(path, true);
-      });
-
-      // Ouvinte geral de todos os arquivos .temp
-      this.uiBus.on("temp-files:pending-list", (arr) => {
-        if (Array.isArray(arr)) {
-          this.clearAllTemp();
-          arr.forEach((file) => {
-            this.updateFileTempStatus(normalizePath(file.path), true);
-          });
-        }
-      });
-
-      // Ouve quando o arquivo atual muda para sincronizar a seleção visual na árvore
-      this.uiBus.on("file:opened", (payload) => {
-        this.autoOpenFileByPath(payload.relativePath);
-      });
+      // Se tem arquivo automático para abrir na lista de espera
+      if (this._autoOpenFile) {
+        this.autoOpenFileByPath(this._autoOpenFile);
+        this._autoOpenFile = null;
+      }
+      // Se tem arquivos .temp para renderizar
+      if (this._tempList) {
+        this.handleTempList(this._tempList);
+        this._tempList = null;
+      }
     });
+
+    // Ouve quando o arquivo atual muda para sincronizar a seleção visual na árvore
+    this.uiBus.on("file:opened", (payload) => {
+      if (!this._treeReady) {
+        this._autoOpenFile = payload.relativePath;
+      } else {
+        this._autoOpenFile = null;
+        this.autoOpenFileByPath(payload.relativePath);
+      }
+    });
+
+    // Ouvinte geral de todos os arquivos .temp
+    this.uiBus.on("temp-files:pending-list", (arr) => {
+      if (!this._treeReady) {
+        this._tempList = arr;
+      } else {
+        this._tempList = null;
+        this.handleTempList(arr);
+      }
+    });
+
+    // Adiciona arquivo .temp à árvore
+    this.uiBus.on("temp-file:saved", (path) => {
+      this.updateFileTempStatus(path, true);
+    });
+  }
+
+  handleTempList(arr) {
+    if (Array.isArray(arr)) {
+      this.clearAllTemp();
+      arr.forEach((file) => {
+        this.updateFileTempStatus(normalizePath(file.path), true);
+      });
+    }
   }
 
   /**
@@ -161,68 +194,73 @@ export class ExplorerComponent extends Component {
   }
 
   /**
-   * Renderiza a árvore de arquivos no container principal utilizando o estado atual.
+   * Renderiza a árvore de arquivos no container principal utilizando o esqueleto do estado atual.
    * @async
    * @returns {Promise<void>}
    */
   async renderTree() {
     const container = this.element.querySelector("#file-tree");
-    if (!container || !this.state || !this.state.currentBookPath) return;
+
+    if (!container || !this.state) return;
 
     container.innerHTML = "";
 
-    const folderName = this.state.currentBookPath.split(/[/\\]/).pop();
-    const ul = await this.buildTree(this.state.currentBookPath, folderName);
+    // Utiliza a árvore completa armazenada em memória no state
+    const bookTree = this.state.currentBookMap;
+
+    if (!bookTree) return;
+
+    const folderName = this.state.currentBookPath
+      ? this.state.currentBookPath.split(/[/\\]/).pop()
+      : "book";
+    const ul = this.buildTree(bookTree, folderName);
     ul.className = "main-ul";
     container.appendChild(ul);
   }
 
   /**
-   * Função principal de montagem recursiva da árvore de diretórios e arquivos.
-   * @async
-   * @param {string} directoryPath - Caminho absoluto do diretório a ser lido.
-   * @param {string} currentPath - Caminho relativo acumulado.
-   * @param {Object|null} [parentMeta=null] - Metadados herdados do diretório pai.
-   * @returns {Promise<HTMLUListElement>} Elemento de lista (ul) contendo os nós processados.
+   * Função principal de montagem recursiva da árvore a partir do dicionário em memória.
+   * @param {Object} node Nó atual da árvore (contém folders e files).
+   * @param {string} currentPath Caminho relativo acumulado.
+   * @param {Object|null} [parentMeta=null] Metadados herdados do diretório pai.
+   * @returns {HTMLUListElement} Elemento de lista (ul) contendo os nós processados.
    */
-  async buildTree(directoryPath, currentPath, parentMeta = null) {
+  buildTree(node, currentPath, parentMeta = null) {
     const ul = document.createElement("ul");
-
-    const folderData = await window.electronAPI.getTree(directoryPath);
-    const rawEntries =
-      folderData && folderData.children ? folderData.children : [];
-
-    const entries = rawEntries.filter((e) => {
-      if (e.isDirectory) return true;
-      const nameLower = e.name.toLowerCase();
-      return nameLower.endsWith(".md") && nameLower !== "folder.yml";
-    });
-
-    entries.sort((a, b) =>
-      a.name.localeCompare(b.name, undefined, {
-        numeric: true,
-        sensitivity: "base",
-      }),
-    );
+    if (!node) return ul;
 
     const folderNodes = [];
     const fileNodes = [];
 
-    for (const entry of entries) {
-      const relativePath = currentPath
-        ? `${currentPath}/${entry.name}`
-        : entry.name;
-
-      if (entry.isDirectory) {
-        const folderLi = await this.createFolderNode(
-          entry,
+    // Processa subpastas presentes em node.folders
+    if (node.folders) {
+      for (const [folderName, subFolderNode] of Object.entries(node.folders)) {
+        const relativePath = currentPath
+          ? `${currentPath}/${folderName}`
+          : folderName;
+        const folderLi = this.createFolderNode(
+          subFolderNode,
+          folderName,
           relativePath,
           parentMeta,
         );
         if (folderLi) folderNodes.push(folderLi);
-      } else {
-        const fileLi = await this.createFileNode(
-          entry,
+      }
+    }
+
+    // Processa arquivos presentes em node.files
+    if (node.files) {
+      for (const [fileKey, fileData] of Object.entries(node.files)) {
+        // Ignora arquivos JSON de sistema na árvore visual de documentos
+        if (fileData.path && fileData.path.toLowerCase().endsWith(".json"))
+          continue;
+
+        const relativePath = currentPath
+          ? `${currentPath}/${fileKey}.md`
+          : `${fileKey}.md`;
+        const fileLi = this.createFileNode(
+          fileData,
+          fileKey,
           relativePath,
           parentMeta,
         );
@@ -242,31 +280,26 @@ export class ExplorerComponent extends Component {
     folderNodes.sort(compareByTitle);
     fileNodes.sort(compareByTitle);
 
-    [...folderNodes, ...fileNodes].forEach((node) => ul.appendChild(node));
+    [...folderNodes, ...fileNodes].forEach((nodeEl) => ul.appendChild(nodeEl));
 
     return ul;
   }
 
   /**
-   * Processa e cria o nó de pasta utilizando o template dedicado de pasta via Handlebars.
-   * @param {Object} entry - Objeto contendo os dados do diretório (caminho, nome, etc.).
-   * @param {string} relativePath - Caminho relativo do diretório na árvore.
-   * @param {Object|null} [parentMeta=null] - Metadados do diretório pai, se houver.
-   * @returns {Promise<HTMLLIElement|null>} O elemento HTML da pasta montada ou null se não for legível.
+   * Processa e cria o nó de pasta utilizando os metadados já cacheados no sub-nó.
+   * @param {Object} folderNode Objeto contendo os dados da subpasta (metadata, folders, files).
+   * @param {string} folderName Nome da pasta atual.
+   * @param {string} relativePath Caminho relativo da pasta na árvore.
+   * @param {Object|null} [parentMeta=null] Metadados do diretório pai, se houver.
+   * @returns {HTMLLIElement|null} O elemento HTML da pasta montada ou null se não for legível.
    */
-  async createFolderNode(entry, relativePath, parentMeta = null) {
-    const folderYmlPath = `${normalizePath(entry.path)}/folder.yml`;
-    let rawMeta = {};
+  createFolderNode(folderNode, folderName, relativePath, parentMeta = null) {
+    // Os metadados do folder.yml já vêm processados do backend na propriedade metadata do nó
+    const rawMeta = folderNode.metadata || {};
+    const meta = normalizeItemMetadata(rawMeta, folderName);
 
-    const rawText = await window.electronAPI.readFile(folderYmlPath);
-    if (rawText) {
-      const parsed = parseMarkdown(rawText, true);
-      rawMeta = parsed.metadata || {};
-    }
-
-    const meta = normalizeItemMetadata(rawMeta, entry.name);
-    if (this.state && this.state.fileMetadataMap) {
-      this.state.fileMetadataMap[relativePath] = meta;
+    if (this.state && this.state.currentBookMap) {
+      this.state.currentBookMap[relativePath] = meta;
     }
 
     if (!meta.humanRead) return null;
@@ -277,9 +310,8 @@ export class ExplorerComponent extends Component {
 
     let rootClass = "";
     if (!parentMeta) {
-      const folderKey = entry.name;
-      if (folderKey.includes("content")) rootClass = "content-folder";
-      else if (folderKey.includes("assets")) rootClass = "assets-folder";
+      if (folderName.includes("content")) rootClass = "content-folder";
+      else if (folderName.includes("assets")) rootClass = "assets-folder";
       else rootClass = "notes-folder";
     }
 
@@ -301,7 +333,6 @@ export class ExplorerComponent extends Component {
       }
     }
 
-    // Compila e cria o nó DOM do folder usando os utilitários da classe Component
     const htmlString = this.compile(folderNodeTpl, {
       meta,
       relativePath,
@@ -327,36 +358,29 @@ export class ExplorerComponent extends Component {
       }
     };
 
-    const subUl = await this.buildTree(entry.path, relativePath, meta);
+    // Constrói a sub-lista recursivamente passando o sub-nó correspondente
+    const subUl = this.buildTree(folderNode, relativePath, meta);
     li.appendChild(subUl);
 
     return li;
   }
 
   /**
-   * Cria o nó de arquivo emitindo eventos via uiBus e utilizando o template dedicado de arquivo via Handlebars.
-   * @param {Object} entry - Objeto contendo os dados do arquivo (caminho, nome, etc.).
-   * @param {string} relativePath - Caminho relativo do arquivo na árvore.
-   * @param {Object|null} [parentMeta=null] - Metadados do diretório pai, se houver.
-   * @returns {Promise<HTMLLIElement|null>} O elemento HTML do arquivo montado ou null se não permitido.
+   * Cria o nó de arquivo utilizando os metadados do Frontmatter já presentes no dicionário.
+   * @param {Object} fileData Objeto contendo os dados do arquivo (path, originalPath, isTemp, metadata).
+   * @param {string} fileKey Nome base do arquivo sem extensão.
+   * @param {string} relativePath Caminho relativo do arquivo na árvore.
+   * @param {Object|null} [parentMeta=null] Metadados do diretório pai, se houver.
+   * @returns {HTMLLIElement|null} O elemento HTML do arquivo montado ou null se não permitido.
    */
-  async createFileNode(entry, relativePath, parentMeta = null) {
-    let rawText = "";
-    let isTemp = false;
+  createFileNode(fileData, fileKey, relativePath, parentMeta = null) {
+    // Os metadados do Frontmatter já foram extraídos e armazenados no objeto pelo get-tree
+    const rawMeta = fileData.metadata || {};
+    const fileName = `${fileKey}.md`;
+    const meta = normalizeItemMetadata(rawMeta, fileName);
 
-    if (window.electronAPI && window.electronAPI.readFile) {
-      rawText = await window.electronAPI.readFile(entry.path);
-    }
-
-    let rawMeta = {};
-    if (rawText) {
-      const parsed = parseMarkdown(rawText);
-      rawMeta = parsed.metadata || {};
-    }
-
-    const meta = normalizeItemMetadata(rawMeta, entry.name);
-    if (this.state && this.state.fileMetadataMap) {
-      this.state.fileMetadataMap[relativePath] = meta;
+    if (this.state && this.state.currentBookMap) {
+      this.state.currentBookMap[relativePath] = meta;
     }
 
     if (!meta.humanRead && !meta.humanWrite) return null;
@@ -364,11 +388,11 @@ export class ExplorerComponent extends Component {
     const isAdvanced =
       (parentMeta && parentMeta.advanced === true) || meta.advanced === true;
     const isReadonly = meta.humanRead && !meta.humanWrite;
+    const isTemp = fileData.isTemp || false;
 
-    let absolutePath = normalizePath(entry.path);
+    let absolutePath = normalizePath(fileData.originalPath);
     relativePath = normalizePath(relativePath);
 
-    // Compila e cria o nó DOM do file usando os utilitários da classe Component
     const htmlString = this.compile(fileNodeTpl, {
       absolutePath,
       relativePath,
@@ -387,7 +411,11 @@ export class ExplorerComponent extends Component {
       span.classList.add("active");
 
       if (this.uiBus) {
-        this.uiBus.emit("editor:open-file", { path: entry.path, relativePath });
+        // Envia o caminho absoluto correto (seja o rascunho .temp ativo ou o original .md)
+        this.uiBus.emit("editor:open-file", {
+          path: fileData.path,
+          relativePath,
+        });
       }
     };
 
@@ -395,34 +423,74 @@ export class ExplorerComponent extends Component {
   }
 
   /**
-   * Abre/seleciona o arquivo na árvore de forma completa (abas, switch avançado, pastas e seleção),
-   * aguardando de forma resiliente caso a árvore ainda esteja sendo renderizada.
-   * @param {string} targetPath - Caminho relativo do arquivo.
+   * Abre/seleciona o arquivo na árvore com rastreamento completo de depuração (Debug).
+   * @param {string} targetPath Caminho relativo do arquivo.
    * @returns {void}
    */
   async autoOpenFileByPath(targetPath) {
-    if (!targetPath) return;
+    // Cancela qualquer timer pendente de uma seleção anterior para evitar empilhamento
+    if (this._currentSelectionTimer) {
+      clearTimeout(this._currentSelectionTimer);
+      this._currentSelectionTimer = null;
+    }
+
+    if (!targetPath) {
+      console.warn(
+        "[ExplorerDebug] autoOpenFileByPath chamado com targetPath vazio.",
+      );
+      return;
+    }
+
+    console.log("[ExplorerDebug] 1. targetPath recebido:", targetPath);
 
     let decodedPath = targetPath;
     try {
       decodedPath = decodeURIComponent(targetPath);
     } catch (e) {
-      console.error("[ExplorerComponent] Erro ao decodificar targetPath:", e);
+      console.error("[ExplorerDebug] Erro ao decodificar targetPath:", e);
     }
 
-    const cleanTargetPath = decodedPath
+    let cleanTargetPath = decodedPath
       .replace(/\\/g, "/")
       .replace(/^\/+/, "")
       .replace(/^content\//, "")
       .replace(/^\.\.\/books\//, "");
 
+    // Normaliza se for .temp para coincidir com o data-path limpo do DOM (.md)
+    cleanTargetPath = cleanTargetPath.replace(/\.md\.temp$/, ".md");
+    if (cleanTargetPath.endsWith(".temp")) {
+      cleanTargetPath = cleanTargetPath.slice(0, -5);
+    }
+
+    console.log(
+      "[ExplorerDebug] 2. cleanTargetPath normalizado:",
+      cleanTargetPath,
+    );
+
     const pathSegments = cleanTargetPath.split("/");
-    const rootFolder = pathSegments[1];
+    const rootFolder =
+      pathSegments.length > 1 &&
+      ["notes", "content", "assets"].includes(pathSegments[0])
+        ? pathSegments[0]
+        : pathSegments[1] || pathSegments[0];
+
+    console.log(
+      "[ExplorerDebug] 3. Segmentos detectados:",
+      pathSegments,
+      "-> rootFolder calculado:",
+      rootFolder,
+    );
 
     if (rootFolder) {
       const tabBtn = this.element.querySelector(
         `.tab-btn[folder="${rootFolder}"]`,
       );
+      console.log(
+        "[ExplorerDebug] 4. Botão da aba encontrado para [%s]?",
+        rootFolder,
+        !!tabBtn,
+      );
+
       if (tabBtn) {
         this.element
           .querySelectorAll(".tab-btn")
@@ -437,16 +505,42 @@ export class ExplorerComponent extends Component {
             "active-tab-assets",
           );
           fileTreeContainer.classList.add(`active-tab-${rootFolder}`);
+          console.log(
+            "[ExplorerDebug] 5. Classe da aba aplicada com sucesso no container:",
+            `active-tab-${rootFolder}`,
+          );
         }
+      } else {
+        console.warn(
+          "[ExplorerDebug] AVISO: Nenhuma tab-btn encontrada com folder=",
+          rootFolder,
+        );
       }
     }
 
-    const attemptSelection = () => {
-      const fileSpan = this.element.querySelector(
-        `.file-name[data-path$="${CSS.escape(cleanTargetPath)}"]`,
+    const attemptSelection = (retries = 10, delay = 100) => {
+      const selector = `.file-name[data-path$="${CSS.escape(cleanTargetPath)}"]`;
+      const fileSpan = this.element.querySelector(selector);
+
+      console.log(
+        `[ExplorerDebug] 6. Tentativa de seleção [Restam: ${retries}]. Seletor: ${selector} -> Encontrado?`,
+        !!fileSpan,
       );
 
-      if (!fileSpan) return false;
+      if (!fileSpan) {
+        if (retries > 0) {
+          this._currentSelectionTimer = setTimeout(
+            () => attemptSelection(retries - 1, delay),
+            delay,
+          );
+        } else {
+          console.error(
+            "[ExplorerDebug] ERRO: Elemento não encontrado no DOM após todas as tentativas:",
+            cleanTargetPath,
+          );
+        }
+        return false;
+      }
 
       const parentLi = fileSpan.closest("li");
 
@@ -481,15 +575,15 @@ export class ExplorerComponent extends Component {
         .querySelectorAll(".file-name")
         .forEach((el) => el.classList.remove("active"));
       fileSpan.classList.add("active");
+      console.log(
+        "[ExplorerDebug] 7. SUCESSO: Arquivo selecionado e destacado no DOM:",
+        cleanTargetPath,
+      );
 
       return true;
     };
 
-    if (!attemptSelection()) {
-      setTimeout(() => {
-        attemptSelection();
-      }, 150);
-    }
+    attemptSelection();
   }
 
   /**
@@ -498,7 +592,6 @@ export class ExplorerComponent extends Component {
    * @param {boolean} isTemp - True para marcar como temporário, false para limpar.
    */
   updateFileTempStatus(filePath, isTemp) {
-    console.log("updateFileTempStatus()", filePath, isTemp);
     if (!filePath) return;
 
     // Normaliza o caminho para garantir compatibilidade com os atributos data-path e data-absolute-path
@@ -564,8 +657,8 @@ export class ExplorerComponent extends Component {
       }
     });
 
-    console.log(
-      "[ExplorerComponent] Todas as marcações .temp foram limpas da UI.",
-    );
+    // console.log(
+    //   "[ExplorerComponent] Todas as marcações .temp foram limpas da UI.",
+    // );
   }
 }

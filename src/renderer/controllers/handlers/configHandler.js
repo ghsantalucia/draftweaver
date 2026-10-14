@@ -4,6 +4,7 @@
 
 import { uiBus } from "../../events/uiBus.js";
 import { domainBus } from "../../events/domainBus.js";
+import { normalizePath } from "../../utils/helpers.js";
 
 /**
  * Processa a alteração de um arquivo config.json detectada no sistema de arquivos.
@@ -16,8 +17,11 @@ export async function onConfigChanged(
   state,
   filePath,
   relativePath,
-  fileContent,
+  fileService,
 ) {
+  console.log(filePath);
+  const { fileContent } = await fileService.readFile(filePath);
+  console.log(fileContent);
   try {
     if (!state) return;
 

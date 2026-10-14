@@ -4,6 +4,7 @@
 
 import { uiBus } from "../../events/uiBus.js";
 import { domainBus } from "../../events/domainBus.js";
+import { normalizePath } from "../../utils/helpers.js";
 
 export async function fetchBooks(state, bookService) {
   try {
@@ -105,22 +106,23 @@ export function onAdvancedModeToggle(state, bookService, payload) {
  * @param {State} state - Instância do gerenciador de estado global da aplicação.
  * @param {string} bookPath - Caminho completo do livro selecionado.
  */
-export function onBookSelect(state, bookPath) {
+export async function onBookSelect(state, bookPath, bookService) {
   localStorage.setItem("last_selected_book", bookPath);
 
-  let filePath = state.currentFilePath || null;
-  // console.log("1--------------", filePath);
+  // Limpa state do livro anterior para evitar problemas
+  state.currentBookPath = null;
+  state.currentBookMetadata = {};
+  state.currentBookMap = {};
+  state.currentFilePath = null;
+  state.currentFileMetadata = {};
 
-  // Normaliza barras para evitar problemas entre Windows (\) e Linux/Mac (/)
-  const normBook = bookPath.replace(/\\/g, "/").replace(/\/+$/, "");
-  const normFile = filePath ? filePath.replace(/\\/g, "/") : null;
+  const bookMap = await bookService.getMap(normalizePath(bookPath));
+  const bookConfig = state.bookList.find((book) => book.fullPath === bookPath);
 
-  // O arquivo pertence ao livro se o caminho do arquivo começa com o caminho do livro
-  filePath = normFile && !normFile.startsWith(normBook + "/") ? null : filePath;
-  // console.log("2--------------", filePath);
   state.currentBookPath = bookPath;
-  state.currentFilePath = filePath;
-  // console.log("3--------------", state.currentFilePath);
+  state.currentBookMetadata = bookConfig;
+  state.currentBookMap = bookMap;
+
   uiBus.emit("book:changed", bookPath);
 }
 
@@ -132,11 +134,10 @@ export function onBookSelect(state, bookPath) {
  * @param {Object} uiBus - Barramento de eventos da interface.
  * @returns {void}
  */
-export function onBookChange(bookPath, state) {
-  if (!bookPath || !state || !state.bookList) return;
+export function onBookChange(state) {
+  if (!state.currentBookPath || !state || !state.bookList) return;
 
-  // 1. Atualiza o livro atual no state
-  state.currentBookPath = bookPath;
+  const bookPath = state.currentBookPath;
 
   // 2. Localiza o objeto do livro na lista para ler suas configurações salvas
   const currentBook = state.bookList.find((book) => book.fullPath === bookPath);

@@ -124,7 +124,6 @@ export class AppContainer {
       localStorage.getItem("last_selected_book") || null;
     this.state.currentFilePath =
       localStorage.getItem("last_opened_file") || null;
-    console.log(this.state.currentFilePath); // FIXME: Remover este log após depuração
   }
 
   /**

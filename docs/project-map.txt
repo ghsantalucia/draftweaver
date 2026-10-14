@@ -116,7 +116,6 @@ Estrutura do Projeto com Descrições:
 │       │       ├── styles.css
 │       │       ├── [templates]
 │       │       │   └── main.hbs
-│       │       ├── toolbar.js — Barra de Ferramentas do framework acima do editor
 │       │       └── ToolbarComponent.js — Componente responsável pela estrutura e lógica reativa da Barra de Ferramentas (Toolbar).
 │       ├── [controllers]
 │       │   ├── domainController.js — Gerencia e despacha os eventos de negócio e domínio vindos do domainBus para os handlers específicos.

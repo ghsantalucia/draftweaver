@@ -2,6 +2,7 @@
  * @file Serviço responsável pela comunicação, intermediação com o gateway de IA e gestão dos logs de chat do projeto.
  */
 
+import { normalizePath } from "../utils/helpers.js";
 import * as ai from "../ai/aiGateway.js";
 
 const MAX_MESSAGES_PER_FILE = 50;
@@ -163,15 +164,14 @@ export class AiService {
 
     try {
       const folderTree = await window.electronAPI.getTree(chatlogFolder);
-      if (!folderTree || !folderTree.children) return [];
+      if (!folderTree || !folderTree.files) return [];
 
-      return folderTree.children
+      // Como `files` agora é um dicionário, usamos Object.values() para varrer os arquivos
+      return Object.values(folderTree.files)
         .filter(
-          (item) =>
-            (item.type === "file" || item.isDirectory === false) &&
-            item.name.endsWith(".json"),
+          (file) => file.path && file.path.toLowerCase().endsWith(".json"),
         )
-        .map((item) => item.path)
+        .map((file) => file.path)
         .sort((a, b) => a.localeCompare(b)); // Ordenação cronológica
     } catch (err) {
       console.error("[CHAT LOG] Erro ao listar arquivos de histórico:", err);

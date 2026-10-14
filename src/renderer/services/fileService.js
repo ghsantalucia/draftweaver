@@ -128,7 +128,10 @@ export class FileService {
    * @returns {string|null} Caminho do .temp ou null se inválido.
    */
   getTempPath(filePath) {
-    return filePath ? `${filePath}.temp` : null;
+    if (!filePath) return null;
+
+    // Se o caminho já terminar em .temp, retorna ele mesmo sem adicionar outro
+    return filePath.endsWith(".temp") ? filePath : `${filePath}.temp`;
   }
 
   /**
@@ -140,43 +143,47 @@ export class FileService {
     if (!this.state || !this.state.currentBookPath) return [];
 
     try {
-      // 1. Obtém a árvore de arquivos completa do livro atual via IPC
+      // 1. Obtém a árvore de arquivos completa estruturada do livro atual via IPC
       const tree = await window.electronAPI.getTree(this.state.currentBookPath);
       const tempFiles = [];
 
-      // Função recursiva para varrer os nós do projeto
+      // Função recursiva para varrer os dicionários folders e files da árvore
       const walkTree = async (node) => {
         if (!node) return;
 
-        if (node.children && Array.isArray(node.children)) {
-          for (const child of node.children) {
-            await walkTree(child);
-          }
-        } else if (node.name && node.name.endsWith(".temp")) {
-          const tempPath = node.path;
-          const originalPath = tempPath.replace(/\.temp$/, "");
+        // Varre os arquivos do diretório atual se existirem
+        if (node.files) {
+          for (const [fileKey, fileData] of Object.entries(node.files)) {
+            // Se o arquivo for um temp ativo
+            if (fileData && fileData.isTemp) {
+              const tempPath = fileData.path;
+              const originalPath = fileData.originalPath;
+              const content = fileData.content || "";
 
-          // 2. Lê o conteúdo bruto do arquivo .temp diretamente do disco
-          const { content } = await this.readFile(tempPath);
+              let displayName = fileKey
+                .replace(/\.temp$/, "")
+                .replace(/\.md$/, "");
 
-          let displayName = node.name
-            .replace(/\.temp$/, "")
-            .replace(/\.md$/, "");
+              // Se houver metadados no arquivo, tenta extrair o título real
+              if (fileData.metadata && fileData.metadata.title) {
+                displayName = fileData.metadata.title;
+              }
 
-          // 3. Extrai o título dos metadados Frontmatter do .temp se existir
-          if (content) {
-            const { metadata } = parseMarkdown(content);
-            if (metadata && metadata.title) {
-              displayName = metadata.title;
+              tempFiles.push({
+                path: originalPath,
+                tempPath: tempPath,
+                name: displayName,
+                content: content,
+              });
             }
           }
+        }
 
-          tempFiles.push({
-            path: originalPath,
-            tempPath: tempPath,
-            name: displayName,
-            content: content || "",
-          });
+        // Varre recursivamente as subpastas em folders
+        if (node.folders) {
+          for (const subFolder of Object.values(node.folders)) {
+            await walkTree(subFolder);
+          }
         }
       };
 

@@ -123,4 +123,12 @@ export class BookService {
       console.error("[BookService] Erro ao salvar config.json do livro:", err);
     }
   }
+
+  async getMap(bookPath) {
+    /** TODO A ideia dessa função é consumir o IPC que monta a árvore de arquivos e pastas do arquivo,
+     * convertendo tudo em um objeto Javascript com todos os metadados
+     * e então colocá-lo à disposição no State
+     */
+    return await window.electronAPI.getTree(bookPath);
+  }
 }

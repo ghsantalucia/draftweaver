@@ -75,15 +75,16 @@ export class UiController {
     // Lida com seleção de livro/projeto
     uiBus.on("book:selected", (e) => {
       if (e.nativeEvent) {
-        book.onBookSelect(this.state, e.value);
+        book.onBookSelect(this.state, e.value, this.services.book);
       } else {
-        book.onBookSelect(this.state, e);
+        book.onBookSelect(this.state, e, this.services.book);
       }
     });
 
     // Lida com troca de livro/projeto
     uiBus.on("book:changed", (bookPath) => {
-      book.onBookChange(bookPath, this.state);
+      //console.log(this.state);
+      book.onBookChange(this.state);
       chat.loadHistory(0, this.services.ai);
       file.handlePendingTempFiles(this.services.file);
     });

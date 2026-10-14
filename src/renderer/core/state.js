@@ -28,16 +28,28 @@ export class State {
    */
   constructor() {
     /**
-     * Instância do editor de texto ativo.
-     * @type {Object|null}
+     * Lista de todos os livros/projetos
+     * @type {Array[Object]}
      */
-    this.editor = null;
+    this.bookList = [];
 
     /**
      * Caminho absoluto do livro atualmente selecionado.
      * @type {string|null}
      */
     this.currentBookPath = null;
+
+    /**
+     * Dados do config.json do livro
+     * @type {Object}
+     */
+    this.currentBookMetadata = {};
+
+    /**
+     * Mapa de metadados de todos os arquivos rastreados.
+     * @type {Object}
+     */
+    this.currentBookMap = {};
 
     /**
      * Caminho absoluto do arquivo atualmente aberto.
@@ -52,21 +64,9 @@ export class State {
     this.currentFileMetadata = {};
 
     /**
-     * Mapa de metadados de todos os arquivos rastreados.
-     * @type {Object}
+     * Instância do editor de texto ativo.
+     * @type {Object|null}
      */
-    this.fileMetadataMap = {};
-
-    /**
-     * Estado de trava de segurança da IA.
-     * @type {boolean}
-     */
-    this.aiLockState = false;
-
-    /**
-     * Lista de todos os livros/projetos
-     * @type {Array[Object]}
-     */
-    this.bookList = [];
+    this.editor = null;
   }
 }

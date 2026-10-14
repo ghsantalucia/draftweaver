@@ -59,8 +59,6 @@
      │   │       ├── ⚙️ constructor(selector, context, templateHtml, params = null, parent = null) — Cria uma instância do componente.
      │   │       ├── ⚙️ newChild(ComponentClass, selector, context, params = null) — Fábrica interna para instanciar e registrar um componente filho de forma limpa pelo pai.
      │   │       ├── ⚙️ setChild(child) — Adiciona um componente filho à lista de gerenciamento.
-     │   │       ├── ⚙️ init(isParent = false) — Ciclo de vida principal padronizado.
-     │   │       ├── ⚙️ render() — Motor de renderização centralizado usando Handlebars.
      │   │       ├── ⚙️ setupListeners() — Método padrão vazio (Hook). As filhas fazem override se precisarem de eventos.
      │   │       ├── ⚙️ compile(templateStr, data = {}) — Compila uma string de template Handlebars com um contexto de dados e retorna a string HTML.
      │   │       └── ⚙️ createDOMElement(htmlString) — Converte uma string HTML em um elemento DOM individual (Node).
@@ -74,7 +72,6 @@
      │   │            ├── ⚙️ openFile(path) — Gerencia a abertura de arquivos no editor, requisitando o conteúdo via uiBus e renderizando-o.
      │   │            ├── ⚙️ setupInternalLinkHandler() — Escuta cliques dentro do container do editor para capturar navegações por links internos.
      │   │            ├── ⚙️ handleEditorChange() — Monitora digitação e aguarda 1s sem digitação para disparar autosave.
-     │   │            ├── ⚙️ setSaveStatus(status) — Atualiza o ícone visual de status de salvamento na UI.
      │   │            ├── ⚙️ setEditorReadOnly(isReadOnly) — Define o estado de leitura/escrita do editor de texto.
      │   │            ├── ⚙️ renderFileContent(fullPath, rawText) — Renderiza o conteúdo do arquivo no editor e atualiza a interface.
      │   │            └── ⚙️ resetEditorState() — Reseta a interface do editor para o estado inicial sem arquivo aberto.
@@ -90,13 +87,14 @@
      │   │            ├── ⚙️ constructor(selector, context, params, parent = null) — Cria uma instância da classe.
      │   │            ├── ⚙️ onInit() — Executado logo após a renderização inicial do componente.
      │   │            ├── ⚙️ setupListeners() — Configura os ouvintes de eventos da UI e de domínio.
-     │   │            ├── ⚙️ initExplorerEvents() — Inicializa todos os ouvintes de eventos e comportamentos visuais do explorador.
      │   │            ├── ⚙️ toggleAdvancedExplorerView() — Controla e alterna a visibilidade dos elementos avançados no explorador.
      │   │            ├── ⚙️ updateAdvancedVisibility()
      │   │            ├── ⚙️ tabSelectionEvents() — Gerencia a seleção de abas de navegação do explorador.
      │   │            ├── ⚙️ syncAdvancedModeView() — Sincroniza o estado visual do switch e do container de arquivos avançados com base nas configurações (config.json) do livro atual.
      │   │            ├── ⚙️ setTimeout(()
-     │   │            └── ⚙️ attemptSelection()
+     │   │            ├── ⚙️ attemptSelection()
+     │   │            ├── ⚙️ updateFileTempStatus(filePath, isTemp) — Adiciona ou remove a indicação de arquivo temporário (.temp) na UI do Explorer.
+     │   │            └── ⚙️ clearAllTemp() — Remove todas as marcações de arquivos temporários (.temp) da interface do Explorer.
      │   ├── [Modal]
      │   │   ├── ModalComponent.js — [Classe gerenciadora de modais em pilha (Stack).]
      │   │   │   └── 📦 class ModalComponent — Componente de Modal em Pilha (Stack), herdando da classe base Component.
@@ -131,7 +129,9 @@
      │   │   └── ToastComponent.js — [Componente responsável pela renderização estrutural do toast.]
      │   │        └── 📦 class ToastComponent — Representa o toast da aplicação.
      │   │            ├── ⚙️ constructor(selector, context, params, parent = null) — Cria uma instância da classe
-     │   │            └── ⚙️ setupListeners() — Configura os ouvintes de eventos da interface.
+     │   │            ├── ⚙️ setupListeners() — Configura os ouvintes de eventos da interface.
+     │   │            ├── ⚙️ show(message, type = "success") — Exibe uma mensagem de notificação toast temporária na tela.
+     │   │            └── ⚙️ clearTimeout(this._toastTimer)
      │   ├── [Toolbar]
      │   │   ├── ToolbarComponent.js — [Componente responsável pela estrutura e lógica reativa da Barra de Ferramentas (Toolbar).]
      │   │   │   └── 📦 class ToolbarComponent — Representa a barra de ferramentas do editor.
@@ -139,47 +139,25 @@
      │   │   │       ├── ⚙️ onInit() — Inicialização do componente executada após a renderização no DOM.
      │   │   │       ├── ⚙️ setupListeners() — Configura os ouvintes de eventos da UI (`uiBus`) e de interações do usuário no DOM.
      │   │   │       ├── ⚙️ initAnimations() — Inicializa a animação visual do botão de salvar/sincronizar.
-     │   │   │       ├── ⚙️ checkInitialTempState() — Solicita via evento a checagem inicial de existência de arquivos temporários (.temp).
      │   │   │       ├── ⚙️ handleSyncClick() — Dispara a solicitação para abertura do modal de sincronização de alterações pendentes.
-     │   │   │       └── ⚙️ refreshSaveButtonState(hasPendingChanges = false) — Centraliza a regra de ativação/desativação do botão Salvar/Sincronizar.
-     │   │   ├── animations.js — [Gerencia as animações da interface do usuário]
-     │   │   │   └── ⚙️ initSaveButtonAnimation()
-     │   │   └── toolbar.js — [Barra de Ferramentas do framework acima do editor]
-     │   │        ├── 📦 class extends
-     │   │        │   ├── ⚙️ refreshSaveButtonState()
-     │   │        │   ├── ⚙️ showToast(`⚠ ${successCount} salvos, e ${errorCount} falharam.`, "error")
-     │   │        │   ├── ⚙️ showToast("Nenhum arquivo pendente de sincronização.", "info")
-     │   │        │   ├── ⚙️ attachSyncModalEvents(syncModal)
-     │   │        │   ├── ⚙️ showToast(`Alterações de "${name}" descartadas.`, "success")
-     │   │        │   ├── ⚙️ updateListState()
-     │   │        │   ├── ⚙️ refreshSaveButtonState()
-     │   │        │   ├── ⚙️ showToast(`Erro ao descartar: ${res.error}`, "error")
-     │   │        │   ├── ⚙️ refreshSaveButtonState()
-     │   │        │   ├── ⚙️ updateListState()
-     │   │        │   ├── ⚙️ updateListState()
-     │   │        │   ├── ⚙️ autoOpenFileByPath(targetPath)
-     │   │        │   └── ⚙️ updateListState()
-     │   │        ├── ⚙️ syncFile(filePath) — Persiste as alterações de um único arquivo (socreve original com .temp e limpa estado)
-     │   │        ├── ⚙️ syncMultipleFiles(filePaths) — Sincroniza uma lista de caminhos de arquivos em lote.
-     │   │        ├── ⚙️ openSyncModal() — Abre o modal de gerenciamento de alterações temporárias pendentes.
-     │   │        ├── ⚙️ renderSyncModalContent(tempFiles) — Gera o HTML dinâmico contendo a lista de arquivos temporários para exibição no modal de sincronização.
-     │   │        ├── ⚙️ attachSyncModalEvents(syncModal) — Gerencia os ouvintes de eventos e interações dentro do modal de sincronização (cliques em links, seleção de checkboxes e exclusão de itens).
-     │   │        └── ⚙️ refreshSaveButtonState() — Centraliza a regra de ativação/desativação do botão Salvar/Sincronizar
+     │   │   │       ├── ⚙️ refreshSaveButtonState(hasPendingChanges = false) — Centraliza a regra de ativação/desativação do botão Salvar/Sincronizar.
+     │   │   │       └── ⚙️ setSaveStatus(status) — Atualiza o ícone visual de status de salvamento na UI.
+     │   │   └── animations.js — [Gerencia as animações da interface do usuário]
+     │   │        └── ⚙️ initSaveButtonAnimation()
      │   └── index.js — [Barrel para exportação centralizada de todos os componentes de interface.]
      ├── [controllers]
      │   ├── domainController.js — [Gerencia e despacha os eventos de negócio e domínio vindos do domainBus para os handlers específicos.]
      │   │   └── 📦 class DomainController — Controller responsável pelas regras de negócio, IA e manipulação de dados.
-     │   │       ├── ⚙️ constructor(services) — Cria uma instância do DomainController e registra os ouvintes de eventos de domínio.
+     │   │       ├── ⚙️ constructor(services, state) — Cria uma instância do DomainController e registra os ouvintes de eventos de domínio.
      │   │       ├── ⚙️ registerEvents() — Registra todos os escutadores do barramento de domínio.
-     │   │       ├── ⚙️ handleFileChanged(filePath) — Handler para alterações de arquivos no disco.
-     │   │       ├── ⚙️ handleBookSelected(payload) — Handler para quando um livro é selecionado.
-     │   │       └── ⚙️ handleAiLockStateChanged(payload) — Handler para mudança de estado da trava de IA.
+     │   │       ├── ⚙️ normalizePath(payload.filePath)
+     │   │       └── ⚙️ normalizePath(payload.relativePath)
      │   ├── [handlers]
      │   │   ├── bookHandler.js — [Handler dos eventos relacionados ao livro/projeto]
      │   │   │   ├── ⚙️ fetchBooks(state, bookService)
      │   │   │   ├── ⚙️ onFolderToggle(state, bookService, payload) — Manipula a abertura/fechamento de pastas na árvore, atualizando o estado do livro atual.
      │   │   │   ├── ⚙️ onAdvancedModeToggle(state, bookService, payload) — Manipula a alteração do modo avançado, atualizando o estado do livro atual e persistindo.
-     │   │   │   ├── ⚙️ onBookSelect(state, bookPath) — Handler de troca de livro.
+     │   │   │   ├── ⚙️ onBookSelect(state, bookPath, bookService) — Handler de troca de livro.
      │   │   │   ├── ⚙️ onBookChange(bookPath, state) — Manipula a alteração de livro, atualizando o estado global, resetando o editor e restaurando o último arquivo aberto (se houver) salvo no config.json.
      │   │   │   └── ⚙️ onFetchBooksList(req, bookService) — Solicita lista de livros do backend e também confere qual o último livro selecionado. @async
      │   │   ├── chapterHandler.js
@@ -195,9 +173,11 @@
      │   │        ├── ⚙️ onSyncOpenModal(fileService, state) — Varre o sistema de arquivos via FileService e abre o modal de sincronização.
      │   │        ├── ⚙️ attachSyncModalEvents(syncModal, fileService, state) — Gerencia os ouvintes de eventos e interações dentro do modal.
      │   │        ├── ⚙️ onFileGet(req, state, fileService) — Realiza a consulta do arquivo no disco (com prioridade .temp), atualiza o state e notifica globalmente.
-     │   │        ├── ⚙️ onSaveTemp(path, content)
+     │   │        ├── ⚙️ onSaveTemp(path, content, fileService)
      │   │        ├── ⚙️ onFileOpened(state, bookService, payload) — Manipula a abertura de um arquivo, atualizando o estado do livro atual e persistindo as configurações.
-     │   │        └── ⚙️ onEditorReset(state) — Ações a serem tomadas quando o editor é resetado
+     │   │        ├── ⚙️ onEditorReset(state) — Ações a serem tomadas quando o editor é resetado
+     │   │        ├── ⚙️ onTempDeleted(filePath, state, fileService)
+     │   │        └── ⚙️ handlePendingTempFiles(fileService)
      │   └── uiController.js — [Gerencia e despacha os eventos de interface (UI) vindos do uiBus para os handlers visuais.]
      │        └── 📦 class UiController — Controller responsável pelas reações visuais da interface.
      │            ├── ⚙️ constructor(services, state) — Cria uma instância do UiController e registra os ouvintes de eventos da UI.
@@ -206,6 +186,7 @@
      │   ├── appContainer.js — [Contém a classe AppContainer, responsável por inicializar, instanciar e gerenciar]
      │   │   └── 📦 class AppContainer — Orquestrador principal da aplicação no processo de renderização. Gerencia a inicialização e injeção de dependências das classes de serviços e UI.
      │   │       ├── ⚙️ constructor() — Cria uma instância do AppContainer e inicializa suas dependências. @constructor
+     │   │       ├── ⚙️ async(component)
      │   │       └── ⚙️ setupGlobalEvents() — Configura ouvintes globais de eventos na janela (arrastar arquivos, restrições de TAB, etc.).
      │   ├── state.js — [Gerencia o estado global compartilhado e define os valores padrão para os metadados e permissões dos arquivos.]
      │   │   └── 📦 class State — Classe responsável por gerenciar o estado global compartilhado da aplicação.
@@ -223,15 +204,17 @@
      │   │   └── 📦 class UiEventBus
      │   │       ├── ⚙️ constructor() — @constructor
      │   │       ├── ⚙️ initDeclarativeEvents(this.bus)
-     │   │       ├── ⚙️ emit(event, payload) — @method emit
-     │   │       ├── ⚙️ on(event, callback) — @method on
+     │   │       ├── ⚙️ emit(event, payload = null) — @method emit
+     │   │       ├── ⚙️ on(event, callback, replay = true) — @method on
+     │   │       ├── ⚙️ setTimeout(()
+     │   │       ├── ⚙️ callback(item.payload)
      │   │       ├── ⚙️ callback(reqContext)
-     │   │       ├── ⚙️ onReq(event, callback) — @method onReq
      │   │       ├── ⚙️ off(event, callback) — @method off
      │   │       ├── ⚙️ req(eventBase, payload = {}) — @method req
      │   │       ├── ⚙️ clearTimeout(timeout)
      │   │       ├── ⚙️ reject(new Error(response.error)
-     │   │       └── ⚙️ resolve(response.data)
+     │   │       ├── ⚙️ resolve(response.data)
+     │   │       └── ⚙️ onReq(event, callback) — @method onReq
      │   └── uiDeclarativeEvents.js
      │        └── ⚙️ initDeclarativeEvents(uiBus) — Inicializa o escutador global de eventos no documento.
      ├── renderer.js

@@ -38,7 +38,6 @@ export class SettingsComponent extends Component {
 
     // Sincroniza o estado do switch sempre que o tema mudar (inclusive no init)
     this.uiBus.on("theme:changed", (data) => {
-      console.log("[TOGGLE SWITCH]", data.theme);
       this.toggleThemeSwitch(data.theme);
     });
   }
