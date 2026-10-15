@@ -12,7 +12,6 @@ import { domainBus } from "./events/domainBus.js";
 
 window.api.onFileWatcher((eventType, data) => {
   domainBus.emit(`fs:${eventType}`, data);
-  // console.log(`[DomainBus] Evento de disco capturado: fs:${eventType}`, data);
 });
 
 console.log("[2. RENDERER]");

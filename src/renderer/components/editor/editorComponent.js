@@ -152,11 +152,6 @@ export class EditorComponent extends Component {
           e.preventDefault();
           e.stopPropagation();
 
-          console.log(
-            "[LINK INTERNO] Emitindo editor:open-file para:",
-            cleanHref,
-          );
-
           if (this.uiBus && this.state && this.state.currentFilePath) {
             const currentPath = this.state.currentFilePath;
             const parts = currentPath.split(/[/\\]/);

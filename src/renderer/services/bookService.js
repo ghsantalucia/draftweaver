@@ -60,9 +60,6 @@ export class BookService {
     const bookToLoad =
       books.find((b) => b.fullPath === lastSelectedBook) || books[0];
 
-    console.log(
-      `[BOOK SERVICE] Carregando livro: ${bookToLoad.title} (${bookToLoad.fullPath})`,
-    );
     await this.selectBook(bookToLoad.fullPath, bookToLoad.title);
   }
 

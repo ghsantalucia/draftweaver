@@ -44,7 +44,6 @@ export function initDeclarativeEvents(uiBus) {
         nativeEvent: e,
         target: targetElement,
       });
-      // console.log(eventChannel, { data, nativeEvent: e, target: targetElement });
     });
   });
 }

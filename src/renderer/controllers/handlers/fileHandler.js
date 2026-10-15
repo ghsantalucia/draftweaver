@@ -350,9 +350,6 @@ export function onFileOpened(state, bookService, payload) {
       normalizePath(book.fullPath) === normalizePath(state.currentBookPath),
   );
 
-  // console.log("=======", currentBook);
-  // console.log("=======", state.bookList);
-
   if (!currentBook) return;
 
   // Cada um cuida do seu: garante apenas a existência do container e atualiza o seu campo
@@ -407,7 +404,6 @@ export async function onTempChanged(filePath, state, bookService) {
   // Atualiza o mapa do livro atual com os dados mais recentes do serviço
   const bookMap = await bookService.getMap(normBookPath);
   state.currentBookMap = bookMap;
-  console.log("========= MAP: ", bookMap);
 }
 
 export async function onTempDeleted(filePath, state, fileService) {

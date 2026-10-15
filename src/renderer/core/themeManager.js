@@ -34,7 +34,6 @@ export class ThemeManager {
   setupListeners() {
     // Evento de troca de tema
     uiBus.on("theme:toggle", (context) => {
-      // console.log(context.value);
       this.toggleTheme(context.value);
     });
   }

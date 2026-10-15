@@ -51,7 +51,6 @@ export function setupIpcHandlers(mainWindow) {
   });
 
   ipcMain.handle("delete-file", async (event, filePath) => {
-    // console.log('[MAIN IPC delete-file] Tentando deletar:', filePath);
     try {
       if (!filePath) {
         return { success: false, error: "Caminho não fornecido." };
@@ -72,7 +71,7 @@ export function setupIpcHandlers(mainWindow) {
       }
 
       await fs.promises.unlink(normalizedPath);
-      // console.log('[MAIN IPC delete-file] Arquivo deletado com sucesso:', normalizedPath);
+
       return { success: true };
     } catch (err) {
       console.error("[MAIN IPC delete-file] Erro ao deletar:", err);

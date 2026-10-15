@@ -124,10 +124,6 @@ export class ToolbarComponent extends Component {
       isReadOnly ||
       !this._hasPendingChanges ||
       this.state.currentBookMetadata.ai_lock;
-
-    // console.log("isReadOnly: ", isReadOnly);
-    // console.log("hasPendingChanges: ", !this._hasPendingChanges);
-    // console.log("ai_lock: ", this.state.currentBookMetadata.ai_lock);
   }
 
   /**

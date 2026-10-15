@@ -19,12 +19,10 @@ export async function onConfigChanged(payload, state, bookService) {
     const currentBookConfig = bookList.find(
       (b) => b.fullPath === state.currentBookPath,
     );
-    //config.onConfigChanged(currentBookConfig);
-    // console.log(currentBookConfig);
 
     onCurrentConfigChanged(state, currentBookConfig);
   } else {
-    // config secundário
+    // TODO: handler do config secundário
   }
 }
 

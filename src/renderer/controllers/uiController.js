@@ -69,8 +69,6 @@ export class UiController {
       const currentBookConfig = bookList.find(
         (b) => b.fullPath === this.state.currentBookPath,
       );
-      //config.onConfigChanged(currentBookConfig);
-      console.log(currentBookConfig);
     });
 
     // Atualiza estado da árvore de arquivos quando uma pasta é aberta ou fechada
@@ -94,7 +92,6 @@ export class UiController {
 
     // Lida com troca de livro/projeto
     uiBus.on("book:changed", (bookPath) => {
-      //console.log(this.state);
       book.onBookChange(this.state);
       chat.loadHistory(0, this.services.ai);
       file.handlePendingTempFiles(this.services.file);
