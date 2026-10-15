@@ -20,7 +20,7 @@ export async function onConfigChanged(payload, state, bookService) {
       (b) => b.fullPath === state.currentBookPath,
     );
     //config.onConfigChanged(currentBookConfig);
-    console.log(currentBookConfig);
+    // console.log(currentBookConfig);
 
     onCurrentConfigChanged(state, currentBookConfig);
   } else {
@@ -44,13 +44,9 @@ export async function onCurrentConfigChanged(state, config) {
     uiBus.emit("books:refresh-list");
 
     // Título do livro atual
-    if (book_title !== undefined && book_title !== state.currentBookTitle) {
-      state.currentBookTitle = book_title;
+    if (book_title !== undefined) {
       const payload = { title: book_title, filePath: state.currentBookPath };
-
-      // Dispara em ambos os barramentos para desacoplar domínio e UI
-      domainBus.emit("book:title-changed", payload);
-      uiBus.emit("book:title-changed", payload);
+      uiBus.emit("book:title", payload);
     }
 
     // Lock de IA do livro atual

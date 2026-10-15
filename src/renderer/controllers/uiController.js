@@ -98,6 +98,7 @@ export class UiController {
       book.onBookChange(this.state);
       chat.loadHistory(0, this.services.ai);
       file.handlePendingTempFiles(this.services.file);
+      config.onCurrentConfigChanged(this.state, this.state.currentBookMetadata);
     });
 
     // Lida com editor resetado (nenhum arquivo aberto)
@@ -131,14 +132,14 @@ export class UiController {
     });
 
     // Trata deleção de arquivo temporário
-    uiBus.on("temp-file:deleted", (filePath) => {
+    uiBus.on("temp-file:deleted", async (filePath) => {
+      await file.onTempChanged(filePath, this.state, this.services.book);
       file.onTempDeleted(filePath, this.state, this.services.file);
-      file.onTempChanged(filePath, this.state, this.services.book);
     });
     // Trata sincronização de arquivo temporário
-    uiBus.on("temp-file:synced", (filePath) => {
+    uiBus.on("temp-file:synced", async (filePath) => {
+      await file.onTempChanged(filePath, this.state, this.services.book);
       file.onTempDeleted(filePath, this.state, this.services.file);
-      file.onTempChanged(filePath, this.state, this.services.book);
     });
     uiBus.on("temp-file:saved", (filePath) => {
       file.onTempChanged(filePath, this.state, this.services.book);

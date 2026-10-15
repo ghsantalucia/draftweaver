@@ -40,18 +40,23 @@ export class ToolbarComponent extends Component {
   setupListeners() {
     if (!this.uiBus) return;
 
+    //
+    this.uiBus.on("book:selected", () => {
+      this._tempListReady = false;
+      this._hasPendingChanges = false;
+    });
+
     // Trata atualização da lista de temp files
     this.uiBus.on("temp-files:pending-list", (list) => {
-      if (list.length == 0) {
-        this.refreshSaveButtonState(false);
-      } else {
-        this.refreshSaveButtonState(true);
-      }
+      this._hasPendingChanges = list.length > 0;
+      this._tempListReady = true;
+      this.refreshSaveButtonState();
     });
 
     // Trata atualização da lista de temp files
     this.uiBus.on("temp-file:saved", () => {
-      this.refreshSaveButtonState(true);
+      this._hasPendingChanges = true;
+      this.refreshSaveButtonState();
     });
 
     // Exibe status de salvamento do arquivo aberto no editor
@@ -61,11 +66,11 @@ export class ToolbarComponent extends Component {
 
     //
     this.uiBus.on("book:ai-locked", () => {
-      this.toggleSaveBtn(false);
+      if (this._tempListReady) this.refreshSaveButtonState();
     });
     //
     this.uiBus.on("book:ai-unlocked", () => {
-      this.toggleSaveBtn(true);
+      if (this._tempListReady) this.refreshSaveButtonState();
     });
 
     // Evento do botão de sincronização/salvamento na barra de ferramentas
@@ -76,16 +81,6 @@ export class ToolbarComponent extends Component {
           this.handleSyncClick();
         }
       });
-    }
-  }
-
-  toggleSaveBtn(active = null) {
-    const btnSave = this.element?.querySelector("#btn-save");
-
-    if (active !== null) {
-      btnSave.disabled = !active;
-    } else {
-      btnSave.disabled = !btnSave.disabled;
     }
   }
 
@@ -113,10 +108,9 @@ export class ToolbarComponent extends Component {
 
   /**
    * Centraliza a regra de ativação/desativação do botão Salvar/Sincronizar.
-   * @param {boolean} [hasPendingChanges=false] - Indica se existem alterações .temp pendentes no projeto.
    * @returns {void}
    */
-  refreshSaveButtonState(hasPendingChanges = false) {
+  refreshSaveButtonState() {
     const btnSave = this.element?.querySelector("#btn-save");
     if (!btnSave) return;
 
@@ -126,7 +120,14 @@ export class ToolbarComponent extends Component {
       : false;
 
     // Habilita o botão apenas se o editor permitir escrita E houver arquivos .temp no projeto
-    btnSave.disabled = isReadOnly || !hasPendingChanges;
+    btnSave.disabled =
+      isReadOnly ||
+      !this._hasPendingChanges ||
+      this.state.currentBookMetadata.ai_lock;
+
+    // console.log("isReadOnly: ", isReadOnly);
+    // console.log("hasPendingChanges: ", !this._hasPendingChanges);
+    // console.log("ai_lock: ", this.state.currentBookMetadata.ai_lock);
   }
 
   /**

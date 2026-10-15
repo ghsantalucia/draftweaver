@@ -56,7 +56,7 @@ export class FileService {
 
   /**
    * Lê o conteúdo bruto de um arquivo via IPC. Tenta carregar o .temp prioritariamente.
-   * @param {string} fullPath - Caminho completo do arquivo.
+   * @param {string} fullPath Caminho completo do arquivo.
    * @returns {Promise<{content: string|null, isTemp: boolean}>} Objeto contendo o conteúdo e a flag se é rascunho temporário.
    */
   async readFile(fullPath) {
@@ -69,11 +69,12 @@ export class FileService {
         return { content: rawText, isTemp: true };
       }
 
-      // Se for o caminho original, tenta o .temp primeiro
+      // Se for o caminho original, obtém o caminho do temp correspondente
       const tempPath = this.getTempPath(fullPath);
       let rawText = await window.electronAPI.readFile(tempPath);
       let isTemp = true;
 
+      // Se o arquivo .temp não existir no disco (retornou null), usa o fallback para o original
       if (rawText === null) {
         rawText = await window.electronAPI.readFile(fullPath);
         isTemp = false;

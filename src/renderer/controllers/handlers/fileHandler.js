@@ -346,8 +346,12 @@ export function onFileOpened(state, bookService, payload) {
 
   // Localiza o livro atual na lista
   const currentBook = state.bookList.find(
-    (book) => book.fullPath === state.currentBookPath,
+    (book) =>
+      normalizePath(book.fullPath) === normalizePath(state.currentBookPath),
   );
+
+  // console.log("=======", currentBook);
+  // console.log("=======", state.bookList);
 
   if (!currentBook) return;
 
@@ -403,15 +407,18 @@ export async function onTempChanged(filePath, state, bookService) {
   // Atualiza o mapa do livro atual com os dados mais recentes do serviço
   const bookMap = await bookService.getMap(normBookPath);
   state.currentBookMap = bookMap;
+  console.log("========= MAP: ", bookMap);
 }
 
 export async function onTempDeleted(filePath, state, fileService) {
   // Se o arquivo deletado estava aberto no editor, recarrega o arquivo original
   if (normalizePath(state.currentFilePath) === normalizePath(filePath)) {
     uiBus.emit("toolbar:save-status", "hidden");
-    uiBus.emit("editor:open-file", { path: normalizePath(filePath) });
+    uiBus.emit("editor:open-file", {
+      path: normalizePath(filePath.replace(/\.temp$/, "")),
+    });
   }
-  handlePendingTempFiles(fileService);
+  await handlePendingTempFiles(fileService);
 }
 
 export async function handlePendingTempFiles(fileService) {

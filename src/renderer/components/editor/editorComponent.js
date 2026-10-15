@@ -49,7 +49,10 @@ export class EditorComponent extends Component {
    */
   setupListeners() {
     this.uiBus.on("editor:open-file", (payload) => {
-      this.openFile(payload.path);
+      const path = payload.nativeEvent
+        ? payload.data.absolutePath
+        : payload.path;
+      this.openFile(path);
     });
 
     // Reseta e bloqueia o editor sempre que um novo livro/projeto for selecionado

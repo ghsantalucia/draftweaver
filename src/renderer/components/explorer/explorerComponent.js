@@ -410,13 +410,13 @@ export class ExplorerComponent extends Component {
         .forEach((el) => el.classList.remove("active"));
       span.classList.add("active");
 
-      if (this.uiBus) {
-        // Envia o caminho absoluto correto (seja o rascunho .temp ativo ou o original .md)
-        this.uiBus.emit("editor:open-file", {
-          path: fileData.path,
-          relativePath,
-        });
-      }
+      // if (this.uiBus) {
+      //   // Envia o caminho absoluto correto (seja o rascunho .temp ativo ou o original .md)
+      //   this.uiBus.emit("editor:open-file", {
+      //     path: fileData.path.replace(/\.temp$/, ""),
+      //     relativePath,
+      //   });
+      // }
     };
 
     return li;
