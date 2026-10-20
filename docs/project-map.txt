@@ -185,6 +185,34 @@ Estrutura do Projeto com Descrições:
 │       ├── index.md
 │       └── [notes]
 │           └── folder.yml
+├── [tests]
+│   ├── [e2e]
+│   ├── [fixtures]
+│   │   ├── chapter.md
+│   │   ├── folder.yml
+│   │   ├── metadata-completo.yml
+│   │   └── metadata-incompleto.yml
+│   ├── [integration]
+│   ├── [reports]
+│   │   └── [html]
+│   │       ├── [assets]
+│   │       │   ├── index-B6hUSIXg.js
+│   │       │   └── index-BOa2vf5V.css
+│   │       ├── bg.png
+│   │       ├── favicon.ico
+│   │       ├── favicon.svg
+│   │       ├── html.meta.json.gz
+│   │       └── index.html
+│   └── [unit]
+│       ├── [main]
+│       │   ├── file-watcher.test.js
+│       │   └── ipc-handlers.test.js
+│       └── [renderer]
+│           ├── [services]
+│           │   └── fileService.test.js
+│           └── [utils]
+│               ├── helpers.test.js
+│               └── markdown.test.js
 ├── vite.main.config.mjs
 ├── vite.preload.config.mjs
 └── vite.renderer.config.mjs

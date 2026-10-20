@@ -5,7 +5,7 @@
 │   │   └── ⚙️ setupFileWatcher(mainWindow) — Configura e inicia o observador do sistema de arquivos para a pasta de livros.
 │   ├── ipc-handlers.js — [Gerencia todos os canais de comunicação IPC (Inter-Process Communication) entre o processo de renderização e o processo principal do Electron (sistema de arquivos, diálogos e temas).]
 │   │   ├── ⚙️ setupIpcHandlers(mainWindow) — Configura todos os ouvintes de eventos IPC do processo principal.
-│   │   └── ⚙️ buildTree(dir)
+│   │   └── ⚙️ buildBookTree(dir)
 │   └── main.js — [Ponto de entrada do Electron, gerencia a janela principal e manipuladores IPC do sistema de arquivos.]
 ├── [preload]
 │   └── preload.js — [Expõe a API segura via IPC para comunicação entre o processo de renderização e o Node.js.]
@@ -87,14 +87,18 @@
      │   │            ├── ⚙️ constructor(selector, context, params, parent = null) — Cria uma instância da classe.
      │   │            ├── ⚙️ onInit() — Executado logo após a renderização inicial do componente.
      │   │            ├── ⚙️ setupListeners() — Configura os ouvintes de eventos da UI e de domínio.
+     │   │            ├── ⚙️ handleTempList(arr)
      │   │            ├── ⚙️ toggleAdvancedExplorerView() — Controla e alterna a visibilidade dos elementos avançados no explorador.
      │   │            ├── ⚙️ updateAdvancedVisibility()
      │   │            ├── ⚙️ tabSelectionEvents() — Gerencia a seleção de abas de navegação do explorador.
      │   │            ├── ⚙️ syncAdvancedModeView() — Sincroniza o estado visual do switch e do container de arquivos avançados com base nas configurações (config.json) do livro atual.
-     │   │            ├── ⚙️ setTimeout(()
+     │   │            ├── ⚙️ buildTree(node, currentPath, parentMeta = null) — Função principal de montagem recursiva da árvore a partir do dicionário em memória.
+     │   │            ├── ⚙️ createFolderNode(folderNode, folderName, relativePath, parentMeta = null) — Processa e cria o nó de pasta utilizando os metadados já cacheados no sub-nó.
+     │   │            ├── ⚙️ createFileNode(fileData, fileKey, relativePath, parentMeta = null) — Cria o nó de arquivo utilizando os metadados do Frontmatter já presentes no dicionário.
+     │   │            ├── ⚙️ clearTimeout(this._currentSelectionTimer)
      │   │            ├── ⚙️ attemptSelection()
      │   │            ├── ⚙️ updateFileTempStatus(filePath, isTemp) — Adiciona ou remove a indicação de arquivo temporário (.temp) na UI do Explorer.
-     │   │            └── ⚙️ clearAllTemp() — Remove todas as marcações de arquivos temporários (.temp) da interface do Explorer.
+     │   │            └── ⚙️ clearAllTemp() — Remove todas as marcações de arquivos temporários (.temp) e os elementos físicos do asterisco (*) da UI do Explorer.
      │   ├── [Modal]
      │   │   ├── ModalComponent.js — [Classe gerenciadora de modais em pilha (Stack).]
      │   │   │   └── 📦 class ModalComponent — Componente de Modal em Pilha (Stack), herdando da classe base Component.
@@ -140,7 +144,7 @@
      │   │   │       ├── ⚙️ setupListeners() — Configura os ouvintes de eventos da UI (`uiBus`) e de interações do usuário no DOM.
      │   │   │       ├── ⚙️ initAnimations() — Inicializa a animação visual do botão de salvar/sincronizar.
      │   │   │       ├── ⚙️ handleSyncClick() — Dispara a solicitação para abertura do modal de sincronização de alterações pendentes.
-     │   │   │       ├── ⚙️ refreshSaveButtonState(hasPendingChanges = false) — Centraliza a regra de ativação/desativação do botão Salvar/Sincronizar.
+     │   │   │       ├── ⚙️ refreshSaveButtonState() — Centraliza a regra de ativação/desativação do botão Salvar/Sincronizar.
      │   │   │       └── ⚙️ setSaveStatus(status) — Atualiza o ícone visual de status de salvamento na UI.
      │   │   └── animations.js — [Gerencia as animações da interface do usuário]
      │   │        └── ⚙️ initSaveButtonAnimation()
@@ -149,17 +153,16 @@
      │   ├── domainController.js — [Gerencia e despacha os eventos de negócio e domínio vindos do domainBus para os handlers específicos.]
      │   │   └── 📦 class DomainController — Controller responsável pelas regras de negócio, IA e manipulação de dados.
      │   │       ├── ⚙️ constructor(services, state) — Cria uma instância do DomainController e registra os ouvintes de eventos de domínio.
-     │   │       ├── ⚙️ registerEvents() — Registra todos os escutadores do barramento de domínio.
-     │   │       ├── ⚙️ normalizePath(payload.filePath)
-     │   │       └── ⚙️ normalizePath(payload.relativePath)
+     │   │       └── ⚙️ registerEvents() — Registra todos os escutadores do barramento de domínio.
      │   ├── [handlers]
      │   │   ├── bookHandler.js — [Handler dos eventos relacionados ao livro/projeto]
      │   │   │   ├── ⚙️ fetchBooks(state, bookService)
      │   │   │   ├── ⚙️ onFolderToggle(state, bookService, payload) — Manipula a abertura/fechamento de pastas na árvore, atualizando o estado do livro atual.
      │   │   │   ├── ⚙️ onAdvancedModeToggle(state, bookService, payload) — Manipula a alteração do modo avançado, atualizando o estado do livro atual e persistindo.
      │   │   │   ├── ⚙️ onBookSelect(state, bookPath, bookService) — Handler de troca de livro.
-     │   │   │   ├── ⚙️ onBookChange(bookPath, state) — Manipula a alteração de livro, atualizando o estado global, resetando o editor e restaurando o último arquivo aberto (se houver) salvo no config.json.
-     │   │   │   └── ⚙️ onFetchBooksList(req, bookService) — Solicita lista de livros do backend e também confere qual o último livro selecionado. @async
+     │   │   │   ├── ⚙️ onBookChange(state) — Manipula a alteração de livro, atualizando o estado global, resetando o editor e restaurando o último arquivo aberto (se houver) salvo no config.json.
+     │   │   │   ├── ⚙️ onFetchBooksList(req, bookService) — Solicita lista de livros do backend e também confere qual o último livro selecionado. @async
+     │   │   │   └── ⚙️ onAiLock(locked)
      │   │   ├── chapterHandler.js
      │   │   ├── characterHandler.js
      │   │   ├── chatHandler.js — [Handler para orquestração de eventos e mensagens do chat.]
@@ -167,6 +170,8 @@
      │   │   │   ├── ⚙️ loadHistory(offset, aiService) — Carrega o histórico de mensagens do chat para a sessão atual do livro ativo. Se o lote inicial tiver <= 20 mensagens, busca arquivos anteriores até acumular >= 50 mensagens.
      │   │   │   └── ⚙️ fetchMoreHistory(offset, aiService) — Busca mais histórico antigo quando o usuário rola o chat até o topo (Infinite Scroll).
      │   │   ├── configHandler.js — [Handler para gerenciar alterações no arquivo config.json dos projetos.]
+     │   │   │   ├── ⚙️ onConfigChanged(payload, state, bookService)
+     │   │   │   └── ⚙️ onCurrentConfigChanged(state, config) — Processa a alteração de um arquivo config.json do projeto atual detectada no sistema de arquivos.
      │   │   └── fileHandler.js — [Handler responsável pelas ações de sincronização e gerenciamento de arquivos .temp.]
      │   │        ├── ⚙️ syncFile(filePath, fileService, state) — Persiste as alterações de um único arquivo (socreve original com .temp e limpa estado)
      │   │        ├── ⚙️ syncMultipleFiles(filePaths, fileService, state) — Sincroniza uma lista de caminhos de arquivos em lote.
@@ -176,6 +181,7 @@
      │   │        ├── ⚙️ onSaveTemp(path, content, fileService)
      │   │        ├── ⚙️ onFileOpened(state, bookService, payload) — Manipula a abertura de um arquivo, atualizando o estado do livro atual e persistindo as configurações.
      │   │        ├── ⚙️ onEditorReset(state) — Ações a serem tomadas quando o editor é resetado
+     │   │        ├── ⚙️ onTempChanged(filePath, state, bookService) — Manipula o evento de salvamento de arquivo temporário (.temp), validando se o arquivo pertence ao livro atualmente ativo antes de atualizar o estado. @async @function onTempSaved
      │   │        ├── ⚙️ onTempDeleted(filePath, state, fileService)
      │   │        └── ⚙️ handlePendingTempFiles(fileService)
      │   └── uiController.js — [Gerencia e despacha os eventos de interface (UI) vindos do uiBus para os handlers visuais.]

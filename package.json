@@ -17,7 +17,9 @@
     "code-map": "node scripts/code-map.js > docs/code-map.txt",
     "event-map": "node scripts/event-map.js > docs/event-map.txt",
     "docs": "npm run file-map && npm run code-map && npm run event-map && npm run docs:web",
-    "format": "prettier --write \"src/**/*.{js,ts,json,css,md}\""
+    "format": "prettier --write \"src/**/*.{js,ts,json,css,md}\"",
+    "test:unit": "vitest run tests/unit",
+    "test:ui": "vitest --ui"
   },
   "keywords": [],
   "author": {
@@ -35,10 +37,13 @@
     "@electron-forge/plugin-fuses": "^7.11.2",
     "@electron-forge/plugin-vite": "^7.11.2",
     "@electron/fuses": "^1.8.0",
+    "@vitest/ui": "^2.1.9",
     "electron": "44.2.0",
+    "happy-dom": "^21.0.3",
     "jsdoc": "^4.0.5",
     "prettier": "^3.9.9",
-    "vite": "^5.4.21"
+    "vite": "^5.4.21",
+    "vitest": "^2.1.9"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.3.1",

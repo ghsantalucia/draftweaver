@@ -104,3 +104,6 @@ out/
 # Ignora arquivos pessoais
 /docs/.personal
 /docs/dist
+
+# Ignora relatórios de testes
+/tests/reports

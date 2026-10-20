@@ -1,0 +1,7 @@
+humanRead: true
+humanWrite: true
+aiRead: false
+aiWrite: false
+advanced: true
+title: "Manual do Desenvolvedor"
+description: "Documentação do sistema"

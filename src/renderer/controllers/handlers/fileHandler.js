@@ -320,16 +320,6 @@ export async function onFileGet(req, state, fileService) {
   }
 }
 
-// Solicita o salvamento de um arquivo temporário (.temp) via IPC
-export async function onSaveTemp(path, content, fileService) {
-  const result = await fileService.saveTempFile(path, content);
-  if (result.success) {
-    uiBus.emit("temp-file:saved", normalizePath(path));
-  } else {
-    uiBus.emit("temp-file:saving-error", { path, error: result.err });
-  }
-}
-
 /**
  * Manipula a abertura de um arquivo, atualizando o estado do livro atual e persistindo as configurações.
  * @param {Object} state - Instância do estado global.
@@ -374,12 +364,22 @@ export function onEditorReset(state) {
   state.currentFileMetadata = "";
 }
 
+// Solicita o salvamento de um arquivo temporário (.temp) via IPC
+export async function onSaveTemp(path, content, fileService) {
+  const result = await fileService.saveTempFile(path, content);
+  if (result.success) {
+    uiBus.emit("temp-file:saved", normalizePath(path));
+  } else {
+    uiBus.emit("temp-file:saving-error", { path, error: result.err });
+  }
+}
+
 /**
  * Manipula o evento de salvamento de arquivo temporário (.temp), validando
  * se o arquivo pertence ao livro atualmente ativo antes de atualizar o estado.
  *
  * @async
- * @function onTempSaved
+ * @function onTempChanged
  * @param {string} filePath - Caminho absoluto ou relativo do arquivo temporário.
  * @param {Object} state - Instância contendo o estado global da aplicação.
  * @param {string} state.currentBookPath - Caminho do livro atualmente selecionado.

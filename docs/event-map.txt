@@ -22,10 +22,25 @@
     * Escutadores:
       └── registerEvents (src\renderer\controllers\uiController.js)
 
+⚙️ [book:ai-locked]
+    * Emissores:
+      └── onCurrentConfigChanged (src\renderer\controllers\handlers\configHandler.js)
+    * Escutadores:
+      ├── setupListeners (src\renderer\components\Toolbar\ToolbarComponent.js)
+      └── registerEvents (src\renderer\controllers\uiController.js)
+
+⚙️ [book:ai-unlocked]
+    * Emissores:
+      └── onCurrentConfigChanged (src\renderer\controllers\handlers\configHandler.js)
+    * Escutadores:
+      ├── setupListeners (src\renderer\components\Toolbar\ToolbarComponent.js)
+      └── registerEvents (src\renderer\controllers\uiController.js)
+
 ⚙️ [book:changed]
     * Emissores:
       └── onBookSelect (src\renderer\controllers\handlers\bookHandler.js)
     * Escutadores:
+      ├── setupListeners (src\renderer\components\Explorer\ExplorerComponent.js)
       ├── setupListeners (src\renderer\components\Sidebar\SidebarComponent.js)
       └── registerEvents (src\renderer\controllers\uiController.js)
 
@@ -35,17 +50,18 @@
       └── registerEvents (src\renderer\controllers\uiController.js)
     * Escutadores:
       ├── setupListeners (src\renderer\components\Explorer\ExplorerComponent.js)
+      ├── setupListeners (src\renderer\components\Toolbar\ToolbarComponent.js)
       └── registerEvents (src\renderer\controllers\uiController.js)
 
-⚙️ [book:title-changed]
+⚙️ [book:title]
     * Emissores:
-      └── onConfigChanged (src\renderer\controllers\handlers\configHandler.js)
+      └── onCurrentConfigChanged (src\renderer\controllers\handlers\configHandler.js)
     * Escutadores:
       └── ---
 
 ⚙️ [books:refresh-list]
     * Emissores:
-      └── onConfigChanged (src\renderer\controllers\handlers\configHandler.js)
+      └── onCurrentConfigChanged (src\renderer\controllers\handlers\configHandler.js)
     * Escutadores:
       └── ---
 
@@ -97,17 +113,31 @@
     * Escutadores:
       └── setupListeners (src\renderer\components\Chat\ChatComponent.js)
 
+⚙️ [config:changed]
+    * Emissores:
+      └── ---
+    * Escutadores:
+      └── registerEvents (src\renderer\controllers\uiController.js)
+
 ⚙️ [editor-overlay:close]
     * Emissores:
-      └── renderFileContent (src\renderer\components\Editor\EditorComponent.js)
+      ├── renderFileContent (src\renderer\components\Editor\EditorComponent.js)
+      └── onAiLock (src\renderer\controllers\handlers\bookHandler.js)
     * Escutadores:
       └── setupListeners (src\renderer\components\EditorOverlay\EditorOverlayComponent.js)
 
 ⚙️ [editor-overlay:open]
     * Emissores:
-      └── resetEditorState (src\renderer\components\Editor\EditorComponent.js)
+      ├── resetEditorState (src\renderer\components\Editor\EditorComponent.js)
+      └── onAiLock (src\renderer\controllers\handlers\bookHandler.js)
     * Escutadores:
       └── setupListeners (src\renderer\components\EditorOverlay\EditorOverlayComponent.js)
+
+⚙️ [editor:lock]
+    * Emissores:
+      └── onAiLock (src\renderer\controllers\handlers\bookHandler.js)
+    * Escutadores:
+      └── setupListeners (src\renderer\components\Editor\EditorComponent.js)
 
 ⚙️ [editor:locked]
     * Emissores:
@@ -138,6 +168,12 @@
       └── registerEvents (src\renderer\controllers\uiController.js)
     * Escutadores:
       └── registerEvents (src\renderer\controllers\uiController.js)
+
+⚙️ [editor:unlock]
+    * Emissores:
+      └── onAiLock (src\renderer\controllers\handlers\bookHandler.js)
+    * Escutadores:
+      └── setupListeners (src\renderer\components\Editor\EditorComponent.js)
 
 ⚙️ [editor:unlocked]
     * Emissores:
@@ -201,7 +237,8 @@
     * Escutadores:
       ├── setupListeners (src\renderer\components\Editor\EditorComponent.js)
       ├── setupListeners (src\renderer\components\Explorer\ExplorerComponent.js)
-      └── setupListeners (src\renderer\components\Toolbar\ToolbarComponent.js)
+      ├── setupListeners (src\renderer\components\Toolbar\ToolbarComponent.js)
+      └── registerEvents (src\renderer\controllers\uiController.js)
 
 ⚙️ [temp-file:saving-error]
     * Emissores:
@@ -285,12 +322,6 @@
 ⚙️ [book:selected]
     * Emissores:
       └── selectBook (src\renderer\services\bookService.js)
-    * Escutadores:
-      └── ---
-
-⚙️ [book:title-changed]
-    * Emissores:
-      └── onConfigChanged (src\renderer\controllers\handlers\configHandler.js)
     * Escutadores:
       └── ---
 

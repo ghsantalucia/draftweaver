@@ -182,7 +182,7 @@ export function setupIpcHandlers(mainWindow) {
 
         const entries = await fs.promises.readdir(dir, { withFileTypes: true });
 
-        // 1. Processa o folder.yml da pasta atual (se existir)
+        // 1. Processa o folder.yml da pasta atual
         const folderYmlPath = path.join(dir, "folder.yml");
         let folderMeta = {};
         if (fs.existsSync(folderYmlPath)) {
@@ -191,7 +191,6 @@ export function setupIpcHandlers(mainWindow) {
               folderYmlPath,
               "utf8",
             );
-            // Usa o engine YAML do gray-matter para ler arquivos YAML puros (folder.yml)
             folderMeta = matter.engines.yaml.parse(ymlContent) || {};
           } catch (ymlErr) {
             console.error(
@@ -204,7 +203,7 @@ export function setupIpcHandlers(mainWindow) {
 
         const markdownFilesMap = new Map();
 
-        // Primeira passada: Varre os arquivos do diretório
+        // 2. Mapeia entradas do diretório atual de forma isolada
         for (const entry of entries) {
           if (!entry.isDirectory()) {
             const fileName = entry.name;
@@ -212,15 +211,12 @@ export function setupIpcHandlers(mainWindow) {
 
             if (lowerName === "folder.yml") continue;
 
-            // Tratamento para arquivos Markdown e Rascunhos Temporários (.md.temp)
             if (lowerName.endsWith(".md") || lowerName.endsWith(".md.temp")) {
               let keyName = fileName;
-
               if (lowerName.endsWith(".md.temp")) {
-                keyName = fileName.slice(0, -5); // Remove o ".temp"
+                keyName = fileName.slice(0, -5);
               }
-
-              keyName = keyName.replace(/\.md$/, ""); // Remove o ".md" para a chave do dicionário
+              keyName = keyName.replace(/\.md$/, "");
 
               const originalPath = path.join(dir, `${keyName}.md`);
               const tempPath = `${originalPath}.temp`;
@@ -228,7 +224,6 @@ export function setupIpcHandlers(mainWindow) {
               let activePath = originalPath;
               let usingTemp = false;
 
-              // Prioriza o arquivo .temp se ele existir fisicamente no disco
               if (fs.existsSync(tempPath)) {
                 activePath = tempPath;
                 usingTemp = true;
@@ -248,9 +243,7 @@ export function setupIpcHandlers(mainWindow) {
                   isTemp: usingTemp,
                 });
               }
-            }
-            // Tratamento para arquivos JSON (esqueleto leve, sem carregar o conteúdo pesado)
-            else if (lowerName.endsWith(".json")) {
+            } else if (lowerName.endsWith(".json")) {
               const filePath = path.join(dir, fileName);
               const baseName = path.basename(fileName, ".json");
 
@@ -259,45 +252,62 @@ export function setupIpcHandlers(mainWindow) {
                 originalPath: filePath,
                 isTemp: false,
                 metadata: {},
-                // Conteúdo JSON removido do esqueleto para poupar cache e desempenho
               };
             }
           }
         }
 
-        // Processa apenas os metadados (Frontmatter) dos arquivos Markdown
-        for (const [keyName, fileInfo] of markdownFilesMap.entries()) {
-          try {
-            const fileContent = await fs.promises.readFile(
-              fileInfo.activePath,
-              "utf8",
-            );
-            const parsedFile = matter(fileContent);
+        // 3. Lê os metadados dos markdowns em paralelo de forma segura para este diretório
+        const filePromises = Array.from(markdownFilesMap.entries()).map(
+          async ([keyName, fileInfo]) => {
+            try {
+              const fileContent = await fs.promises.readFile(
+                fileInfo.activePath,
+                "utf8",
+              );
+              const parsedFile = matter(fileContent);
 
-            result.files[keyName] = {
-              path: fileInfo.activePath,
-              originalPath: fileInfo.originalPath,
-              isTemp: fileInfo.isTemp,
-              metadata: parsedFile.data || {},
-            };
-          } catch (fileErr) {
-            console.error(
-              `[IPC get-tree] Erro ao ler metadados do arquivo ${fileInfo.activePath}:`,
-              fileErr,
-            );
+              return {
+                keyName,
+                data: {
+                  path: fileInfo.activePath,
+                  originalPath: fileInfo.originalPath,
+                  isTemp: fileInfo.isTemp,
+                  metadata: parsedFile.data || {},
+                },
+              };
+            } catch (fileErr) {
+              console.error(
+                `[IPC get-tree] Erro ao ler ${fileInfo.activePath}:`,
+                fileErr,
+              );
+              return null;
+            }
+          },
+        );
+
+        const resolvedFiles = await Promise.all(filePromises);
+        for (const item of resolvedFiles) {
+          if (item) {
+            result.files[item.keyName] = item.data;
           }
         }
 
-        // Segunda passada: Processa subdiretórios recursivamente
-        for (const entry of entries) {
-          if (entry.isDirectory()) {
+        // 4. Processa subdiretórios recursivamente de forma isolada
+        const subDirPromises = entries
+          .filter((entry) => entry.isDirectory())
+          .map(async (entry) => {
             const subDirName = entry.name;
             const subDirPath = path.join(dir, subDirName);
             const subTree = await buildBookTree(subDirPath);
 
-            if (subTree) {
-              result.folders[subDirName] = subTree;
-            }
+            return { subDirName, subTree };
+          });
+
+        const resolvedSubDirs = await Promise.all(subDirPromises);
+        for (const sub of resolvedSubDirs) {
+          if (sub.subTree) {
+            result.folders[sub.subDirName] = sub.subTree;
           }
         }
 

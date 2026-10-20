@@ -122,6 +122,8 @@ export class BookService {
   }
 
   async getMap(bookPath) {
-    return await window.electronAPI.getTree(bookPath);
+    const bookTree = await window.electronAPI.getTree(bookPath);
+    console.log(bookTree);
+    return bookTree;
   }
 }
