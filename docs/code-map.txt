@@ -17,7 +17,7 @@
      │   └── [providers]
      │        └── [mock]
      │             └── index.js — [Módulo do Provedor Simulado (Mock)]
-     │                  └── ⚙️ sendRequest({ prompt }) — Simula a chamada de rede e retorna apenas a string de resposta crua.
+     │                  └── ⚙️ sendRequest({ prompt, history }) — Simula a chamada de rede e retorna apenas a string de resposta crua.
      ├── app.js — [Ponto de entrada do frontend (Renderer), responsável por inicializar o container principal da aplicação.]
      ├── [components]
      │   ├── [Chat]
@@ -178,10 +178,10 @@
      │   │        ├── ⚙️ onSyncOpenModal(fileService, state) — Varre o sistema de arquivos via FileService e abre o modal de sincronização.
      │   │        ├── ⚙️ attachSyncModalEvents(syncModal, fileService, state) — Gerencia os ouvintes de eventos e interações dentro do modal.
      │   │        ├── ⚙️ onFileGet(req, state, fileService) — Realiza a consulta do arquivo no disco (com prioridade .temp), atualiza o state e notifica globalmente.
-     │   │        ├── ⚙️ onSaveTemp(path, content, fileService)
      │   │        ├── ⚙️ onFileOpened(state, bookService, payload) — Manipula a abertura de um arquivo, atualizando o estado do livro atual e persistindo as configurações.
      │   │        ├── ⚙️ onEditorReset(state) — Ações a serem tomadas quando o editor é resetado
-     │   │        ├── ⚙️ onTempChanged(filePath, state, bookService) — Manipula o evento de salvamento de arquivo temporário (.temp), validando se o arquivo pertence ao livro atualmente ativo antes de atualizar o estado. @async @function onTempSaved
+     │   │        ├── ⚙️ onSaveTemp(path, content, fileService)
+     │   │        ├── ⚙️ onTempChanged(filePath, state, bookService) — Manipula o evento de salvamento de arquivo temporário (.temp), validando se o arquivo pertence ao livro atualmente ativo antes de atualizar o estado. @async @function onTempChanged
      │   │        ├── ⚙️ onTempDeleted(filePath, state, fileService)
      │   │        └── ⚙️ handlePendingTempFiles(fileService)
      │   └── uiController.js — [Gerencia e despacha os eventos de interface (UI) vindos do uiBus para os handlers visuais.]

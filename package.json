@@ -19,7 +19,11 @@
     "docs": "npm run file-map && npm run code-map && npm run event-map && npm run docs:web",
     "format": "prettier --write \"src/**/*.{js,ts,json,css,md}\"",
     "test:unit": "vitest run tests/unit",
-    "test:ui": "vitest --ui"
+    "test:intagration": "vitest run tests/integration",
+    "test:ui": "vitest --ui",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "npx playwright show-report tests/reports/playwright"
   },
   "keywords": [],
   "author": {
@@ -37,6 +41,7 @@
     "@electron-forge/plugin-fuses": "^7.11.2",
     "@electron-forge/plugin-vite": "^7.11.2",
     "@electron/fuses": "^1.8.0",
+    "@playwright/test": "^1.64.1",
     "@vitest/ui": "^2.1.9",
     "electron": "44.2.0",
     "happy-dom": "^21.0.3",

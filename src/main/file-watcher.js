@@ -2,8 +2,8 @@
  * @file Monitora o sistema de arquivos utilizando a biblioteca Chokidar na pasta /books, disparando eventos via IPC para o processo de renderização sempre que houver alterações em arquivos de configuração, markdowns ou pastas de livros.
  */
 
-const chokidar = require("chokidar");
-const path = require("path");
+import chokidar from "chokidar";
+import path from "path";
 
 /**
  * Configura e inicia o observador do sistema de arquivos para a pasta de livros.

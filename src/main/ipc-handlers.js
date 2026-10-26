@@ -4,8 +4,11 @@
 
 import fs from "node:fs";
 import path from "node:path";
-const matter = require("gray-matter");
 import { ipcMain, dialog } from "electron";
+
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+const matter = require("gray-matter");
 
 /**
  * Configura todos os ouvintes de eventos IPC do processo principal.

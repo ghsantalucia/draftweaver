@@ -2,7 +2,7 @@
  * @file Expõe a API segura via IPC para comunicação entre o processo de renderização e o Node.js.
  */
 
-const { contextBridge, ipcRenderer } = require("electron");
+import { contextBridge, ipcRenderer } from "electron";
 
 /**
  * API principal exposta no escopo global do renderizador para operações do sistema.

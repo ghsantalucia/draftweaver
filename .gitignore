@@ -107,3 +107,4 @@ out/
 
 # Ignora relatórios de testes
 /tests/reports
+/playwright-report

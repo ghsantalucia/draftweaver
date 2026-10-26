@@ -25,6 +25,31 @@ Estrutura do Projeto com Descrições:
 ├── LICENCE
 ├── package-lock.json
 ├── package.json
+├── [playwright-report]
+│   ├── [data]
+│   │   └── e22951ffc2a784394298b2e938528b7269e3a725.zip
+│   ├── index.html
+│   └── [trace]
+│       ├── [assets]
+│       │   ├── codeMirrorModule-BEB2e8M3.js
+│       │   ├── defaultSettingsView-D-g2vrvf.js
+│       │   └── urlMatch-L3liM589.js
+│       ├── codeMirrorModule.-QdMvsKi.css
+│       ├── codicon.DCmgc-ay.ttf
+│       ├── defaultSettingsView.C8BeHuxd.css
+│       ├── index.B_TqY17P.css
+│       ├── index.html
+│       ├── index.oNry3Hjv.js
+│       ├── manifest.webmanifest
+│       ├── playwright-logo.svg
+│       ├── snapshot.B_Jk1wbt.js
+│       ├── snapshot.html
+│       ├── sw.bundle.js
+│       ├── uiMode.CyMfwkXJ.css
+│       ├── uiMode.CYwC_gH1.js
+│       ├── uiMode.html
+│       └── xtermModule.kHJ-D0s7.css
+├── playwright.config.js
 ├── [public]
 │   ├── icon.ico
 │   └── icon.png
@@ -187,12 +212,16 @@ Estrutura do Projeto com Descrições:
 │           └── folder.yml
 ├── [tests]
 │   ├── [e2e]
+│   │   └── app.spec.js
 │   ├── [fixtures]
 │   │   ├── chapter.md
 │   │   ├── folder.yml
 │   │   ├── metadata-completo.yml
 │   │   └── metadata-incompleto.yml
 │   ├── [integration]
+│   │   ├── chat-message.test.js
+│   │   ├── file-sync.test.js
+│   │   └── save-temp.test.js
 │   ├── [reports]
 │   │   └── [html]
 │   │       ├── [assets]
@@ -215,4 +244,5 @@ Estrutura do Projeto com Descrições:
 │               └── markdown.test.js
 ├── vite.main.config.mjs
 ├── vite.preload.config.mjs
-└── vite.renderer.config.mjs
+├── vite.renderer.config.mjs
+└── vitest.config.js
