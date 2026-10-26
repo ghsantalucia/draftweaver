@@ -12,7 +12,7 @@ import { domainBus } from "../../events/domainBus.js";
  * @param {Object} aiService - Instância do AiService.
  */
 export async function onSendMessage({ promptText }, aiService) {
-  if (!promptText || !promptText.trim()) return;
+  if (!promptText || !promptText.trim()) return false;
 
   try {
     // 1. Cria a estrutura da mensagem do usuário
@@ -23,9 +23,7 @@ export async function onSendMessage({ promptText }, aiService) {
     };
 
     // 2. Salva no disco (AGUARDA a gravação ser concluída)
-    if (aiService) {
-      await aiService.saveMessage(userMessage);
-    }
+    await aiService.saveMessage(userMessage);
 
     // 3. Renderiza a mensagem do usuário na interface
     uiBus.emit("chat:render-message", userMessage);
@@ -67,13 +65,14 @@ export async function onSendMessage({ promptText }, aiService) {
 
     // Renderiza uma mensagem de erro na interface para feedback visual
     uiBus.emit("chat:render-message", {
-      role: "assistant",
+      role: "system",
       content:
         "Desculpe, ocorreu um erro ao processar sua solicitação. Tente novamente.",
     });
   } finally {
     // 10. Libera o carregamento da UI independente do resultado
     uiBus.emit("chat:set-loading", false);
+    return true;
   }
 }
 

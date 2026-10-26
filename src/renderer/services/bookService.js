@@ -123,7 +123,7 @@ export class BookService {
 
   async getMap(bookPath) {
     const bookTree = await window.electronAPI.getTree(bookPath);
-    console.log(bookTree);
+
     return bookTree;
   }
 }

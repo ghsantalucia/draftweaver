@@ -14,9 +14,15 @@ const MOCK_RESPONSES = [
  * @param {string} params.prompt
  * @returns {Promise<string>}
  */
-export async function sendRequest({ prompt }) {
+export async function sendRequest({ prompt, history }) {
   await new Promise((resolve) => setTimeout(resolve, 1200));
 
   const randomIndex = Math.floor(Math.random() * MOCK_RESPONSES.length);
-  return MOCK_RESPONSES[randomIndex];
+  let response = MOCK_RESPONSES[randomIndex];
+
+  if (prompt === "Return strictly: Test passed.") {
+    response = "Test passed.";
+  }
+
+  return response;
 }
