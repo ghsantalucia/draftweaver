@@ -27,6 +27,48 @@ export async function onConfigChanged(payload, state, bookService) {
 }
 
 /**
+ * Persiste o provider de IA, o modelo e a chave de API escolhidos.
+ * @param {Object} data
+ * @param {string} data.provider - ID do provider selecionado.
+ * @param {string} [data.model] - Modelo escolhido.
+ * @param {string} [data.apiKey] - Chave de API.
+ * @param {Object} aiService - Instância do AiService.
+ */
+export async function onAiSettingsSave(data, aiService) {
+  try {
+    const saved = await aiService.saveSettings(data);
+    uiBus.emit("toast:show", {
+      message: saved
+        ? "Configurações de IA salvas."
+        : "Não foi possível salvar as configurações de IA.",
+      type: saved ? "success" : "error",
+    });
+  } catch (err) {
+    console.error("[ConfigHandler] Erro ao salvar configurações de IA:", err);
+    uiBus.emit("toast:show", {
+      message: "Erro ao salvar configurações de IA.",
+      type: "error",
+    });
+  }
+}
+
+/**
+ * Busca os modelos disponíveis do provider e avisa a interface. Falhas (chave inválida,
+ * sem rede) são silenciosas: o select continua com a lista padrão.
+ * @param {Object} data
+ * @param {string} data.provider - ID do provider.
+ * @param {Object} aiService - Instância do AiService.
+ */
+export async function onAiModelsRequested({ provider }, aiService) {
+  try {
+    const models = await aiService.listModels(provider);
+    if (models) uiBus.emit("ai-settings:models-loaded", { provider, models });
+  } catch (err) {
+    console.warn("[ConfigHandler] Não foi possível listar modelos:", err);
+  }
+}
+
+/**
  * Processa a alteração de um arquivo config.json do projeto atual detectada no sistema de arquivos.
  * @param {Object} state - Estado global da aplicação.
  * @param {Object|string} config - Conteúdo parseado do config.json ou string JSON.

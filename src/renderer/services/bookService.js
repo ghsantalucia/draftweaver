@@ -4,6 +4,7 @@
 
 import { domainBus } from "../events/domainBus.js";
 import { uiBus } from "../events/uiBus.js";
+import { normalizePath } from "../utils/helpers.js";
 
 export class BookService {
   /**
@@ -97,13 +98,13 @@ export class BookService {
    * @async
    * @returns {Promise<void>}
    */
-  async updateConfig() {
-    if (!this.state || !this.state.currentBookPath || !this.state.bookList) {
+  async updateConfig(bookPath = this.state?.currentBookPath) {
+    if (!this.state || !bookPath || !this.state.bookList) {
       return;
     }
 
     const currentBook = this.state.bookList.find(
-      (book) => book.fullPath === this.state.currentBookPath,
+      (book) => book.fullPath === bookPath,
     );
     if (!currentBook) return;
 
@@ -119,6 +120,27 @@ export class BookService {
     } catch (err) {
       console.error("[BookService] Erro ao salvar config.json do livro:", err);
     }
+  }
+
+  /**
+   * Ativa/desativa o `ai_lock` no config.json do projeto informado. O watcher de arquivos
+   * detecta a mudança e a interface bloqueia/libera o editor (fluxo único para todas as IAs).
+   * @param {string} bookPath - Caminho absoluto do livro.
+   * @param {boolean} locked
+   * @returns {Promise<void>}
+   */
+  async setAiLock(bookPath, locked) {
+    const norm = (p) => normalizePath(p);
+    const book = this.state.bookList?.find(
+      (b) => norm(b.fullPath) === norm(bookPath),
+    );
+    if (!book) return;
+
+    book.ai_lock = locked;
+    if (norm(this.state.currentBookPath) === norm(bookPath)) {
+      this.state.aiLockState = locked;
+    }
+    await this.updateConfig(book.fullPath);
   }
 
   async getMap(bookPath) {

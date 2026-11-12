@@ -87,10 +87,11 @@ export async function syncMultipleFiles(filePaths, fileService, state) {
 /**
  * Varre o sistema de arquivos via FileService e abre o modal de sincronização.
  */
-export async function onSyncOpenModal(fileService, state) {
+export async function onSyncOpenModal(fileService, state, onDone = null) {
   const tempFiles = await fileService.getPendingTempFiles();
 
   if (tempFiles.length === 0) {
+    onDone?.();
     uiBus.emit("toast:show", {
       message: "Nenhum arquivo pendente de sincronização.",
       type: "info",
@@ -101,10 +102,16 @@ export async function onSyncOpenModal(fileService, state) {
   const template = Handlebars.compile(syncFormTpl);
   const modalContentHtml = template({ tempFiles });
 
+  // `onDone` é chamado quando o fluxo termina: após sincronizar ou ao fechar sem sincronizar.
+  let syncing = false;
+
   uiBus.emit("modal:open", {
     id: "sync-files-modal",
     title: "Sincronizar Alterações Pendentes",
     content: modalContentHtml,
+    onClose: () => {
+      if (!syncing) onDone?.();
+    },
     buttons: [
       { text: "Cancelar", class: "btn-secondary" },
       {
@@ -126,8 +133,10 @@ export async function onSyncOpenModal(fileService, state) {
             return;
           }
 
+          syncing = true;
           modalInstance.close();
           await syncMultipleFiles(pathsToSync, fileService, state);
+          onDone?.();
         },
       },
     ],
@@ -421,4 +430,18 @@ export async function handlePendingTempFiles(fileService) {
   // Envia lista de arquivos pendentes atualizados para ouvintes (botão sync e explorer)
   const pendingFiles = await fileService.getPendingTempFiles();
   uiBus.emit("temp-files:pending-list", pendingFiles);
+}
+
+/**
+ * Exige que todos os rascunhos do projeto sejam resolvidos (usado antes de a IA editar arquivos).
+ * @param {{onDone: Function}} payload - `onDone` é chamado quando o usuário termina ou desiste.
+ * @param {Object} fileService
+ * @param {Object} state
+ */
+export async function onSyncRequireAll({ onDone }, fileService, state) {
+  uiBus.emit("toast:show", {
+    message: "Sincronize os rascunhos pendentes para a IA poder editar.",
+    type: "info",
+  });
+  await onSyncOpenModal(fileService, state, onDone);
 }

@@ -32,6 +32,17 @@ export class DomainController {
       // ...
     });
 
+    // A IA vai editar arquivos: trava o projeto (ai_lock no config.json do livro)
+    domainBus.on("ai:edit-started", ({ bookPath }) => {
+      this.services.book.setAiLock(bookPath, true);
+    });
+
+    // A IA terminou: libera o projeto e pede a revisão dos arquivos alterados
+    domainBus.on("ai:edit-finished", async ({ bookPath, files }) => {
+      await this.services.book.setAiLock(bookPath, false);
+      if (files.length > 0) uiBus.emit("ai-review:open", { files });
+    });
+
     // Evento disparado quando um livro é selecionado
     domainBus.on("fs:config-changed", async (payload) => {
       config.onConfigChanged(payload, this.state, this.services.book);

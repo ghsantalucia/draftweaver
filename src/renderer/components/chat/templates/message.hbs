@@ -1,1 +1,1 @@
-<div class="ai-message {{role}}">{{content}}</div>
+<div class="ai-message {{role}}{{#if html}} markdown{{/if}}">{{#if html}}{{{html}}}{{else}}{{content}}{{/if}}</div>

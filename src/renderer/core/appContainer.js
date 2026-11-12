@@ -124,6 +124,11 @@ export class AppContainer {
       localStorage.getItem("last_selected_book") || null;
     this.state.currentFilePath =
       localStorage.getItem("last_opened_file") || null;
+
+    await this.services.ai.loadSettings();
+
+    // Atualiza em segundo plano a lista de modelos (janela de contexto) do provider ativo
+    this.services.ai.listModels(this.state.aiProvider).catch(() => {});
   }
 
   /**

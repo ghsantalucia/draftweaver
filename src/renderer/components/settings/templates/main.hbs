@@ -11,4 +11,24 @@
             <span class="slider"></span>
         </label>
     </div>
+
+    <div class="settings-section">
+        <label class="settings-label" for="ai-provider-select">Provedor de IA</label>
+        <select id="ai-provider-select" class="settings-input" event-change="ai-settings:changed"
+            data-field="provider">
+            {{#each providers}}
+            <option value="{{id}}" {{#if selected}}selected{{/if}}>{{label}}</option>
+            {{/each}}
+        </select>
+
+        <label class="settings-label" for="ai-model-select">Modelo</label>
+        <select id="ai-model-select" class="settings-input" event-change="ai-settings:changed" data-field="model">
+        </select>
+
+        <div id="ai-key-group" class="settings-key-group">
+            <label class="settings-label" for="ai-api-key">Chave de API</label>
+            <input id="ai-api-key" class="settings-input" type="password" autocomplete="off" spellcheck="false"
+                placeholder="Cole sua chave de API" event-change="ai-settings:changed" data-field="key">
+        </div>
+    </div>
 </div>

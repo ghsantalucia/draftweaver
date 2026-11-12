@@ -7,6 +7,7 @@ import templateHtml from "./templates/main.hbs?raw";
 import { initStarryBackground } from "./animations.js";
 import { Component } from "../Component.js";
 import { gsap } from "gsap";
+import { renderChatMarkdown } from "../../utils/chatMarkdown.js";
 
 import messageTpl from "./templates/message.hbs?raw";
 import dateDividerTpl from "./templates/dateDivider.hbs?raw";
@@ -80,6 +81,23 @@ export class ChatComponent extends Component {
 
       this.renderChatHistory(messages, hasMore);
     });
+
+    // Atualiza a faixa de consumo de tokens
+    this.domainBus.on("ai:usage-updated", (usage) => {
+      this.updateUsageBar(usage);
+    });
+
+    // A IA começou a editar arquivos: ajusta o texto do indicador
+    this.domainBus.on("ai:edit-started", () => {
+      this.setWorkingLabel("A IA está editando arquivos…");
+    });
+
+    // Links no chat nunca navegam a janela do app
+    document
+      .getElementById("ai-chat-messages")
+      ?.addEventListener("click", (e) => {
+        if (e.target.closest("a")) e.preventDefault();
+      });
 
     // Limpa a caixa de mensagens
     this.uiBus.on("chat:clear", () => {
@@ -159,7 +177,8 @@ export class ChatComponent extends Component {
     if (!chatContainer) return;
 
     const messageElement = this.createMessageElement(msgData);
-    chatContainer.appendChild(messageElement);
+    const indicator = chatContainer.querySelector("#ai-working-indicator");
+    chatContainer.insertBefore(messageElement, indicator);
     this.scrollToBottom();
   }
 
@@ -266,6 +285,12 @@ export class ChatComponent extends Component {
 
     if (textarea) {
       textarea.disabled = isLoading;
+      if (isLoading) {
+        this.defaultPlaceholder ??= textarea.placeholder;
+        textarea.placeholder = "A IA está trabalhando…";
+      } else if (this.defaultPlaceholder) {
+        textarea.placeholder = this.defaultPlaceholder;
+      }
       if (
         !isLoading &&
         document.getElementById("chat-container").classList.contains("expanded")
@@ -279,6 +304,77 @@ export class ChatComponent extends Component {
       btnSend.style.opacity = isLoading ? "0.5" : "1";
       btnSend.style.pointerEvents = isLoading ? "none" : "auto";
     }
+
+    this.toggleWorkingIndicator(isLoading);
+  }
+
+  /**
+   * Mostra/remove o indicador "A IA está trabalhando…" ao final das mensagens.
+   * @param {boolean} show
+   * @returns {void}
+   */
+  toggleWorkingIndicator(show) {
+    const chatContainer = document.getElementById("ai-chat-messages");
+    if (!chatContainer) return;
+
+    chatContainer.querySelector("#ai-working-indicator")?.remove();
+    if (!show) return;
+
+    const indicator = this.createDOMElement(
+      `<div class="ai-message assistant ai-working" id="ai-working-indicator">
+        <span class="ai-working-dots"><i></i><i></i><i></i></span>
+        <span class="ai-working-label">A IA está trabalhando…</span>
+      </div>`,
+    );
+    chatContainer.appendChild(indicator);
+    this.scrollToBottom();
+  }
+
+  /**
+   * Altera o texto do indicador de trabalho, se ele estiver visível.
+   * @param {string} label
+   * @returns {void}
+   */
+  setWorkingLabel(label) {
+    const el = document.querySelector(
+      "#ai-working-indicator .ai-working-label",
+    );
+    if (el) el.textContent = label;
+  }
+
+  /**
+   * Atualiza a faixa de consumo de tokens da sessão.
+   * @param {{inputTokens: number, outputTokens: number, contextTokens: number, contextWindow: number|null}} usage
+   * @returns {void}
+   */
+  updateUsageBar({ inputTokens, outputTokens, contextTokens, contextWindow }) {
+    const text = document.getElementById("ai-usage-text");
+    const meter = document.getElementById("ai-usage-meter");
+    const fill = document.getElementById("ai-usage-meter-fill");
+    const context = document.getElementById("ai-usage-context");
+    if (!text || !meter || !fill || !context) return;
+
+    const fmt = (n) =>
+      n >= 1_000_000
+        ? `${(n / 1_000_000).toFixed(1)}M`
+        : n >= 1000
+          ? `${(n / 1000).toFixed(1)}k`
+          : String(n);
+
+    text.textContent = `Sessão: ${fmt(inputTokens + outputTokens)} tokens (↑${fmt(inputTokens)} ↓${fmt(outputTokens)})`;
+
+    if (!contextWindow) {
+      meter.hidden = true;
+      context.textContent = "";
+      return;
+    }
+
+    const percent = Math.min(100, (contextTokens / contextWindow) * 100);
+    meter.hidden = false;
+    fill.style.width = `${percent}%`;
+    fill.classList.toggle("warn", percent >= 70);
+    fill.classList.toggle("danger", percent >= 90);
+    context.textContent = `Contexto: ${percent.toFixed(percent < 10 ? 1 : 0)}% de ${fmt(contextWindow)}`;
   }
 
   /**
@@ -397,7 +493,12 @@ export class ChatComponent extends Component {
    * @returns {HTMLElement} Elemento DOM do nó da mensagem pronto para injeção.
    */
   createMessageElement({ role, content }) {
-    const html = this.compile(messageTpl, { role, content });
+    // Respostas da IA vêm em Markdown; mensagens do usuário continuam texto puro
+    const html = this.compile(messageTpl, {
+      role,
+      content,
+      html: role === "assistant" ? renderChatMarkdown(content) : null,
+    });
     return this.createDOMElement(html);
   }
 

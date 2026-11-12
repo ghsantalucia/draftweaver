@@ -1,0 +1,18 @@
+<div class="ai-review">
+    <p class="ai-review-hint">
+        Verde: linhas novas da IA. Cinza riscado: linhas removidas. A versão nova é editável; o que estiver nela ao
+        clicar em <strong>Manter versão nova</strong> será salvo.
+    </p>
+    <div class="ai-review-panes">
+        <section class="ai-review-pane">
+            <header class="ai-review-pane-title">Versão atual</header>
+            <div class="ai-review-old">
+                {{#each oldLines}}<div class="diff-line{{#if deleted}} diff-deleted{{/if}}">{{text}}</div>{{/each}}
+            </div>
+        </section>
+        <section class="ai-review-pane">
+            <header class="ai-review-pane-title">Versão da IA (editável)</header>
+            <div class="ai-review-new" id="ai-review-editor"></div>
+        </section>
+    </div>
+</div>

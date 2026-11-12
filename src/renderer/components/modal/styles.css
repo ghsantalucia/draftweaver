@@ -332,3 +332,93 @@
   margin-top: 8px;
   margin-bottom: 0;
 }
+
+/* ==========================================================================
+   JANELA DE REVISÃO DAS ALTERAÇÕES DA IA (comparação lado a lado)
+   ========================================================================== */
+
+.app-modal-window.modal-wide {
+  width: 94vw;
+  max-width: 94vw;
+  height: 88vh;
+}
+
+.app-modal-window.modal-wide .modal-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ai-review {
+  color: #cdd6f4;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-height: 0;
+}
+
+.ai-review-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted, #a6adc8);
+}
+
+.ai-review-panes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+}
+
+.ai-review-pane {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: 1px solid var(--border-app, rgba(255, 255, 255, 0.1));
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.ai-review-pane-title {
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.15);
+  color: var(--text-muted, #a6adc8);
+}
+
+.ai-review-old,
+.ai-review-new {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.ai-review-old {
+  padding: 8px 0;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 0.85rem;
+}
+
+.diff-line {
+  min-height: 1.5em;
+  padding: 0 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.diff-line.diff-deleted {
+  color: #8b8f9c;
+  text-decoration: line-through;
+  background: rgba(139, 143, 156, 0.12);
+}
+
+/* Linhas novas no editor da versão da IA */
+.ai-review-new .diff-added {
+  background: rgba(46, 213, 115, 0.14);
+  box-shadow: inset 3px 0 0 rgba(46, 213, 115, 0.6);
+}

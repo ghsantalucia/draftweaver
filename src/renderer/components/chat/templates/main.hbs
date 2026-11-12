@@ -15,6 +15,15 @@
         <!-- Mensagens de chat do assistente de IA -->
     </div>
 
+    <div class="ai-usage-bar" id="ai-usage-bar"
+        title="As APIs não informam a cota restante da conta. A barra mostra quanto da janela de contexto do modelo está ocupada.">
+        <span class="ai-usage-text" id="ai-usage-text">Sessão: 0 tokens</span>
+        <div class="ai-usage-meter" id="ai-usage-meter" hidden>
+            <div class="ai-usage-meter-fill" id="ai-usage-meter-fill"></div>
+        </div>
+        <span class="ai-usage-context" id="ai-usage-context"></span>
+    </div>
+
     <div class="ai-chat-input-container">
         <div class="ai-input-wrapper">
             <!-- Campo de Texto -->

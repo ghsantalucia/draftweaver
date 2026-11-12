@@ -3,9 +3,15 @@
  */
 
 import { normalizePath } from "../utils/helpers.js";
+import { uiBus } from "../events/uiBus.js";
+import { domainBus } from "../events/domainBus.js";
 import * as ai from "../ai/aiGateway.js";
+import { DEFAULT_AI_PROVIDER, getProviderInfo } from "../ai/providers/index.js";
 
 const MAX_MESSAGES_PER_FILE = 50;
+
+const SYNC_DENIED_MESSAGE =
+  "Existem rascunhos (.temp) não sincronizados no projeto e o autor não os sincronizou. Nenhuma alteração foi feita. Avise o autor que é obrigatório sincronizar tudo antes de a IA editar arquivos.";
 
 /**
  * Obtém a data atual formatada como YYYY-MM-DD para nomear a sessão do chat.
@@ -28,8 +34,70 @@ export class AiService {
    * Cria uma instância do AiService.
    * @param {Object} state - Instância do gerenciador de estado global da aplicação.
    */
-  constructor(state) {
+  constructor(state, fileService) {
     this.state = state;
+    this.fileService = fileService;
+  }
+
+  /**
+   * Carrega do disco as configurações de IA (provider, modelo e chave de cada provider) para o state.
+   * @returns {Promise<void>}
+   */
+  async loadSettings() {
+    const saved = await window.electronAPI.getAiSettings();
+    if (!saved || typeof saved !== "object") return;
+
+    const provider = getProviderInfo(saved.provider)
+      ? saved.provider
+      : DEFAULT_AI_PROVIDER;
+
+    this.state.aiSettings = { provider, providers: saved.providers || {} };
+    this.state.aiProvider = provider;
+  }
+
+  /**
+   * Atualiza o provider ativo e/ou a chave e o modelo dele, persistindo no arquivo JSON.
+   * @param {Object} params
+   * @param {string} params.provider - ID do provider selecionado.
+   * @param {string} [params.apiKey] - Chave de API do provider.
+   * @param {string} [params.model] - Modelo escolhido para o provider.
+   * @returns {Promise<boolean>} Verdadeiro se salvou com sucesso.
+   */
+  async saveSettings({ provider, apiKey, model }) {
+    const providers = { ...this.state.aiSettings.providers };
+    const current = { ...providers[provider] };
+    if (apiKey !== undefined) current.apiKey = apiKey.trim();
+    if (model) current.model = model;
+    providers[provider] = current;
+
+    const settings = { provider, providers };
+    const result = await window.electronAPI.saveAiSettings(settings);
+    if (!result?.success) return false;
+
+    this.state.aiSettings = settings;
+    this.state.aiProvider = provider;
+    this.publishUsage();
+    return true;
+  }
+
+  /**
+   * Busca na API do provider a lista de modelos disponíveis para a chave salva.
+   * @param {string} provider - ID do provider.
+   * @returns {Promise<Array<{id: string, label: string}>|null>} Null se não houver chave ou suporte.
+   */
+  async listModels(provider) {
+    const config = this.state.aiSettings.providers?.[provider];
+    if (!config?.apiKey || !getProviderInfo(provider)) return null;
+
+    const providerModule = await import(`../ai/providers/${provider}/index.js`);
+    if (typeof providerModule.listModels !== "function") return null;
+
+    const models = await providerModule.listModels(config);
+    if (models.length === 0) return null;
+
+    this.state.aiModels[provider] = models;
+    this.publishUsage();
+    return models;
   }
 
   /**
@@ -46,22 +114,118 @@ export class AiService {
   }
 
   /**
-   * Envia uma mensagem/prompt para o gateway e retorna a resposta crua da IA.
+   * Janela de contexto do modelo ativo (da lista da API ou do catálogo padrão), se conhecida.
+   * @returns {number|null}
+   */
+  getContextWindow() {
+    const provider = this.state.aiProvider;
+    const info = getProviderInfo(provider);
+    const model =
+      this.state.aiSettings.providers?.[provider]?.model || info?.defaultModel;
+    const known = [
+      ...(this.state.aiModels[provider] || []),
+      ...(info?.models || []),
+    ];
+    return known.find((m) => m.id === model)?.contextWindow || null;
+  }
+
+  /**
+   * Publica o consumo de tokens atual (e a janela de contexto) para a interface.
+   */
+  publishUsage() {
+    domainBus.emit("ai:usage-updated", {
+      ...this.state.aiUsage,
+      contextWindow: this.getContextWindow(),
+    });
+  }
+
+  /**
+   * Zera o consumo de tokens (nova sessão de chat).
+   */
+  resetUsage() {
+    this.state.aiUsage = { inputTokens: 0, outputTokens: 0, contextTokens: 0 };
+    this.publishUsage();
+  }
+
+  /**
+   * Abre o modal de sincronização e aguarda o usuário resolver todos os rascunhos (.temp) do projeto.
+   * @returns {Promise<boolean>} Verdadeiro se não restou nenhum rascunho pendente.
+   */
+  async requireFullSync() {
+    const pending = await this.fileService.getPendingTempFiles();
+    if (pending.length === 0) return true;
+
+    await new Promise((resolve) => {
+      uiBus.emit("sync:require-all", { onDone: resolve });
+    });
+
+    return (await this.fileService.getPendingTempFiles()).length === 0;
+  }
+
+  /**
+   * Envia uma mensagem/prompt para o gateway e retorna o texto da resposta da IA.
+   *
+   * Fluxo de edição (igual para todos os provedores): na primeira ferramenta que escreve,
+   * exige que todos os rascunhos do projeto estejam sincronizados, trava o projeto
+   * (`ai:edit-started`) e, ao final da resposta, libera (`ai:edit-finished`) e pede a revisão
+   * dos arquivos alterados.
    * @param {Object} params
    * @param {string} params.prompt - Texto simples enviado pelo usuário.
    * @param {Array} [params.history=[]] - Histórico de mensagens anteriores (se houver).
-   * @returns {Promise<string|Object>} Resposta crua retornada pelo provedor ativo.
+   * @returns {Promise<string>} Texto da resposta do provedor ativo.
    */
   async sendMessage({ prompt, history = [] }) {
+    const bookPath = this.state.currentBookPath;
+    const session = { locked: false, syncDenied: false, files: new Set() };
+
+    const toolContext = {
+      state: this.state,
+      fileService: this.fileService,
+
+      beginEdit: async () => {
+        if (session.locked) return;
+        if (session.syncDenied) throw new Error(SYNC_DENIED_MESSAGE);
+
+        if (!(await this.requireFullSync())) {
+          session.syncDenied = true;
+          throw new Error(SYNC_DENIED_MESSAGE);
+        }
+
+        session.locked = true;
+        domainBus.emit("ai:edit-started", { bookPath });
+      },
+
+      recordEdit: (filePath) => session.files.add(filePath),
+    };
+
     try {
-      const response = await ai.processPrompt({ prompt, history }, this.state);
-      return response;
+      const { text, usage } = await ai.processPrompt(
+        { prompt, history },
+        this.state,
+        toolContext,
+      );
+
+      this.state.aiUsage = {
+        inputTokens: this.state.aiUsage.inputTokens + usage.inputTokens,
+        outputTokens: this.state.aiUsage.outputTokens + usage.outputTokens,
+        contextTokens: usage.contextTokens,
+      };
+      this.publishUsage();
+
+      return text;
     } catch (error) {
       console.error(
         "[AiService] Erro ao enviar mensagem para o gateway:",
         error,
       );
       throw error;
+    } finally {
+      if (session.locked) {
+        domainBus.emit("ai:edit-finished", {
+          bookPath,
+          files: [...session.files],
+        });
+      }
     }
   }
 

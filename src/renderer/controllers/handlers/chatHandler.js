@@ -65,6 +65,8 @@ export async function onSendMessage({ promptText }, aiService) {
   } catch (error) {
     console.error("[ChatHandler] Falha ao processar mensagem do chat:", error);
 
+    uiBus.emit("toast:show", { message: error.message, type: "error" });
+
     // Renderiza uma mensagem de erro na interface para feedback visual
     uiBus.emit("chat:render-message", {
       role: "assistant",

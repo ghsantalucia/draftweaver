@@ -49,6 +49,20 @@ export function parseMarkdown(fileContent, isYmlOnly = false) {
 }
 
 /**
+ * Separa o bloco de Frontmatter (texto bruto, intacto) do corpo do Markdown.
+ * @param {string} fileContent Conteúdo bruto do arquivo
+ * @returns {{ frontmatter: string, body: string }} `frontmatter` inclui os delimitadores `---` e a quebra final (ou "" se não houver).
+ */
+export function splitFrontmatter(fileContent) {
+  const match = (fileContent || "").match(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/);
+  if (!match) return { frontmatter: "", body: fileContent || "" };
+  return {
+    frontmatter: match[0],
+    body: fileContent.slice(match[0].length),
+  };
+}
+
+/**
  * Reconstrói o bloco Frontmatter YAML e anexa ao corpo em Markdown para salvamento.
  * @param {Object} metadata Objeto de metadados
  * @param {string} body Texto do Markdown

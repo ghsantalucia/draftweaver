@@ -64,6 +64,30 @@ export class State {
     this.currentFileMetadata = {};
 
     /**
+     * Provedor de IA ativo (nome da pasta em /ai/providers).
+     * @type {string}
+     */
+    this.aiProvider = "claude";
+
+    /**
+     * Configurações de IA persistidas: { provider, providers: { [id]: { apiKey } } }
+     * @type {Object}
+     */
+    this.aiSettings = { provider: "claude", providers: {} };
+
+    /**
+     * Modelos conhecidos por provider (vindos da API), com janela de contexto.
+     * @type {Object<string, Array<{id: string, label: string, contextWindow?: number}>>}
+     */
+    this.aiModels = {};
+
+    /**
+     * Consumo de tokens da sessão atual do chat.
+     * @type {{inputTokens: number, outputTokens: number, contextTokens: number}}
+     */
+    this.aiUsage = { inputTokens: 0, outputTokens: 0, contextTokens: 0 };
+
+    /**
      * Instância do editor de texto ativo.
      * @type {Object|null}
      */

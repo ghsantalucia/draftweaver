@@ -27,6 +27,13 @@ contextBridge.exposeInMainWorld("electronAPI", {
   /** Retorna a listagem de livros disponíveis na pasta raiz /books. */
   getBooksList: () => ipcRenderer.invoke("get-books-list"),
 
+  /** Lê as configurações de IA (provider ativo e chaves de API). */
+  getAiSettings: () => ipcRenderer.invoke("get-ai-settings"),
+
+  /** Salva as configurações de IA em arquivo JSON. */
+  saveAiSettings: (settings) =>
+    ipcRenderer.invoke("save-ai-settings", settings),
+
   /** Altera o tema visual da barra de título nativa. */
   setNativeTheme: (isDark) => ipcRenderer.send("update-titlebar-theme", isDark),
 });

@@ -48,3 +48,40 @@
   flex-direction: column;
   gap: 15px;
 }
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 15px;
+  border-top: 1px solid var(--toggle-bg);
+}
+
+.settings-label {
+  font-size: 0.85rem;
+  color: var(--text-header);
+}
+
+.settings-input {
+  background: var(--toggle-bg);
+  color: var(--text-sidebar);
+  border: 1px solid var(--sidebar-separator);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.settings-input:focus {
+  border-color: var(--file-active-bg);
+}
+
+.settings-key-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-key-group.hidden {
+  display: none;
+}

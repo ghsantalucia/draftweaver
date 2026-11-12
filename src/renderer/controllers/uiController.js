@@ -8,6 +8,7 @@ import * as book from "./handlers/bookHandler.js";
 import * as file from "./handlers/fileHandler.js";
 import * as chat from "./handlers/chatHandler.js";
 import * as config from "./handlers/configHandler.js";
+import * as aiReview from "./handlers/aiReviewHandler.js";
 
 /**
  * Controller responsável pelas reações visuais da interface.
@@ -81,6 +82,16 @@ export class UiController {
       file.onSyncOpenModal(this.services.file, this.state);
     });
 
+    // A IA vai editar arquivos: exige a sincronização de todos os rascunhos antes
+    uiBus.on("sync:require-all", (payload) => {
+      file.onSyncRequireAll(payload, this.services.file, this.state);
+    });
+
+    // Abre a janela de comparação das alterações feitas pela IA
+    uiBus.on("ai-review:open", (payload) => {
+      aiReview.onAiReviewOpen(payload, this.services.file);
+    });
+
     // Lida com seleção de livro/projeto
     uiBus.on("book:selected", (e) => {
       if (e.nativeEvent) {
@@ -94,6 +105,7 @@ export class UiController {
     uiBus.on("book:changed", (bookPath) => {
       book.onBookChange(this.state);
       chat.loadHistory(0, this.services.ai);
+      this.services.ai.resetUsage();
       file.handlePendingTempFiles(this.services.file);
       config.onCurrentConfigChanged(this.state, this.state.currentBookMetadata);
     });
@@ -121,6 +133,16 @@ export class UiController {
     // Envia mensagem para IA
     uiBus.on("chat:send-message", (data) => {
       chat.onSendMessage(data, this.services.ai);
+    });
+
+    // Salva provider, modelo e chave de API da IA
+    uiBus.on("ai-settings:save-requested", (data) => {
+      config.onAiSettingsSave(data, this.services.ai);
+    });
+
+    // Atualiza a lista de modelos do provider
+    uiBus.on("ai-settings:models-requested", (data) => {
+      config.onAiModelsRequested(data, this.services.ai);
     });
 
     // Solicita mais histórico de chat

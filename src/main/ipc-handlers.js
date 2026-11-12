@@ -5,7 +5,10 @@
 import fs from "node:fs";
 import path from "node:path";
 const matter = require("gray-matter");
-import { ipcMain, dialog } from "electron";
+import { app, ipcMain, dialog } from "electron";
+
+/** Arquivo JSON (na pasta de dados do usuário) com o provider de IA ativo e suas chaves. */
+const AI_SETTINGS_FILE = "ai-settings.json";
 
 /**
  * Configura todos os ouvintes de eventos IPC do processo principal.
@@ -89,6 +92,35 @@ export function setupIpcHandlers(mainWindow) {
       await fs.promises.writeFile(filePath, content, "utf-8");
       return { success: true };
     } catch (err) {
+      return { success: false, error: err.message };
+    }
+  });
+
+  // Lê as configurações de IA (provider ativo + chaves de API). Retorna null se ainda não existirem.
+  ipcMain.handle("get-ai-settings", async () => {
+    try {
+      const filePath = path.join(app.getPath("userData"), AI_SETTINGS_FILE);
+      if (!fs.existsSync(filePath)) return null;
+      return JSON.parse(await fs.promises.readFile(filePath, "utf-8"));
+    } catch (err) {
+      console.error("[MAIN IPC get-ai-settings] Erro:", err);
+      return null;
+    }
+  });
+
+  // Persiste as configurações de IA no arquivo JSON da pasta de dados do usuário.
+  ipcMain.handle("save-ai-settings", async (event, settings) => {
+    try {
+      const filePath = path.join(app.getPath("userData"), AI_SETTINGS_FILE);
+      await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
+      await fs.promises.writeFile(
+        filePath,
+        JSON.stringify(settings, null, 2),
+        "utf-8",
+      );
+      return { success: true };
+    } catch (err) {
+      console.error("[MAIN IPC save-ai-settings] Erro:", err);
       return { success: false, error: err.message };
     }
   });

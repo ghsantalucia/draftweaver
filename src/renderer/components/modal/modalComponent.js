@@ -16,7 +16,7 @@ export class ModalComponent extends Component {
    * Cria uma instância do ModalComponent.
    * @param {string} selector - Seletor CSS do container onde o modal será inserido (ex: '#modal-container').
    * @param {Object} context - Objeto de contexto e infraestrutura (state, uiBus, domainBus).
-   * @param {Object|null} [params=null] - Configurações do modal (id, title, content, buttons, onClose).
+   * @param {Object|null} [params=null] - Configurações do modal (id, title, content, buttons, onClose, windowClass, closable).
    * @param {Component|null} [parent=null] - Componente pai opcional.
    */
   constructor(selector, context, params = null, parent = null) {
@@ -50,6 +50,14 @@ export class ModalComponent extends Component {
    * Gancho do ciclo de vida executado logo após a renderização inicial do HTML.
    */
   onInit() {
+    const windowEl = this.element.querySelector(".app-modal-window");
+    if (this.modalConfig.windowClass) {
+      windowEl?.classList.add(this.modalConfig.windowClass);
+    }
+    if (this.modalConfig.closable === false) {
+      this.element.querySelector(".modal-close-btn")?.remove();
+    }
+
     // Renderiza botões dinamicamente no rodapé, se houver
     if (this.buttons.length > 0) {
       const footer = this.element.querySelector(".modal-footer");

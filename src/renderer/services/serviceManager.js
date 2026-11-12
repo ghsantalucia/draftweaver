@@ -23,7 +23,7 @@ export class ServiceManager {
     // Instancia os serviços injetando as dependências necessárias
     this.file = new FileService(this.state);
     this.book = new BookService(this.state, this.file);
-    this.ai = new AiService(this.state);
+    this.ai = new AiService(this.state, this.file);
   }
 }
 
